@@ -109,6 +109,18 @@ def give_fireplace(game: Game, number: int) -> None:
     game.players[number - 1].has_fireplace = True
 
 
+@when(parsers.parse("玩家 {number:d} 圍出一塊牧場"))
+def give_pasture(game: Game, number: int) -> None:
+    from oyster_omelette.pastures import enclose_one_pasture
+
+    enclose_one_pasture(game.players[number - 1].farm)
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 羊"))
+def give_sheep(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].sheep = count
+
+
 @when(parsers.parse("羊市上有 {count:d} 羊"))
 def set_sheep_pile(game: Game, count: int) -> None:
     game.space("sheep").accumulated = count
