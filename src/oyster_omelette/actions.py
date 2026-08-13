@@ -8,6 +8,7 @@ from oyster_omelette.farmyard import (
     plow_first_legal,
     sow_fields,
 )
+from oyster_omelette.animals import house_animals
 from oyster_omelette.pastures import enclose_one_pasture, next_pasture_cost
 
 
@@ -45,7 +46,10 @@ def cannot_use(player, space) -> str:
 
 def resolve_space(game, player, space) -> None:
     if space.resource is not None:
-        add_resource(player, space.resource, space.accumulated)
+        if space.resource in {"sheep", "wild_boar", "cattle"}:
+            house_animals(player, space.resource, space.accumulated)
+        else:
+            add_resource(player, space.resource, space.accumulated)
         space.accumulated = 0
         return
 
