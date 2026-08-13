@@ -25,6 +25,7 @@ class Cell:
     people: int = 0
     crop: str | None = None
     crop_count: int = 0
+    stable: bool = False
 
 
 @dataclass
@@ -181,6 +182,33 @@ def build_one_room(farm: Farmyard) -> bool:
     if spot is None:
         return False
     return place_room(farm, spot[0], spot[1])
+
+
+def first_legal_stable(farm: Farmyard) -> tuple[int, int] | None:
+    count = 0
+    for row in farm.cells:
+        for cell in row:
+            if cell.stable:
+                count += 1
+    if count >= 4:
+        return None
+    for row in range(farm.rows):
+        for col in range(farm.cols):
+            cell = farm.cell(row, col)
+            if cell.kind != CellKind.EMPTY:
+                continue
+            if cell.stable:
+                continue
+            return (row, col)
+    return None
+
+
+def build_one_stable(farm: Farmyard) -> bool:
+    spot = first_legal_stable(farm)
+    if spot is None:
+        return False
+    farm.cell(spot[0], spot[1]).stable = True
+    return True
 
 
 def plow_first_legal(farm: Farmyard) -> bool:

@@ -273,6 +273,11 @@ def then_in_pasture(game: Game, row: int, col: int) -> None:
     assert (row - 1, col - 1) in pasture_cells(game.players[0].farm)
 
 
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格應有畜舍"))
+def then_has_stable(game: Game, row: int, col: int) -> None:
+    assert game.players[0].farm.cell(row - 1, col - 1).stable
+
+
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 穀物"))
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 穀"))
 def then_player_grain(game: Game, number: int, count: int) -> None:
