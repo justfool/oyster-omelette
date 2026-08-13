@@ -1,0 +1,121 @@
+"""2 人版行動板：固定格與之後翻開的回合卡。"""
+
+from dataclasses import dataclass, field
+
+
+# 每回合準備時加上的資源與數量；沒拿走就堆疊。
+ACCUMULATION: dict[str, tuple[str, int]] = {
+    "forest": ("wood", 3),
+    "clay_pit": ("clay", 1),
+    "reed_bank": ("reed", 1),
+    "fishing": ("food", 1),
+    "sheep": ("sheep", 1),
+    "wild_boar": ("wild_boar", 1),
+    "cattle": ("cattle", 1),
+    "western_quarry": ("stone", 1),
+    "eastern_quarry": ("stone", 1),
+}
+
+FIXED_SPACE_IDS_2P: tuple[str, ...] = (
+    "farm_expansion",
+    "meeting_place",
+    "grain_seeds",
+    "farmland",
+    "lessons",
+    "day_laborer",
+    "forest",
+    "clay_pit",
+    "reed_bank",
+    "fishing",
+)
+
+# 14 張回合卡分 6 階段（4, 3, 2, 2, 2, 1）。
+STAGE_SIZES: tuple[int, ...] = (4, 3, 2, 2, 2, 1)
+
+# 正式遊戲各階段內應洗牌，測試可注入。
+# 未注入時用這份固定順序，避免測試不穩。
+DEFAULT_ROUND_CARDS: tuple[str, ...] = (
+    "fences",
+    "major_or_minor",
+    "sheep",
+    "sow_and_or_bake",
+    "family_growth",
+    "western_quarry",
+    "renovation",
+    "vegetable_seeds",
+    "wild_boar",
+    "cattle",
+    "eastern_quarry",
+    "plow_and_or_sow",
+    "family_growth_without_room",
+    "renovation_and_fences",
+)
+
+
+@dataclass
+class ActionSpace:
+    id: str
+    resource: str | None = None
+    replenish_amount: int = 0
+    accumulated: int = 0
+    occupant: int | None = None
+
+    def is_occupied(self) -> bool:
+        return self.occupant is not None
+
+    @property
+    def occupied_by(self) -> int | None:
+        return self.occupant
+
+    @property
+    def goods(self) -> dict[str, int]:
+        if self.resource is None:
+            return {}
+        return {self.resource: self.accumulated}
+
+
+def make_space(space_id: str) -> ActionSpace:
+    if space_id in ACCUMULATION:
+        resource, amount = ACCUMULATION[space_id]
+        return ActionSpace(
+            id=space_id,
+            resource=resource,
+            replenish_amount=amount,
+        )
+    return ActionSpace(id=space_id)
+
+
+@dataclass
+class Board:
+    spaces: dict[str, ActionSpace] = field(default_factory=dict)
+    revealed_round_cards: list[str] = field(default_factory=list)
+
+    def get(self, space_id: str) -> ActionSpace | None:
+        return self.spaces.get(space_id)
+
+    def __getitem__(self, space_id: str) -> ActionSpace:
+        return self.spaces[space_id]
+
+    def __contains__(self, space_id: object) -> bool:
+        return space_id in self.spaces
+
+    def add_space(self, space_id: str) -> ActionSpace:
+        space = make_space(space_id)
+        self.spaces[space_id] = space
+        return space
+
+    def replenish(self) -> None:
+        for space in self.spaces.values():
+            if space.replenish_amount:
+                space.accumulated += space.replenish_amount
+
+    def clear_occupants(self) -> None:
+        for space in self.spaces.values():
+            space.occupant = None
+
+
+def two_player_board() -> Board:
+    board = Board()
+    for space_id in FIXED_SPACE_IDS_2P:
+        board.add_space(space_id)
+    return board

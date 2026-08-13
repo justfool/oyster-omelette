@@ -49,3 +49,43 @@ def starting_farmyard() -> Farmyard:
     cells[0][0] = Cell(kind=CellKind.WOOD_ROOM, people=1)
     cells[1][0] = Cell(kind=CellKind.WOOD_ROOM, people=1)
     return Farmyard(cells=cells)
+
+
+def _rooms(farm: Farmyard) -> list[Cell]:
+    return [cell for row in farm.cells for cell in row if cell.kind == CellKind.WOOD_ROOM]
+
+
+def take_one_person(farm: Farmyard) -> bool:
+    """從農場帶走 1 位家人去行動板。優先房間。"""
+    rooms = []
+    others = []
+    for row in farm.cells:
+        for cell in row:
+            if cell.people <= 0:
+                continue
+            if cell.kind == CellKind.WOOD_ROOM:
+                rooms.append(cell)
+            else:
+                others.append(cell)
+    for cell in rooms + others:
+        cell.people -= 1
+        return True
+    return False
+
+
+def return_people_home(farm: Farmyard, count: int) -> None:
+    """家人回到房間：每間 1 人，多的先留在第一間。"""
+    for row in farm.cells:
+        for cell in row:
+            cell.people = 0
+    rooms = _rooms(farm)
+    if not rooms or count <= 0:
+        return
+    remaining = count
+    for cell in rooms:
+        if remaining <= 0:
+            break
+        cell.people = 1
+        remaining -= 1
+    if remaining > 0:
+        rooms[0].people += remaining
