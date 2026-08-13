@@ -35,7 +35,20 @@ def feed_player(player) -> None:
     player.begging += need
 
 
+def breed_player(player) -> None:
+    from oyster_omelette.animals import animal_total
+    from oyster_omelette.pastures import animal_capacity
+
+    for kind in ("sheep", "wild_boar", "cattle"):
+        if getattr(player, kind) < 2:
+            continue
+        if animal_total(player) >= animal_capacity(player.farm):
+            continue
+        setattr(player, kind, getattr(player, kind) + 1)
+
+
 def harvest(game) -> None:
     for player in game.players:
         take_crops(player)
         feed_player(player)
+        breed_player(player)
