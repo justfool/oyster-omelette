@@ -1,6 +1,13 @@
 """行動格立刻結算。還沒做完的格子只佔格、不改農場。"""
 
-from oyster_omelette.farmyard import empty_fields, first_legal_field, plow_first_legal, sow_fields
+from oyster_omelette.farmyard import (
+    build_one_room,
+    empty_fields,
+    first_legal_field,
+    first_legal_room,
+    plow_first_legal,
+    sow_fields,
+)
 
 
 def add_resource(player, resource: str, amount: int) -> None:
@@ -11,6 +18,12 @@ def cannot_use(player, space) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
         return "no_field_space"
+    if space.id == "farm_expansion":
+        if player.wood < 5 or player.reed < 2 or first_legal_room(player.farm) is None:
+            return "cannot_build_room"
+    if space.id == "family_growth":
+        if player.farm.room_count() <= player.family_size():
+            return "need_spare_room"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
         can_sow = bool(empty_fields(player.farm)) and (
             player.grain > 0 or player.vegetable > 0
@@ -39,6 +52,20 @@ def resolve_space(game, player, space) -> None:
         for other in game.players:
             other.is_start_player = False
         player.is_start_player = True
+        return
+
+    if space.id == "farm_expansion":
+        player.wood -= 5
+        player.reed -= 2
+        build_one_room(player.farm)
+        return
+
+    if space.id == "family_growth":
+        player.family_members += 1
+        return
+
+    if space.id == "vegetable_seeds":
+        player.vegetable += 1
         return
 
     if space.id == "farmland":

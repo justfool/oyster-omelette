@@ -191,6 +191,8 @@ def test_meeting_place_passes_start_player_to_next_round():
 def test_lessons_and_farm_expansion_are_occupiable():
     game = _ready_two_player()
     assert game.place_worker(0, "lessons").ok
+    game.players[1].wood = 5
+    game.players[1].reed = 2
     assert game.place_worker(1, "farm_expansion").ok
     assert game.space("lessons").occupant == 0
     assert game.space("farm_expansion").occupant == 1

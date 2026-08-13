@@ -176,6 +176,7 @@ Feature: 2 人版行動板的刁鑽規則
     When 完成開局設置
     And 準備下一回合
     And 玩家 1 放置工人到 lessons
+    And 玩家 2 身上有 5 木與 2 蘆葦
     And 玩家 2 放置工人到 farm_expansion
     Then lessons 應被玩家 1 佔領
     And farm_expansion 應被玩家 2 佔領

@@ -72,6 +72,13 @@ def do_harvest(game: Game) -> None:
     game.harvest()
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {wood:d} 木與 {reed:d} 蘆葦"))
+def give_build_goods(game: Game, number: int, wood: int, reed: int) -> None:
+    player = game.players[number - 1]
+    player.wood = wood
+    player.reed = reed
+
+
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
 def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> None:
     last_place["result"] = game.place_worker(number - 1, space_id)
@@ -186,6 +193,16 @@ def then_fishing(game: Game, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 木"))
 def then_player_wood(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].wood == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 蘆葦"))
+def then_player_reed(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].reed == count
+
+
+@then(parsers.parse("玩家 {number:d} 的房間數應為 {count:d}"))
+def then_room_count(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].farm.room_count() == count
 
 
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 穀物"))
