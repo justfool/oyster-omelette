@@ -67,6 +67,11 @@ def return_home(game: Game) -> None:
     game.return_home()
 
 
+@when("進行收成")
+def do_harvest(game: Game) -> None:
+    game.harvest()
+
+
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
 def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> None:
     last_place["result"] = game.place_worker(number - 1, space_id)
@@ -311,3 +316,8 @@ def then_start_player_food(game: Game, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 食物"))
 def then_player_food(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].food == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 張討飯卡"))
+def then_begging(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].begging == count
