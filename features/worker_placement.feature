@@ -26,7 +26,7 @@ Feature: 行動板與工人擺放
     And 準備下一回合
     Then 輪到玩家 1
     When 玩家 2 放置工人到 day_laborer
-    Then 上次放置應失敗且原因包含 不是這位玩家的回合
+    Then 上次放置應失敗且原因包含 not_your_turn
     And day_laborer 應沒有人
 
   Scenario: 日工拿到 2 食物、穀種拿到 1 穀
@@ -70,7 +70,7 @@ Feature: 行動板與工人擺放
     And 準備下一回合
     And 玩家 1 放置工人到 fishing
     And 玩家 2 放置工人到 fishing
-    Then 上次放置應失敗且原因包含 已經有人
+    Then 上次放置應失敗且原因包含 space_occupied
     And fishing 應被玩家 1 佔領
 
   Scenario: 同一玩家不能把兩個家人放到同一格
@@ -79,7 +79,7 @@ Feature: 行動板與工人擺放
     And 玩家 1 放置工人到 clay_pit
     And 玩家 2 放置工人到 day_laborer
     And 玩家 1 放置工人到 clay_pit
-    Then 上次放置應失敗且原因包含 已經有人
+    Then 上次放置應失敗且原因包含 space_occupied
 
   Scenario: 沒有剩餘家人時不能再放
     When 完成開局設置
@@ -89,13 +89,13 @@ Feature: 行動板與工人擺放
     And 玩家 1 放置工人到 reed_bank
     And 玩家 2 放置工人到 fishing
     And 玩家 1 放置工人到 day_laborer
-    Then 上次放置應失敗且原因包含 沒有可放置的家人
+    Then 上次放置應失敗且原因包含 no_available_family
 
   Scenario: 非法行動格不能放
     When 完成開局設置
     And 準備下一回合
     And 玩家 1 放置工人到 moon_farm
-    Then 上次放置應失敗且原因包含 沒有這個行動格
+    Then 上次放置應失敗且原因包含 unknown_space
 
   Scenario: 回家後行動格淨空且家人回到木屋
     When 完成開局設置

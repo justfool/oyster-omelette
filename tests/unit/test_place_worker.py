@@ -8,7 +8,7 @@ def test_place_unknown_player():
     game.prepare_round()
     result = game.place_worker(3, "forest")
     assert not result.ok
-    assert "玩家" in result.error
+    assert result.error == "unknown_player"
 
 
 def test_injected_round_cards_flip_in_order():
