@@ -36,6 +36,16 @@ def given_first_round_card(forced_round_cards: dict, card_id: str) -> None:
     forced_round_cards["cards"] = [card_id] + rest
 
 
+@given(parsers.parse("回合卡依序為 {first} 與 {second}"))
+def given_two_round_cards(forced_round_cards: dict, first: str, second: str) -> None:
+    rest = [
+        card
+        for card in DEFAULT_ROUND_CARDS
+        if card not in {first, second}
+    ]
+    forced_round_cards["cards"] = [first, second] + rest
+
+
 @given("已開局的 2 人農家樂修訂版", target_fixture="game")
 def given_two_player_game() -> Game:
     return Game.setup(player_count=2)
@@ -77,6 +87,16 @@ def give_build_goods(game: Game, number: int, wood: int, reed: int) -> None:
     player = game.players[number - 1]
     player.wood = wood
     player.reed = reed
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 黏土"))
+def give_clay(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].clay = count
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 穀"))
+def give_grain(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].grain = count
 
 
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
@@ -338,3 +358,13 @@ def then_player_food(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 張討飯卡"))
 def then_begging(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].begging == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 黏土"))
+def then_player_clay(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].clay == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有壁爐"))
+def then_has_fireplace(game: Game, number: int) -> None:
+    assert game.players[number - 1].has_fireplace
