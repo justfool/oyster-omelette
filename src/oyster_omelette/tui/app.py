@@ -19,12 +19,17 @@ KIND_MARK = {
 
 
 def farm_text(player) -> str:
+    from oyster_omelette.pastures import pasture_cells
+
+    fenced = pasture_cells(player.farm)
     lines = []
     for row in range(player.farm.rows):
         parts = []
         for col in range(player.farm.cols):
             cell = player.farm.cell(row, col)
             mark = KIND_MARK.get(cell.kind, "？")
+            if (row, col) in fenced:
+                mark = "牧"
             if cell.people:
                 mark = f"{mark}{cell.people}"
             elif cell.crop_count:

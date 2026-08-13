@@ -89,6 +89,11 @@ def give_build_goods(game: Game, number: int, wood: int, reed: int) -> None:
     player.reed = reed
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 木"))
+def give_wood(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].wood = count
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 黏土"))
 def give_clay(game: Game, number: int, count: int) -> None:
     game.players[number - 1].clay = count
@@ -223,6 +228,27 @@ def then_player_reed(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 的房間數應為 {count:d}"))
 def then_room_count(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].farm.room_count() == count
+
+
+@then(parsers.parse("玩家 {number:d} 的牧場數應為 {count:d}"))
+def then_pasture_count(game: Game, number: int, count: int) -> None:
+    from oyster_omelette.pastures import pasture_count
+
+    assert pasture_count(game.players[number - 1].farm) == count
+
+
+@then(parsers.parse("玩家 {number:d} 的動物容量應為 {count:d}"))
+def then_animal_capacity(game: Game, number: int, count: int) -> None:
+    from oyster_omelette.pastures import animal_capacity
+
+    assert animal_capacity(game.players[number - 1].farm) == count
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格應在牧場裡"))
+def then_in_pasture(game: Game, row: int, col: int) -> None:
+    from oyster_omelette.pastures import pasture_cells
+
+    assert (row - 1, col - 1) in pasture_cells(game.players[0].farm)
 
 
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 穀物"))
