@@ -104,6 +104,16 @@ def give_grain(game: Game, number: int, count: int) -> None:
     game.players[number - 1].grain = count
 
 
+@when(parsers.parse("玩家 {number:d} 已有壁爐"))
+def give_fireplace(game: Game, number: int) -> None:
+    game.players[number - 1].has_fireplace = True
+
+
+@when(parsers.parse("羊市上有 {count:d} 羊"))
+def set_sheep_pile(game: Game, count: int) -> None:
+    game.space("sheep").accumulated = count
+
+
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
 def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> None:
     last_place["result"] = game.place_worker(number - 1, space_id)
@@ -394,3 +404,8 @@ def then_player_clay(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有壁爐"))
 def then_has_fireplace(game: Game, number: int) -> None:
     assert game.players[number - 1].has_fireplace
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 羊"))
+def then_player_sheep(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].sheep == count
