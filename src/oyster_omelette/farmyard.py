@@ -1,7 +1,13 @@
 """個人農場：修訂版是 3 列 5 行，共 15 格。"""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
+
+
+def _default_fences():
+    from oyster_omelette.pastures import empty_fences
+
+    return empty_fences()
 
 ROWS = 3
 COLS = 5
@@ -24,6 +30,7 @@ class Cell:
 @dataclass
 class Farmyard:
     cells: list[list[Cell]]
+    fences: object = field(default_factory=_default_fences)
 
     @property
     def rows(self) -> int:

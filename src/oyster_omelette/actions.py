@@ -8,6 +8,7 @@ from oyster_omelette.farmyard import (
     plow_first_legal,
     sow_fields,
 )
+from oyster_omelette.pastures import enclose_one_pasture, next_pasture_cost
 
 
 def add_resource(player, resource: str, amount: int) -> None:
@@ -27,6 +28,10 @@ def cannot_use(player, space) -> str:
     if space.id == "major_or_minor":
         if player.has_fireplace or player.clay < 2:
             return "cannot_build_fireplace"
+    if space.id in {"fences", "renovation_and_fences"}:
+        cost = next_pasture_cost(player.farm)
+        if cost is None or player.wood < cost:
+            return "cannot_fence"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
         can_sow = bool(empty_fields(player.farm)) and (
             player.grain > 0 or player.vegetable > 0
@@ -91,4 +96,9 @@ def resolve_space(game, player, space) -> None:
     if space.id == "plow_and_or_sow":
         plow_first_legal(player.farm)
         sow_fields(player)
+        return
+
+    if space.id in {"fences", "renovation_and_fences"}:
+        cost = enclose_one_pasture(player.farm)
+        player.wood -= cost
         return

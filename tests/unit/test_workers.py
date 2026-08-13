@@ -203,6 +203,7 @@ def test_lessons_and_farm_expansion_are_occupiable():
 def test_revealed_round_card_can_be_occupied():
     game = Game.setup(player_count=2, round_cards=["fences", "sheep"])
     game.prepare_round()
+    game.players[0].wood = 4
     result = game.place_worker(0, "fences")
     assert result.ok is True
     assert game.space("fences").occupant == 0

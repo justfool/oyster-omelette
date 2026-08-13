@@ -97,17 +97,20 @@ def vegetable_total(player) -> int:
 
 def unused_spaces(player) -> int:
     from oyster_omelette.farmyard import CellKind
+    from oyster_omelette.pastures import pasture_cells
 
+    fenced = pasture_cells(player.farm)
     total = 0
-    for row in player.farm.cells:
-        for cell in row:
-            if cell.kind == CellKind.EMPTY:
+    for row_index, row in enumerate(player.farm.cells):
+        for col_index, cell in enumerate(row):
+            if cell.kind == CellKind.EMPTY and (row_index, col_index) not in fenced:
                 total += 1
     return total
 
 
 def score_player(player) -> dict[str, int]:
     from oyster_omelette.farmyard import CellKind
+    from oyster_omelette.pastures import pasture_count
 
     rooms = 0
     for row in player.farm.cells:
@@ -116,7 +119,7 @@ def score_player(player) -> dict[str, int]:
                 rooms += 1
     detail = {
         "fields": points_fields(player.farm.field_count()),
-        "pastures": points_pastures(0),
+        "pastures": points_pastures(pasture_count(player.farm)),
         "grain": points_grain(grain_total(player)),
         "vegetables": points_vegetables(vegetable_total(player)),
         "sheep": points_sheep(player.sheep),
