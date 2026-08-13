@@ -2,9 +2,11 @@
 
 from oyster_omelette.farmyard import (
     build_one_room,
+    build_one_stable,
     empty_fields,
     first_legal_field,
     first_legal_room,
+    first_legal_stable,
     plow_first_legal,
     sow_fields,
 )
@@ -21,7 +23,13 @@ def cannot_use(player, space) -> str:
     if space.id == "farmland" and first_legal_field(player.farm) is None:
         return "no_field_space"
     if space.id == "farm_expansion":
-        if player.wood < 5 or player.reed < 2 or first_legal_room(player.farm) is None:
+        can_room = (
+            player.wood >= 5
+            and player.reed >= 2
+            and first_legal_room(player.farm) is not None
+        )
+        can_stable = player.wood >= 2 and first_legal_stable(player.farm) is not None
+        if not can_room and not can_stable:
             return "cannot_build_room"
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
@@ -68,9 +76,18 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "farm_expansion":
-        player.wood -= 5
-        player.reed -= 2
-        build_one_room(player.farm)
+        can_room = (
+            player.wood >= 5
+            and player.reed >= 2
+            and first_legal_room(player.farm) is not None
+        )
+        if can_room:
+            player.wood -= 5
+            player.reed -= 2
+            build_one_room(player.farm)
+            return
+        player.wood -= 2
+        build_one_stable(player.farm)
         return
 
     if space.id == "family_growth":

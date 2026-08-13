@@ -30,6 +30,8 @@ def farm_text(player) -> str:
             mark = KIND_MARK.get(cell.kind, "？")
             if (row, col) in fenced:
                 mark = "牧"
+            if cell.stable:
+                mark = "舍" if mark == "．" else f"{mark}舍"
             if cell.people:
                 mark = f"{mark}{cell.people}"
             elif cell.crop_count:

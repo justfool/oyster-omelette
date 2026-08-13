@@ -156,10 +156,19 @@ def pasture_count(farm: Farmyard) -> int:
 
 
 def animal_capacity(farm: Farmyard) -> int:
-    """每格牧場 2 隻，房子可當寵物養 1 隻。"""
+    """每格牧場 2 隻；牧場內畜舍讓該牧場加倍。沒圍的畜舍 +1。房子寵物 1 隻。"""
     capacity = 1
+    fenced: set[tuple[int, int]] = set()
     for group in find_pastures(farm):
-        capacity += 2 * len(group)
+        fenced |= group
+        doubled = any(farm.cell(row, col).stable for row, col in group)
+        capacity += 2 * len(group) * (2 if doubled else 1)
+    for row in range(farm.rows):
+        for col in range(farm.cols):
+            if (row, col) in fenced:
+                continue
+            if farm.cell(row, col).stable:
+                capacity += 1
     return capacity
 
 
