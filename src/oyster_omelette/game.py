@@ -29,6 +29,7 @@ class Player:
     cattle: int = 0
     unplaced_workers: int = 0
     family_members: int = 2
+    begging: int = 0
 
     def family_size(self) -> int:
         return self.family_members
@@ -123,6 +124,11 @@ class Game:
     def return_home(self) -> None:
         self._reset_workers()
         self.work_phase = False
+
+    def harvest(self) -> None:
+        from oyster_omelette.harvest import harvest as run_harvest
+
+        run_harvest(self)
 
     def place_worker(self, player_index: int, space_id: str) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
