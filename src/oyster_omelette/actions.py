@@ -24,12 +24,16 @@ def cannot_use(player, space) -> str:
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
             return "need_spare_room"
+    if space.id == "major_or_minor":
+        if player.has_fireplace or player.clay < 2:
+            return "cannot_build_fireplace"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
         can_sow = bool(empty_fields(player.farm)) and (
             player.grain > 0 or player.vegetable > 0
         )
         can_plow = space.id == "plow_and_or_sow" and first_legal_field(player.farm) is not None
-        if not can_sow and not can_plow:
+        can_bake = space.id == "sow_and_or_bake" and player.has_fireplace and player.grain > 0
+        if not can_sow and not can_plow and not can_bake:
             return "cannot_sow"
     return ""
 
@@ -74,6 +78,14 @@ def resolve_space(game, player, space) -> None:
 
     if space.id == "sow_and_or_bake":
         sow_fields(player)
+        if player.has_fireplace and player.grain > 0:
+            player.food += player.grain * 2
+            player.grain = 0
+        return
+
+    if space.id == "major_or_minor":
+        player.clay -= 2
+        player.has_fireplace = True
         return
 
     if space.id == "plow_and_or_sow":

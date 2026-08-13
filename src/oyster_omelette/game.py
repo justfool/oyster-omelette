@@ -30,6 +30,7 @@ class Player:
     unplaced_workers: int = 0
     family_members: int = 2
     begging: int = 0
+    has_fireplace: bool = False
 
     def family_size(self) -> int:
         return self.family_members
