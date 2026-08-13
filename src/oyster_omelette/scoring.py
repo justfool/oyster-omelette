@@ -112,11 +112,11 @@ def score_player(player) -> dict[str, int]:
     from oyster_omelette.farmyard import CellKind
     from oyster_omelette.pastures import pasture_count
 
-    rooms = 0
+    room_points = 0
     for row in player.farm.cells:
         for cell in row:
-            if cell.kind == CellKind.WOOD_ROOM:
-                rooms += 1
+            if cell.kind == CellKind.CLAY_ROOM:
+                room_points += 1
     detail = {
         "fields": points_fields(player.farm.field_count()),
         "pastures": points_pastures(pasture_count(player.farm)),
@@ -126,7 +126,7 @@ def score_player(player) -> dict[str, int]:
         "wild_boar": points_boar(player.wild_boar),
         "cattle": points_cattle(player.cattle),
         "unused": -unused_spaces(player),
-        "rooms": 0,  # 木屋 0 分
+        "rooms": room_points,
         "family": player.family_size() * 3,
         "begging": player.begging * -3,
     }

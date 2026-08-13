@@ -8,7 +8,9 @@ from oyster_omelette.farmyard import (
     first_legal_room,
     first_legal_stable,
     plow_first_legal,
+    renovate_house,
     sow_fields,
+    CellKind,
 )
 from oyster_omelette.animals import house_animals
 from oyster_omelette.pastures import enclose_one_pasture, next_pasture_cost
@@ -18,19 +20,35 @@ def add_resource(player, resource: str, amount: int) -> None:
     setattr(player, resource, getattr(player, resource) + amount)
 
 
+def _room_cost(player) -> tuple[str, int, int]:
+    if player.farm.house_material() == CellKind.CLAY_ROOM:
+        return ("clay", 5, 2)
+    return ("wood", 5, 2)
+
+
+def _can_build_room(player) -> bool:
+    resource, amount, reed = _room_cost(player)
+    return (
+        getattr(player, resource) >= amount
+        and player.reed >= reed
+        and first_legal_room(player.farm) is not None
+    )
+
+
 def cannot_use(player, space) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
         return "no_field_space"
     if space.id == "farm_expansion":
-        can_room = (
-            player.wood >= 5
-            and player.reed >= 2
-            and first_legal_room(player.farm) is not None
-        )
         can_stable = player.wood >= 2 and first_legal_stable(player.farm) is not None
-        if not can_room and not can_stable:
+        if not _can_build_room(player) and not can_stable:
             return "cannot_build_room"
+    if space.id == "renovation":
+        if player.farm.house_material() != CellKind.WOOD_ROOM:
+            return "cannot_renovate"
+        rooms = player.farm.room_count()
+        if player.reed < 1 or player.clay < rooms:
+            return "cannot_renovate"
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
             return "need_spare_room"
@@ -76,18 +94,21 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "farm_expansion":
-        can_room = (
-            player.wood >= 5
-            and player.reed >= 2
-            and first_legal_room(player.farm) is not None
-        )
-        if can_room:
-            player.wood -= 5
-            player.reed -= 2
+        if _can_build_room(player):
+            resource, amount, reed = _room_cost(player)
+            setattr(player, resource, getattr(player, resource) - amount)
+            player.reed -= reed
             build_one_room(player.farm)
             return
         player.wood -= 2
         build_one_stable(player.farm)
+        return
+
+    if space.id == "renovation":
+        rooms = player.farm.room_count()
+        player.reed -= 1
+        player.clay -= rooms
+        renovate_house(player.farm)
         return
 
     if space.id == "family_growth":
