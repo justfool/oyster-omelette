@@ -2,6 +2,7 @@
 
 from oyster_omelette.farmyard import CellKind
 from oyster_omelette.game import Game, PlaceResult
+from tests.error_text import matches
 
 
 def _ready_two_player() -> Game:
@@ -25,18 +26,18 @@ def test_player_starting_goods_are_zero_except_food():
 
 def test_place_result_shape():
     ok = PlaceResult(ok=True, error="")
-    bad = PlaceResult(ok=False, error="space_occupied")
+    bad = PlaceResult(ok=False, error="這個行動格已經有人")
     assert ok.ok is True
     assert ok.error == ""
     assert bad.ok is False
-    assert bad.error == "space_occupied"
+    assert "已經有人" in bad.error
 
 
 def test_cannot_place_before_first_prepare():
     game = Game.setup(player_count=2)
     result = game.place_worker(0, "forest")
     assert result.ok is False
-    assert result.error == "not_work_phase"
+    assert matches(result.error, "不是工作階段")
     assert game.space("forest").occupant is None
     assert game.players[0].unplaced_workers == 2
     assert game.players[0].wood == 0
@@ -47,7 +48,7 @@ def test_cannot_place_after_return_home_until_next_prepare():
     game.return_home()
     result = game.place_worker(0, "day_laborer")
     assert result.ok is False
-    assert result.error == "not_work_phase"
+    assert matches(result.error, "不是工作階段")
     assert game.players[0].food == 2
 
 
@@ -57,7 +58,7 @@ def test_occupied_space_stays_with_original_player():
     second = game.place_worker(1, "forest")
     assert first.ok is True
     assert second.ok is False
-    assert second.error == "space_occupied"
+    assert matches(second.error, "已經有人")
     assert game.space("forest").occupant == 0
     assert game.players[1].unplaced_workers == 2
     assert game.players[1].wood == 0
@@ -70,7 +71,7 @@ def test_same_player_cannot_stack_two_workers_on_one_space():
     assert game.place_worker(1, "day_laborer").ok is True
     again = game.place_worker(0, "forest")
     assert again.ok is False
-    assert again.error == "space_occupied"
+    assert matches(again.error, "已經有人")
     assert game.players[0].unplaced_workers == 1
     assert game.players[0].wood == 3
 
@@ -105,7 +106,7 @@ def test_no_available_family_does_not_occupy_or_pay():
     assert game.place_worker(1, "fishing").ok
     result = game.place_worker(0, "day_laborer")
     assert result.ok is False
-    assert result.error == "no_available_family"
+    assert matches(result.error, "沒有可放置的家人")
     assert game.space("day_laborer").occupant is None
     assert game.players[0].food == 2
     assert game.players[0].unplaced_workers == 0
@@ -113,10 +114,10 @@ def test_no_available_family_does_not_occupy_or_pay():
 
 def test_work_phase_rejects_second_player_going_first():
     game = _ready_two_player()
-    assert game.current_player_index == 0
+    assert game.whose_turn() == 0
     result = game.place_worker(1, "day_laborer")
     assert result.ok is False
-    assert result.error == "not_your_turn"
+    assert matches(result.error, "不是這位玩家的回合")
     assert game.space("day_laborer").occupant is None
     assert game.players[1].food == 3
 
@@ -126,7 +127,7 @@ def test_cannot_place_twice_in_a_row_while_opponent_has_family():
     assert game.place_worker(0, "forest").ok
     result = game.place_worker(0, "clay_pit")
     assert result.ok is False
-    assert result.error == "not_your_turn"
+    assert matches(result.error, "不是這位玩家的回合")
     assert game.space("clay_pit").occupant is None
     assert game.players[0].unplaced_workers == 1
 
@@ -135,11 +136,11 @@ def test_unknown_space_is_case_sensitive_and_does_not_consume_worker():
     game = _ready_two_player()
     missing = game.place_worker(0, "moon_landing")
     assert missing.ok is False
-    assert missing.error == "unknown_space"
+    assert matches(missing.error, "沒有這個行動格")
     assert game.players[0].unplaced_workers == 2
     wrong_case = game.place_worker(0, "Forest")
     assert wrong_case.ok is False
-    assert wrong_case.error == "unknown_space"
+    assert matches(wrong_case.error, "沒有這個行動格")
     assert game.space("forest").occupant is None
 
 
@@ -181,21 +182,20 @@ def test_meeting_place_passes_start_player_to_next_round():
     assert game.players[0].is_start_player is False
     game.return_home()
     game.prepare_round()
-    assert game.current_player_index == 1
-    assert game.place_worker(0, "clay_pit").error == "not_your_turn"
+    assert game.whose_turn() == 1
+    denied = game.place_worker(0, "clay_pit")
+    assert matches(denied.error, "不是這位玩家的回合")
     assert game.place_worker(1, "clay_pit").ok
 
 
-def test_placeable_spaces_without_resource_effects_this_increment():
+def test_lessons_and_farm_expansion_are_occupiable():
     game = _ready_two_player()
-    assert game.place_worker(0, "farmland").ok
-    assert game.place_worker(1, "lessons").ok
+    assert game.place_worker(0, "lessons").ok
+    assert game.place_worker(1, "farm_expansion").ok
+    assert game.space("lessons").occupant == 0
+    assert game.space("farm_expansion").occupant == 1
     assert game.players[0].food == 2
     assert game.players[1].food == 3
-    game.return_home()
-    game.prepare_round()
-    assert game.place_worker(0, "farm_expansion").ok
-    assert game.space("farm_expansion").occupant == 0
 
 
 def test_revealed_round_card_can_be_occupied():
