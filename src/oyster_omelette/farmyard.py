@@ -10,6 +10,7 @@ COLS = 5
 class CellKind(Enum):
     EMPTY = "empty"
     WOOD_ROOM = "wood_room"
+    FIELD = "field"
 
 
 @dataclass
@@ -42,6 +43,14 @@ class Farmyard:
                 total += cell.people
         return total
 
+    def field_count(self) -> int:
+        total = 0
+        for row in self.cells:
+            for cell in row:
+                if cell.kind == CellKind.FIELD:
+                    total += 1
+        return total
+
 
 def starting_farmyard() -> Farmyard:
     """左上兩格是起始木屋，各住一位家人。"""
@@ -71,6 +80,55 @@ def take_one_person(farm: Farmyard) -> bool:
         cell.people -= 1
         return True
     return False
+
+
+def _neighbors(row: int, col: int) -> list[tuple[int, int]]:
+    return [
+        (row - 1, col),
+        (row + 1, col),
+        (row, col - 1),
+        (row, col + 1),
+    ]
+
+
+def can_place_field(farm: Farmyard, row: int, col: int) -> bool:
+    try:
+        cell = farm.cell(row, col)
+    except IndexError:
+        return False
+    if cell.kind != CellKind.EMPTY:
+        return False
+    if farm.field_count() == 0:
+        return True
+    for n_row, n_col in _neighbors(row, col):
+        try:
+            if farm.cell(n_row, n_col).kind == CellKind.FIELD:
+                return True
+        except IndexError:
+            continue
+    return False
+
+
+def first_legal_field(farm: Farmyard) -> tuple[int, int] | None:
+    for row in range(farm.rows):
+        for col in range(farm.cols):
+            if can_place_field(farm, row, col):
+                return (row, col)
+    return None
+
+
+def place_field(farm: Farmyard, row: int, col: int) -> bool:
+    if not can_place_field(farm, row, col):
+        return False
+    farm.cell(row, col).kind = CellKind.FIELD
+    return True
+
+
+def plow_first_legal(farm: Farmyard) -> bool:
+    spot = first_legal_field(farm)
+    if spot is None:
+        return False
+    return place_field(farm, spot[0], spot[1])
 
 
 def return_people_home(farm: Farmyard, count: int) -> None:

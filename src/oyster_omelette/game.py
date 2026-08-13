@@ -3,8 +3,8 @@
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
-from oyster_omelette.actions import resolve_space
-from oyster_omelette.board import ActionSpace, DEFAULT_ROUND_CARDS, Board, two_player_board
+from oyster_omelette.actions import cannot_use, resolve_space
+from oyster_omelette.board import ActionSpace, Board, deal_round_cards, two_player_board
 from oyster_omelette.farmyard import Farmyard, return_people_home, starting_farmyard, take_one_person
 
 
@@ -45,6 +45,7 @@ class Game:
     round: int = 0
     remaining_round_cards: list[str] = field(default_factory=list)
     current_player_index: int | None = 0
+    work_phase: bool = False
     _turn_from: int = 0
 
     @classmethod
@@ -72,8 +73,8 @@ class Game:
                     family_members=family,
                 )
             )
-        # 正式遊戲應洗牌，測試可注入。
-        cards = list(DEFAULT_ROUND_CARDS) if round_cards is None else list(round_cards)
+        # 正式遊戲各階段內洗牌；測試可注入固定順序。
+        cards = deal_round_cards() if round_cards is None else list(round_cards)
         game = cls(
             players=players,
             board=two_player_board(),
@@ -116,26 +117,33 @@ class Game:
         self.round += 1
         self._flip_next_round_card()
         self.board.replenish()
-        self._workers_home()
+        self._reset_workers()
+        self.work_phase = True
 
     def return_home(self) -> None:
-        self._workers_home()
+        self._reset_workers()
+        self.work_phase = False
 
     def place_worker(self, player_index: int, space_id: str) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
-            return PlaceResult(ok=False, error="沒有這位玩家")
+            return PlaceResult(ok=False, error="unknown_player")
+        if not self.work_phase:
+            return PlaceResult(ok=False, error="not_work_phase")
 
         player = self.players[player_index]
         if player.unplaced_workers <= 0:
-            return PlaceResult(ok=False, error="沒有可放置的家人")
+            return PlaceResult(ok=False, error="no_available_family")
         if self.whose_turn() != player_index:
-            return PlaceResult(ok=False, error="不是這位玩家的回合")
+            return PlaceResult(ok=False, error="not_your_turn")
 
         space = self.board.get(space_id)
         if space is None:
-            return PlaceResult(ok=False, error="沒有這個行動格")
+            return PlaceResult(ok=False, error="unknown_space")
         if space.is_occupied():
-            return PlaceResult(ok=False, error="這個行動格已經有人")
+            return PlaceResult(ok=False, error="space_occupied")
+        blocked = cannot_use(player, space)
+        if blocked:
+            return PlaceResult(ok=False, error=blocked)
 
         take_one_person(player.farm)
         player.unplaced_workers -= 1
@@ -155,7 +163,7 @@ class Game:
         self.board.add_space(space_id)
         self.board.revealed_round_cards.append(space_id)
 
-    def _workers_home(self) -> None:
+    def _reset_workers(self) -> None:
         self.board.clear_occupants()
         for player in self.players:
             return_people_home(player.farm, player.family_size())

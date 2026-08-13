@@ -1,5 +1,6 @@
 """2 人版行動板：固定格與之後翻開的回合卡。"""
 
+import random
 from dataclasses import dataclass, field
 
 
@@ -33,7 +34,12 @@ FIXED_SPACE_IDS_2P: tuple[str, ...] = (
 STAGE_SIZES: tuple[int, ...] = (4, 3, 2, 2, 2, 1)
 
 # 正式遊戲各階段內應洗牌，測試可注入。
-# 未注入時用這份固定順序，避免測試不穩。
+# 階段 1：圍籬、主要或次要改良、羊、播種且／或烤麵包
+# 階段 2：生小孩、石礦（西）、蔬菜
+# 階段 3：野豬、翻修
+# 階段 4：牛、石礦（東）
+# 階段 5：耕且／或播、沒房間也能生
+# 階段 6：翻修後圍籬
 DEFAULT_ROUND_CARDS: tuple[str, ...] = (
     "fences",
     "major_or_minor",
@@ -41,9 +47,9 @@ DEFAULT_ROUND_CARDS: tuple[str, ...] = (
     "sow_and_or_bake",
     "family_growth",
     "western_quarry",
-    "renovation",
     "vegetable_seeds",
     "wild_boar",
+    "renovation",
     "cattle",
     "eastern_quarry",
     "plow_and_or_sow",
@@ -112,6 +118,21 @@ class Board:
     def clear_occupants(self) -> None:
         for space in self.spaces.values():
             space.occupant = None
+
+
+def deal_round_cards(rng: random.Random | None = None) -> list[str]:
+    """各階段內洗牌，階段順序不變。測試可改傳固定清單，不必走這裡。"""
+    if rng is None:
+        rng = random.Random()
+    cards = list(DEFAULT_ROUND_CARDS)
+    dealt: list[str] = []
+    start = 0
+    for size in STAGE_SIZES:
+        chunk = cards[start : start + size]
+        rng.shuffle(chunk)
+        dealt.extend(chunk)
+        start += size
+    return dealt
 
 
 def two_player_board() -> Board:
