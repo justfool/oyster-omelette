@@ -17,6 +17,8 @@ class CellKind(Enum):
 class Cell:
     kind: CellKind = CellKind.EMPTY
     people: int = 0
+    crop: str | None = None
+    crop_count: int = 0
 
 
 @dataclass
@@ -129,6 +131,34 @@ def plow_first_legal(farm: Farmyard) -> bool:
     if spot is None:
         return False
     return place_field(farm, spot[0], spot[1])
+
+
+def empty_fields(farm: Farmyard) -> list[Cell]:
+    found = []
+    for row in farm.cells:
+        for cell in row:
+            if cell.kind == CellKind.FIELD and cell.crop_count == 0:
+                found.append(cell)
+    return found
+
+
+def sow_fields(player) -> bool:
+    """把身上的種子播到所有空田。穀田 3、菜田 2。"""
+    planted = False
+    for cell in empty_fields(player.farm):
+        if player.grain > 0:
+            player.grain -= 1
+            cell.crop = "grain"
+            cell.crop_count = 3
+            planted = True
+        elif player.vegetable > 0:
+            player.vegetable -= 1
+            cell.crop = "vegetable"
+            cell.crop_count = 2
+            planted = True
+        else:
+            break
+    return planted
 
 
 def return_people_home(farm: Farmyard, count: int) -> None:

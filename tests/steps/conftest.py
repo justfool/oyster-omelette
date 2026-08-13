@@ -15,6 +15,11 @@ def last_place() -> dict:
     return {"result": None}
 
 
+@pytest.fixture
+def forced_round_cards() -> dict:
+    return {"cards": None}
+
+
 @given(parsers.parse("{count:d} 位玩家的農家樂修訂版"), target_fixture="player_count")
 def given_player_count(count: int) -> int:
     return count
@@ -25,14 +30,23 @@ def given_default_round_cards() -> None:
     return None
 
 
+@given(parsers.parse("回合卡先翻 {card_id}"))
+def given_first_round_card(forced_round_cards: dict, card_id: str) -> None:
+    rest = [card for card in DEFAULT_ROUND_CARDS if card != card_id]
+    forced_round_cards["cards"] = [card_id] + rest
+
+
 @given("已開局的 2 人農家樂修訂版", target_fixture="game")
 def given_two_player_game() -> Game:
     return Game.setup(player_count=2)
 
 
 @when("完成開局設置", target_fixture="game")
-def setup_game(player_count: int) -> Game:
-    return Game.setup(player_count=player_count)
+def setup_game(player_count: int, forced_round_cards: dict) -> Game:
+    return Game.setup(
+        player_count=player_count,
+        round_cards=forced_round_cards["cards"],
+    )
 
 
 @when("準備下一回合")
@@ -78,7 +92,9 @@ def then_place_failed(last_place: dict, text: str) -> None:
     result: PlaceResult = last_place["result"]
     assert result is not None
     assert not result.ok
-    assert text in result.error
+    from tests.error_text import matches
+
+    assert matches(result.error, text), result.error
 
 
 @then(parsers.parse("這次擺放應該失敗，原因是 {error}"))
@@ -125,12 +141,6 @@ def then_turn_player_2(game: Game) -> None:
 @then(parsers.parse("輪到玩家 {number:d} 擺放"))
 def then_current_player(game: Game, number: int) -> None:
     assert game.current_player_index == number - 1
-
-
-@then("玩家 2 應是起始玩家")
-def then_player_2_is_start(game: Game) -> None:
-    assert game.players[1].is_start_player
-    assert not game.players[0].is_start_player
 
 
 @then(parsers.parse("玩家 {number:d} 應是起始玩家"))
@@ -267,6 +277,13 @@ def then_empty_cell(game: Game, row: int, col: int) -> None:
 def then_field_cell(game: Game, row: int, col: int) -> None:
     cell = game.players[0].farm.cell(row - 1, col - 1)
     assert cell.kind == CellKind.FIELD
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格田上應有 {count:d} 穀"))
+def then_field_grain(game: Game, row: int, col: int, count: int) -> None:
+    cell = game.players[0].farm.cell(row - 1, col - 1)
+    assert cell.crop == "grain"
+    assert cell.crop_count == count
 
 
 @then(parsers.parse("玩家 {number:d} 的田地數應為 {count:d}"))
