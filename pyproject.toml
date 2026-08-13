@@ -1,0 +1,26 @@
+[project]
+name = "oyster-omelette"
+version = "0.1.0"
+description = "TUI 農家樂（修訂版）。代號 oyster-omelette。"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=8.2.8",
+]
+
+[project.scripts]
+oyster-omelette = "oyster_omelette:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-bdd>=8.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+bdd_features_base_dir = "features"
