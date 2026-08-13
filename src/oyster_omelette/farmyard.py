@@ -53,6 +53,14 @@ class Farmyard:
                     total += 1
         return total
 
+    def room_count(self) -> int:
+        total = 0
+        for row in self.cells:
+            for cell in row:
+                if cell.kind in {CellKind.WOOD_ROOM}:
+                    total += 1
+        return total
+
 
 def starting_farmyard() -> Farmyard:
     """左上兩格是起始木屋，各住一位家人。"""
@@ -124,6 +132,48 @@ def place_field(farm: Farmyard, row: int, col: int) -> bool:
         return False
     farm.cell(row, col).kind = CellKind.FIELD
     return True
+
+
+def _is_room(cell: Cell) -> bool:
+    return cell.kind == CellKind.WOOD_ROOM
+
+
+def can_place_room(farm: Farmyard, row: int, col: int) -> bool:
+    try:
+        cell = farm.cell(row, col)
+    except IndexError:
+        return False
+    if cell.kind != CellKind.EMPTY:
+        return False
+    for n_row, n_col in _neighbors(row, col):
+        try:
+            if _is_room(farm.cell(n_row, n_col)):
+                return True
+        except IndexError:
+            continue
+    return False
+
+
+def first_legal_room(farm: Farmyard) -> tuple[int, int] | None:
+    for row in range(farm.rows):
+        for col in range(farm.cols):
+            if can_place_room(farm, row, col):
+                return (row, col)
+    return None
+
+
+def place_room(farm: Farmyard, row: int, col: int) -> bool:
+    if not can_place_room(farm, row, col):
+        return False
+    farm.cell(row, col).kind = CellKind.WOOD_ROOM
+    return True
+
+
+def build_one_room(farm: Farmyard) -> bool:
+    spot = first_legal_room(farm)
+    if spot is None:
+        return False
+    return place_room(farm, spot[0], spot[1])
 
 
 def plow_first_legal(farm: Farmyard) -> bool:
