@@ -16,7 +16,11 @@ COLS = 5
 class CellKind(Enum):
     EMPTY = "empty"
     WOOD_ROOM = "wood_room"
+    CLAY_ROOM = "clay_room"
     FIELD = "field"
+
+
+ROOM_KINDS = {CellKind.WOOD_ROOM, CellKind.CLAY_ROOM}
 
 
 @dataclass
@@ -65,9 +69,18 @@ class Farmyard:
         total = 0
         for row in self.cells:
             for cell in row:
-                if cell.kind in {CellKind.WOOD_ROOM}:
+                if cell.kind in ROOM_KINDS:
                     total += 1
         return total
+
+    def house_material(self) -> CellKind:
+        for row in self.cells:
+            for cell in row:
+                if cell.kind == CellKind.CLAY_ROOM:
+                    return CellKind.CLAY_ROOM
+                if cell.kind == CellKind.WOOD_ROOM:
+                    return CellKind.WOOD_ROOM
+        return CellKind.WOOD_ROOM
 
 
 def starting_farmyard() -> Farmyard:
@@ -79,7 +92,7 @@ def starting_farmyard() -> Farmyard:
 
 
 def _rooms(farm: Farmyard) -> list[Cell]:
-    return [cell for row in farm.cells for cell in row if cell.kind == CellKind.WOOD_ROOM]
+    return [cell for row in farm.cells for cell in row if cell.kind in ROOM_KINDS]
 
 
 def take_one_person(farm: Farmyard) -> bool:
@@ -90,7 +103,7 @@ def take_one_person(farm: Farmyard) -> bool:
         for cell in row:
             if cell.people <= 0:
                 continue
-            if cell.kind == CellKind.WOOD_ROOM:
+            if cell.kind in ROOM_KINDS:
                 rooms.append(cell)
             else:
                 others.append(cell)
@@ -143,7 +156,7 @@ def place_field(farm: Farmyard, row: int, col: int) -> bool:
 
 
 def _is_room(cell: Cell) -> bool:
-    return cell.kind == CellKind.WOOD_ROOM
+    return cell.kind in ROOM_KINDS
 
 
 def can_place_room(farm: Farmyard, row: int, col: int) -> bool:
@@ -173,7 +186,18 @@ def first_legal_room(farm: Farmyard) -> tuple[int, int] | None:
 def place_room(farm: Farmyard, row: int, col: int) -> bool:
     if not can_place_room(farm, row, col):
         return False
-    farm.cell(row, col).kind = CellKind.WOOD_ROOM
+    farm.cell(row, col).kind = farm.house_material()
+    return True
+
+
+def renovate_house(farm: Farmyard) -> bool:
+    """木屋一次全部改成黏土屋。已經是黏土屋就失敗。"""
+    if farm.house_material() != CellKind.WOOD_ROOM:
+        return False
+    for row in farm.cells:
+        for cell in row:
+            if cell.kind == CellKind.WOOD_ROOM:
+                cell.kind = CellKind.CLAY_ROOM
     return True
 
 

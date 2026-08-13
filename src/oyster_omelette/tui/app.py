@@ -14,6 +14,7 @@ SPACE_KEYS = "123456789abcdefghijk"
 KIND_MARK = {
     CellKind.EMPTY: "．",
     CellKind.WOOD_ROOM: "屋",
+    CellKind.CLAY_ROOM: "黏",
     CellKind.FIELD: "田",
 }
 

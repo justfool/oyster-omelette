@@ -99,6 +99,13 @@ def give_clay(game: Game, number: int, count: int) -> None:
     game.players[number - 1].clay = count
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {clay:d} 黏土與 {reed:d} 蘆葦"))
+def give_clay_and_reed(game: Game, number: int, clay: int, reed: int) -> None:
+    player = game.players[number - 1]
+    player.clay = clay
+    player.reed = reed
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 穀"))
 def give_grain(game: Game, number: int, count: int) -> None:
     game.players[number - 1].grain = count
@@ -360,6 +367,12 @@ def then_farm_size(game: Game, number: int, rows: int, cols: int) -> None:
 def then_wood_room(game: Game, row: int, col: int) -> None:
     cell = game.players[0].farm.cell(row - 1, col - 1)
     assert cell.kind == CellKind.WOOD_ROOM
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格應是黏土屋"))
+def then_clay_room(game: Game, row: int, col: int) -> None:
+    cell = game.players[0].farm.cell(row - 1, col - 1)
+    assert cell.kind == CellKind.CLAY_ROOM
 
 
 @then(parsers.parse("第 {row:d} 列第 {col:d} 格應是空地"))
