@@ -171,6 +171,7 @@ class OysterOmeletteApp(App):
         Binding("r", "go_home", "回家"),
         Binding("h", "do_harvest", "收成"),
         Binding("s", "show_score", "計分"),
+        Binding("question_mark", "help", "說明"),
     ]
 
     def __init__(self) -> None:
@@ -270,6 +271,12 @@ class OysterOmeletteApp(App):
             self.action_show_score()
             self.note("第 14 回合結束。")
 
+    def action_help(self) -> None:
+        self.note(
+            "P 準備  R 回家  S 計分  ? 說明  Q 離開。"
+            "數字／字母放工人。耕田圍籬蓋房先選行動再按列1-3、行1-5。"
+        )
+
     def action_show_score(self) -> None:
         for index, player in enumerate(self.game.players):
             detail = score_player(player)
@@ -312,7 +319,7 @@ class OysterOmeletteApp(App):
             self.note("沒有這個按鍵對應的格子。")
             return
         space_id = ids[index]
-        if space_id in {"farmland", "fences", "farm_expansion"}:
+        if space_id in {"farmland", "fences", "farm_expansion", "plow_and_or_sow"}:
             self.pending_space = space_id
             self.pending_row = None
             self.note(

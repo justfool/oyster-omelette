@@ -24,6 +24,17 @@ def test_plow_on_room_fails_and_does_not_occupy():
     assert game.players[0].unplaced_workers == 2
 
 
+def test_plow_and_sow_uses_chosen_cell():
+    game = Game.setup(1, round_cards=["plow_and_or_sow"])
+    game.prepare_round()
+    player = game.players[0]
+    player.grain = 1
+    result = game.place_worker(0, "plow_and_or_sow", target=(2, 4))
+    assert result.ok
+    assert player.farm.cell(2, 4).kind == CellKind.FIELD
+    assert player.farm.cell(2, 4).crop_count == 3
+
+
 def test_fence_at_chosen_cell():
     game = Game.setup(1, round_cards=["fences"])
     game.prepare_round()

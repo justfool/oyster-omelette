@@ -123,7 +123,7 @@ def target_error(player, space, target: tuple[int, int] | None) -> str:
     if target is None:
         return ""
     row, col = target
-    if space.id == "farmland":
+    if space.id in {"farmland", "plow_and_or_sow"}:
         if not can_place_field(player.farm, row, col):
             return "illegal_cell"
     if space.id == "fences":
@@ -287,7 +287,10 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
         return
 
     if space.id == "plow_and_or_sow":
-        plow_first_legal(player.farm)
+        if target is not None:
+            place_field(player.farm, target[0], target[1])
+        else:
+            plow_first_legal(player.farm)
         sow_fields(player)
         return
 
