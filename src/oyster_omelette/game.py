@@ -60,6 +60,7 @@ class Game:
     work_phase: bool = False
     harvested: bool = False
     solo: bool = False
+    god_mode: bool = False
     player_count: int = 1
     major_supply: list[str] = field(default_factory=starting_supply)
     _turn_from: int = 0
@@ -70,6 +71,7 @@ class Game:
         player_count: int = 1,
         round_cards: list[str] | None = None,
         solo: bool = False,
+        god_mode: bool = False,
     ) -> "Game":
         if player_count < 1:
             raise ValueError("至少要有 1 位玩家")
@@ -106,6 +108,7 @@ class Game:
             remaining_round_cards=cards,
             major_supply=starting_supply(),
             solo=solo,
+            god_mode=god_mode,
             player_count=player_count,
         )
         job_hands = deal_occupations(player_count)
@@ -163,13 +166,31 @@ class Game:
         self._reset_workers()
         self.work_phase = False
 
+    def upcoming_round_cards(self) -> list[str]:
+        """尚未翻開的回合卡，依即將出現的順序。"""
+        return list(self.remaining_round_cards)
+
+    def hidden_info(self) -> list[dict]:
+        """各玩家手牌等正常不公開的資料。"""
+        rows = []
+        for player in self.players:
+            rows.append(
+                {
+                    "occupations": list(player.occupations_hand),
+                    "minors": list(player.minors_hand),
+                    "newborns": player.newborns_this_round,
+                    "well_food_left": player.well_food_left,
+                }
+            )
+        return rows
+
     def is_finished(self) -> bool:
         return self.round >= 14 and not self.work_phase and self.harvested
 
     def harvest(self) -> None:
         from oyster_omelette.harvest import harvest as run_harvest
 
-        if self.harvested:
+        if self.harvested and not self.god_mode:
             return
         run_harvest(self)
         self.harvested = True
@@ -182,29 +203,31 @@ class Game:
     ) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
             return PlaceResult(ok=False, error="unknown_player")
-        if not self.work_phase:
-            return PlaceResult(ok=False, error="not_work_phase")
 
         player = self.players[player_index]
-        if player.unplaced_workers <= 0:
-            return PlaceResult(ok=False, error="no_available_family")
-        if self.whose_turn() != player_index:
-            return PlaceResult(ok=False, error="not_your_turn")
-
         space = self.board.get(space_id)
         if space is None:
             return PlaceResult(ok=False, error="unknown_space")
-        if space.is_occupied():
-            return PlaceResult(ok=False, error="space_occupied")
-        blocked = cannot_use(player, space, self)
-        if blocked:
-            return PlaceResult(ok=False, error=blocked)
-        blocked = target_error(player, space, target)
-        if blocked:
-            return PlaceResult(ok=False, error=blocked)
 
-        take_one_person(player.farm)
-        player.unplaced_workers -= 1
+        if not self.god_mode:
+            if not self.work_phase:
+                return PlaceResult(ok=False, error="not_work_phase")
+            if player.unplaced_workers <= 0:
+                return PlaceResult(ok=False, error="no_available_family")
+            if self.whose_turn() != player_index:
+                return PlaceResult(ok=False, error="not_your_turn")
+            if space.is_occupied():
+                return PlaceResult(ok=False, error="space_occupied")
+            blocked = cannot_use(player, space, self)
+            if blocked:
+                return PlaceResult(ok=False, error=blocked)
+            blocked = target_error(player, space, target)
+            if blocked:
+                return PlaceResult(ok=False, error=blocked)
+
+        if player.unplaced_workers > 0:
+            take_one_person(player.farm)
+            player.unplaced_workers -= 1
         space.occupant = player_index
         resolve_space(self, player, space, target)
 
