@@ -139,5 +139,9 @@ def score_player(player) -> dict[str, int]:
         "begging": player.begging * -3,
         "majors": major_points(player),
     }
-    detail["total"] = sum(detail.values())
+    leftover = player.wood + player.clay + player.reed + player.stone
+    detail["leftover"] = leftover
+    detail["total"] = sum(
+        value for key, value in detail.items() if key != "leftover"
+    )
     return detail

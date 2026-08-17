@@ -169,10 +169,14 @@ def cannot_use(player, space, game=None) -> str:
             return "cannot_build_fireplace"
     if space.id == "fences":
         return _fence_block_reason(player) or ""
-    if space.id == "lessons":
+    if space.id in {"lessons", "lessons_3p"}:
         if not player.occupations_hand:
             return "cannot_play_occupation"
-        cost = occupation_cost(len(player.occupations_played))
+        cost = (
+            2
+            if space.id == "lessons_3p"
+            else occupation_cost(len(player.occupations_played))
+        )
         if player.food < cost:
             return "cannot_play_occupation"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
@@ -199,6 +203,10 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
             house_animals(player, space.resource, space.accumulated)
         else:
             add_resource(player, space.resource, space.accumulated)
+            if space.resource == "wood":
+                from oyster_omelette.cards import bonus_wood
+
+                player.wood += bonus_wood(player)
         space.accumulated = 0
         return
 
@@ -284,8 +292,12 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
         _do_fence(player, target)
         return
 
-    if space.id == "lessons":
-        cost = occupation_cost(len(player.occupations_played))
+    if space.id in {"lessons", "lessons_3p"}:
+        cost = (
+            2
+            if space.id == "lessons_3p"
+            else occupation_cost(len(player.occupations_played))
+        )
         player.food -= cost
         play_occupation(player, player.occupations_hand[0])
         return

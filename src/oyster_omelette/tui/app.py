@@ -22,6 +22,11 @@ SPACE_NAMES = {
     "clay_pit": "黏土坑",
     "reed_bank": "蘆葦岸",
     "fishing": "漁場",
+    "copse": "小樹林",
+    "hollow": "凹地",
+    "grove": "樹叢",
+    "traveling_players": "賣藝",
+    "lessons_3p": "上課（2食）",
     "fences": "圍籬",
     "major_or_minor": "主要或次要改良",
     "sheep": "羊市",
@@ -232,6 +237,9 @@ class OysterOmeletteApp(App):
             self.note("家人回家並收成：" + "，".join(bits))
         else:
             self.note("家人回家並收成，兩家都吃飽了。")
+        if self.game.is_finished():
+            self.action_show_score()
+            self.note("第 14 回合結束。")
 
     def action_show_score(self) -> None:
         for index, player in enumerate(self.game.players):

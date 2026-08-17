@@ -15,7 +15,14 @@ ACCUMULATION: dict[str, tuple[str, int]] = {
     "cattle": ("cattle", 1),
     "western_quarry": ("stone", 1),
     "eastern_quarry": ("stone", 1),
+    "copse": ("wood", 2),
+    "hollow": ("clay", 1),
+    "grove": ("wood", 2),
+    "traveling_players": ("food", 1),
 }
+
+EXTRA_3P: tuple[str, ...] = ("copse", "hollow", "lessons_3p")
+EXTRA_4P: tuple[str, ...] = EXTRA_3P + ("grove", "traveling_players")
 
 FIXED_SPACE_IDS_2P: tuple[str, ...] = (
     "farm_expansion",
@@ -138,5 +145,22 @@ def deal_round_cards(rng: random.Random | None = None) -> list[str]:
 def two_player_board() -> Board:
     board = Board()
     for space_id in FIXED_SPACE_IDS_2P:
+        board.add_space(space_id)
+    return board
+
+
+def make_board(player_count: int, solo: bool = False) -> Board:
+    board = two_player_board()
+    if solo:
+        forest = board.get("forest")
+        if forest is not None:
+            forest.replenish_amount = 2
+        return board
+    extras = ()
+    if player_count >= 4:
+        extras = EXTRA_4P
+    elif player_count >= 3:
+        extras = EXTRA_3P
+    for space_id in extras:
         board.add_space(space_id)
     return board

@@ -25,7 +25,8 @@ def feed_player(player) -> None:
     # 本回合剛生、還沒工作過的家人只吃 1 食；已進場大人吃 2。
     newborns = max(0, min(player.newborns_this_round, player.family_size()))
     adults = player.family_size() - newborns
-    need = adults * 2 + newborns
+    adult_cost = getattr(player, "food_per_adult", 2)
+    need = adults * adult_cost + newborns
     pay = min(player.food, need)
     player.food -= pay
     need -= pay
