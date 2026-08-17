@@ -24,6 +24,18 @@ def test_feed_uses_food_then_grain():
     assert player.begging == 1
 
 
+def test_second_harvest_in_same_round_does_nothing():
+    from oyster_omelette.game import Game
+
+    game = Game.setup(1)
+    game.prepare_round()
+    game.return_home()
+    game.harvest()
+    first = game.players[0].begging
+    game.harvest()
+    assert game.players[0].begging == first
+
+
 def test_enough_food_no_begging():
     farm = starting_farmyard()
     player = Player(farm=farm, food=4, is_start_player=True)

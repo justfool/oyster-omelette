@@ -20,4 +20,5 @@ def test_starting_player_has_many_empty_spaces():
     assert detail["unused"] == -13
     assert detail["fields"] == -1
     assert detail["begging"] == 0
+    assert detail["fenced_stables"] == 0
     assert detail["total"] == -14

@@ -52,6 +52,7 @@ class Game:
     remaining_round_cards: list[str] = field(default_factory=list)
     current_player_index: int | None = 0
     work_phase: bool = False
+    harvested: bool = False
     major_supply: list[str] = field(default_factory=starting_supply)
     _turn_from: int = 0
 
@@ -132,6 +133,7 @@ class Game:
         self.board.replenish()
         self._reset_workers()
         self.work_phase = True
+        self.harvested = False
 
     def return_home(self) -> None:
         self._reset_workers()
@@ -140,7 +142,10 @@ class Game:
     def harvest(self) -> None:
         from oyster_omelette.harvest import harvest as run_harvest
 
+        if self.harvested:
+            return
         run_harvest(self)
+        self.harvested = True
 
     def place_worker(self, player_index: int, space_id: str) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):

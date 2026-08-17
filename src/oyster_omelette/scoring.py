@@ -111,7 +111,7 @@ def unused_spaces(player) -> int:
 def score_player(player) -> dict[str, int]:
     from oyster_omelette.farmyard import CellKind
     from oyster_omelette.majors import major_points
-    from oyster_omelette.pastures import pasture_count
+    from oyster_omelette.pastures import pasture_cells, pasture_count
 
     room_points = 0
     for row in player.farm.cells:
@@ -129,6 +129,11 @@ def score_player(player) -> dict[str, int]:
         "wild_boar": points_boar(player.wild_boar),
         "cattle": points_cattle(player.cattle),
         "unused": -unused_spaces(player),
+        "fenced_stables": sum(
+            1
+            for row, col in pasture_cells(player.farm)
+            if player.farm.cell(row, col).stable
+        ),
         "rooms": room_points,
         "family": player.family_size() * 3,
         "begging": player.begging * -3,

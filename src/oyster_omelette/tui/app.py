@@ -11,6 +11,32 @@ from oyster_omelette.harvest import is_harvest_round
 from oyster_omelette.scoring import score_player
 
 SPACE_KEYS = "123456789abcdefghijk"
+SPACE_NAMES = {
+    "farm_expansion": "農場擴建",
+    "meeting_place": "聚會所",
+    "grain_seeds": "穀種",
+    "farmland": "耕地",
+    "lessons": "上課",
+    "day_laborer": "日工",
+    "forest": "森林",
+    "clay_pit": "黏土坑",
+    "reed_bank": "蘆葦岸",
+    "fishing": "漁場",
+    "fences": "圍籬",
+    "major_or_minor": "主要或次要改良",
+    "sheep": "羊市",
+    "sow_and_or_bake": "播種／烤麵包",
+    "family_growth": "生小孩",
+    "western_quarry": "西採石場",
+    "vegetable_seeds": "蔬菜",
+    "wild_boar": "野豬市",
+    "renovation": "翻修",
+    "cattle": "牛市",
+    "eastern_quarry": "東採石場",
+    "plow_and_or_sow": "耕且／或播",
+    "family_growth_without_room": "沒房也能生",
+    "renovation_and_fences": "翻修後圍籬",
+}
 KIND_MARK = {
     CellKind.EMPTY: "．",
     CellKind.WOOD_ROOM: "屋",
@@ -64,7 +90,8 @@ def board_text(game: Game) -> str:
         who = ""
         if space.occupant is not None:
             who = f" [P{space.occupant + 1}]"
-        lines.append(f" {key} {space_id}{pile}{who}")
+        name = SPACE_NAMES.get(space_id, space_id)
+        lines.append(f" {key} {name}{pile}{who}")
     return "\n".join(lines)
 
 
@@ -123,8 +150,12 @@ class OysterOmeletteApp(App):
         turn = self.game.whose_turn()
         phase = "工作中" if self.game.work_phase else "等待準備／回家"
         harvest_hint = ""
-        if is_harvest_round(self.game.round) and not self.game.work_phase:
-            harvest_hint = "　本回合該收成（H）"
+        if (
+            is_harvest_round(self.game.round)
+            and not self.game.work_phase
+            and not self.game.harvested
+        ):
+            harvest_hint = "　收成回合"
         self.query_one("#status", Static).update(
             f"回合 {self.game.round}　{phase}　輪到 "
             f"{'你' if turn == 0 else '-'}{harvest_hint}\n"
@@ -143,17 +174,18 @@ class OysterOmeletteApp(App):
             return
         self.game.prepare_round()
         card = self.game.board.revealed_round_cards[-1]
-        self.note(f"第 {self.game.round} 回合開始，翻開 {card}。")
+        name = SPACE_NAMES.get(card, card)
+        self.note(f"第 {self.game.round} 回合開始，翻開{name}。")
 
     def action_go_home(self) -> None:
         if not self.game.work_phase:
             self.note("現在不在工作階段。")
             return
         self.game.return_home()
-        extra = ""
         if is_harvest_round(self.game.round):
-            extra = " 該收成了，按 H。"
-        self.note("家人回家了。" + extra)
+            self._run_harvest()
+        else:
+            self.note("家人回家了。")
 
     def action_do_harvest(self) -> None:
         if self.game.work_phase:
@@ -162,13 +194,19 @@ class OysterOmeletteApp(App):
         if not is_harvest_round(self.game.round):
             self.note("這一回合沒有收成。")
             return
+        self._run_harvest()
+
+    def _run_harvest(self) -> None:
+        if self.game.harvested:
+            self.note("這一回合已經收成過了。")
+            return
         before = self.game.players[0].begging
         self.game.harvest()
         gained = self.game.players[0].begging - before
         if gained:
-            self.note(f"收成結束，拿了 {gained} 張討飯卡。")
+            self.note(f"家人回家並收成，拿了 {gained} 張討飯卡。")
         else:
-            self.note("收成結束，家人吃飽了。")
+            self.note("家人回家並收成，家人吃飽了。")
 
     def action_show_score(self) -> None:
         detail = score_player(self.game.players[0])
@@ -190,7 +228,7 @@ class OysterOmeletteApp(App):
         space_id = ids[index]
         result = self.game.place_worker(0, space_id)
         if result.ok:
-            self.note(f"放到 {space_id}。")
+            self.note(f"放到{SPACE_NAMES.get(space_id, space_id)}。")
         else:
             self.note(f"不能放：{result.error}")
 
