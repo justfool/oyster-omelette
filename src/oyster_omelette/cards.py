@@ -11,6 +11,7 @@ OCCUPATIONS: dict[str, tuple[str, str, int]] = {
     "veg_grower": ("菜農", "vegetable", 1),
     "forester": ("林務員", "wood", 0),
     "clay_digger": ("挖黏人", "clay", 0),
+    "baker": ("麵包師", "food", 0),
 }
 
 OCCUPATION_IDS: tuple[str, ...] = tuple(OCCUPATIONS.keys())
