@@ -43,6 +43,42 @@ def _grow_family(player) -> None:
     player.newborns_this_round += 1
 
 
+def _renovate_block_reason(player) -> str:
+    material = player.farm.house_material()
+    rooms = player.farm.room_count()
+    if material == CellKind.STONE_ROOM:
+        return "cannot_renovate"
+    if player.reed < 1:
+        return "cannot_renovate"
+    if material == CellKind.WOOD_ROOM and player.clay < rooms:
+        return "cannot_renovate"
+    if material == CellKind.CLAY_ROOM and player.stone < rooms:
+        return "cannot_renovate"
+    return ""
+
+
+def _do_renovate(player) -> None:
+    rooms = player.farm.room_count()
+    player.reed -= 1
+    if player.farm.house_material() == CellKind.WOOD_ROOM:
+        player.clay -= rooms
+    else:
+        player.stone -= rooms
+    renovate_house(player.farm)
+
+
+def _fence_block_reason(player) -> str:
+    cost = next_pasture_cost(player.farm)
+    if cost is None or player.wood < cost:
+        return "cannot_fence"
+    return ""
+
+
+def _do_fence(player) -> None:
+    cost = enclose_one_pasture(player.farm)
+    player.wood -= cost
+
+
 def cannot_use(player, space) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
@@ -52,16 +88,9 @@ def cannot_use(player, space) -> str:
         if not _can_build_room(player) and not can_stable:
             return "cannot_build_room"
     if space.id == "renovation":
-        material = player.farm.house_material()
-        rooms = player.farm.room_count()
-        if material == CellKind.STONE_ROOM:
-            return "cannot_renovate"
-        if player.reed < 1:
-            return "cannot_renovate"
-        if material == CellKind.WOOD_ROOM and player.clay < rooms:
-            return "cannot_renovate"
-        if material == CellKind.CLAY_ROOM and player.stone < rooms:
-            return "cannot_renovate"
+        return _renovate_block_reason(player) or ""
+    if space.id == "renovation_and_fences":
+        return _renovate_block_reason(player) or ""
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
             return "need_spare_room"
@@ -71,10 +100,8 @@ def cannot_use(player, space) -> str:
     if space.id == "major_or_minor":
         if player.has_fireplace or player.clay < 2:
             return "cannot_build_fireplace"
-    if space.id in {"fences", "renovation_and_fences"}:
-        cost = next_pasture_cost(player.farm)
-        if cost is None or player.wood < cost:
-            return "cannot_fence"
+    if space.id == "fences":
+        return _fence_block_reason(player) or ""
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
         can_sow = bool(empty_fields(player.farm)) and (
             player.grain > 0 or player.vegetable > 0
@@ -121,13 +148,13 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "renovation":
-        rooms = player.farm.room_count()
-        player.reed -= 1
-        if player.farm.house_material() == CellKind.WOOD_ROOM:
-            player.clay -= rooms
-        else:
-            player.stone -= rooms
-        renovate_house(player.farm)
+        _do_renovate(player)
+        return
+
+    if space.id == "renovation_and_fences":
+        _do_renovate(player)
+        if not _fence_block_reason(player):
+            _do_fence(player)
         return
 
     if space.id in {"family_growth", "family_growth_without_room"}:
@@ -159,7 +186,6 @@ def resolve_space(game, player, space) -> None:
         sow_fields(player)
         return
 
-    if space.id in {"fences", "renovation_and_fences"}:
-        cost = enclose_one_pasture(player.farm)
-        player.wood -= cost
+    if space.id == "fences":
+        _do_fence(player)
         return
