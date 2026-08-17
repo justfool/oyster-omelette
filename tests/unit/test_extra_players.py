@@ -17,6 +17,16 @@ def test_four_player_board_has_traveling_players():
     assert game.space("grove") is not None
 
 
+def test_three_player_paid_lessons_cost_two_food():
+    game = Game.setup(3)
+    game.prepare_round()
+    player = game.players[0]
+    player.food = 2
+    assert game.place_worker(0, "lessons_3p").ok
+    assert player.food == 0
+    assert player.occupations_played
+
+
 def test_two_player_board_has_no_copse():
     game = Game.setup(2)
     assert game.space("copse") is None
