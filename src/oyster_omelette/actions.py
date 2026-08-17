@@ -91,15 +91,15 @@ def _fence_block_reason(player) -> str:
     return ""
 
 
-def _try_play_minor(player) -> None:
+def _try_play_minor(player, game=None) -> None:
     if player.minors_hand:
-        play_minor(player, player.minors_hand[0])
+        play_minor(player, player.minors_hand[0], game)
 
 
 def _try_play_major_or_minor(game, player) -> None:
     major_id = choose_major(player, game.major_supply)
     if major_id is None:
-        _try_play_minor(player)
+        _try_play_minor(player, game)
         return
     take_major(player, game.major_supply, major_id)
     if major_id in {"clay_oven", "stone_oven"}:
@@ -225,7 +225,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
             other.is_start_player = False
         player.is_start_player = True
         if player.minors_hand:
-            play_minor(player, player.minors_hand[0])
+            play_minor(player, player.minors_hand[0], game)
         return
 
     if space.id == "farm_expansion":
@@ -262,7 +262,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
 
     if space.id in {"family_growth", "family_growth_without_room"}:
         _grow_family(player)
-        _try_play_minor(player)
+        _try_play_minor(player, game)
         return
 
     if space.id == "vegetable_seeds":

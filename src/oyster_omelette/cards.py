@@ -43,16 +43,26 @@ MINORS: dict[str, tuple[str, str, int]] = {
     "veg_basket": ("菜籃", "vegetable", 1),
     "stone_sled": ("運石橇", "stone", 1),
     "reed_bundle": ("蘆葦捆", "reed", 1),
+    "traveling_ale": ("旅行麥酒", "food", 1),
 }
+
+TRAVELING_MINORS = frozenset({"traveling_ale"})
 
 MINOR_IDS: tuple[str, ...] = tuple(MINORS.keys())
 
 
-def play_minor(player, card_id: str) -> None:
+def play_minor(player, card_id: str, game=None) -> None:
     _name, resource, amount = MINORS[card_id]
     player.minors_hand.remove(card_id)
-    player.minors_played.append(card_id)
     setattr(player, resource, getattr(player, resource) + amount)
+    if card_id in TRAVELING_MINORS:
+        if game is None or getattr(game, "solo", False) or len(game.players) < 2:
+            return
+        index = game.players.index(player)
+        nxt = game.players[(index + 1) % len(game.players)]
+        nxt.minors_hand.append(card_id)
+        return
+    player.minors_played.append(card_id)
 
 
 def _deal(ids: tuple[str, ...], player_count: int) -> list[list[str]]:
