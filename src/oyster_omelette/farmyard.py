@@ -17,10 +17,11 @@ class CellKind(Enum):
     EMPTY = "empty"
     WOOD_ROOM = "wood_room"
     CLAY_ROOM = "clay_room"
+    STONE_ROOM = "stone_room"
     FIELD = "field"
 
 
-ROOM_KINDS = {CellKind.WOOD_ROOM, CellKind.CLAY_ROOM}
+ROOM_KINDS = {CellKind.WOOD_ROOM, CellKind.CLAY_ROOM, CellKind.STONE_ROOM}
 
 
 @dataclass
@@ -76,6 +77,8 @@ class Farmyard:
     def house_material(self) -> CellKind:
         for row in self.cells:
             for cell in row:
+                if cell.kind == CellKind.STONE_ROOM:
+                    return CellKind.STONE_ROOM
                 if cell.kind == CellKind.CLAY_ROOM:
                     return CellKind.CLAY_ROOM
                 if cell.kind == CellKind.WOOD_ROOM:
@@ -191,13 +194,18 @@ def place_room(farm: Farmyard, row: int, col: int) -> bool:
 
 
 def renovate_house(farm: Farmyard) -> bool:
-    """木屋一次全部改成黏土屋。已經是黏土屋就失敗。"""
-    if farm.house_material() != CellKind.WOOD_ROOM:
+    """木→黏土，或黏土→石頭。已經是石頭屋就失敗。"""
+    material = farm.house_material()
+    if material == CellKind.WOOD_ROOM:
+        before, after = CellKind.WOOD_ROOM, CellKind.CLAY_ROOM
+    elif material == CellKind.CLAY_ROOM:
+        before, after = CellKind.CLAY_ROOM, CellKind.STONE_ROOM
+    else:
         return False
     for row in farm.cells:
         for cell in row:
-            if cell.kind == CellKind.WOOD_ROOM:
-                cell.kind = CellKind.CLAY_ROOM
+            if cell.kind == before:
+                cell.kind = after
     return True
 
 

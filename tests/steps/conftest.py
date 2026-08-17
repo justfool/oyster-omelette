@@ -106,6 +106,13 @@ def give_clay_and_reed(game: Game, number: int, clay: int, reed: int) -> None:
     player.reed = reed
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {stone:d} 石頭與 {reed:d} 蘆葦"))
+def give_stone_and_reed(game: Game, number: int, stone: int, reed: int) -> None:
+    player = game.players[number - 1]
+    player.stone = stone
+    player.reed = reed
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 穀"))
 def give_grain(game: Game, number: int, count: int) -> None:
     game.players[number - 1].grain = count
@@ -378,6 +385,17 @@ def then_wood_room(game: Game, row: int, col: int) -> None:
 def then_clay_room(game: Game, row: int, col: int) -> None:
     cell = game.players[0].farm.cell(row - 1, col - 1)
     assert cell.kind == CellKind.CLAY_ROOM
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格應是石頭屋"))
+def then_stone_room(game: Game, row: int, col: int) -> None:
+    cell = game.players[0].farm.cell(row - 1, col - 1)
+    assert cell.kind == CellKind.STONE_ROOM
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 石頭"))
+def then_player_stone(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].stone == count
 
 
 @then(parsers.parse("第 {row:d} 列第 {col:d} 格應是空地"))

@@ -117,6 +117,8 @@ def score_player(player) -> dict[str, int]:
         for cell in row:
             if cell.kind == CellKind.CLAY_ROOM:
                 room_points += 1
+            elif cell.kind == CellKind.STONE_ROOM:
+                room_points += 2
     detail = {
         "fields": points_fields(player.farm.field_count()),
         "pastures": points_pastures(pasture_count(player.farm)),
