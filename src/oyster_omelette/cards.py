@@ -55,14 +55,29 @@ MINORS: dict[str, tuple[str, str, int]] = {
     "stone_sled": ("運石橇", "stone", 1),
     "reed_bundle": ("蘆葦捆", "reed", 1),
     "traveling_ale": ("旅行麥酒", "food", 1),
+    "hearty_stew": ("大鍋菜", "food", 3),
 }
 
 TRAVELING_MINORS = frozenset({"traveling_ale"})
+MINOR_COSTS: dict[str, dict[str, int]] = {
+    "hearty_stew": {"grain": 1},
+}
 
 MINOR_IDS: tuple[str, ...] = tuple(MINORS.keys())
 
 
+def can_play_minor(player, card_id: str) -> bool:
+    for resource, amount in MINOR_COSTS.get(card_id, {}).items():
+        if getattr(player, resource) < amount:
+            return False
+    return True
+
+
 def play_minor(player, card_id: str, game=None) -> None:
+    if not can_play_minor(player, card_id):
+        return
+    for resource, amount in MINOR_COSTS.get(card_id, {}).items():
+        setattr(player, resource, getattr(player, resource) - amount)
     _name, resource, amount = MINORS[card_id]
     player.minors_hand.remove(card_id)
     setattr(player, resource, getattr(player, resource) + amount)

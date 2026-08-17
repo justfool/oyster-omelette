@@ -92,8 +92,12 @@ def _fence_block_reason(player) -> str:
 
 
 def _try_play_minor(player, game=None) -> None:
-    if player.minors_hand:
-        play_minor(player, player.minors_hand[0], game)
+    from oyster_omelette.cards import can_play_minor
+
+    for card_id in list(player.minors_hand):
+        if can_play_minor(player, card_id):
+            play_minor(player, card_id, game)
+            return
 
 
 def _try_play_major_or_minor(game, player) -> None:
@@ -225,8 +229,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
         for other in game.players:
             other.is_start_player = False
         player.is_start_player = True
-        if player.minors_hand:
-            play_minor(player, player.minors_hand[0], game)
+        _try_play_minor(player, game)
         return
 
     if space.id == "farm_expansion":

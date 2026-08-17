@@ -25,6 +25,20 @@ def test_traveling_minor_passes_to_the_left():
     assert len(other.minors_hand) == before + 1
 
 
+def test_paid_minor_needs_grain():
+    from oyster_omelette.cards import can_play_minor, play_minor
+
+    game = Game.setup(1)
+    player = game.players[0]
+    player.minors_hand = ["hearty_stew"]
+    player.grain = 0
+    assert not can_play_minor(player, "hearty_stew")
+    player.grain = 1
+    play_minor(player, "hearty_stew", game)
+    assert player.grain == 0
+    assert player.food == 5
+
+
 def test_meeting_place_plays_wood_cart():
     game = Game.setup(1)
     game.prepare_round()
