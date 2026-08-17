@@ -35,6 +35,11 @@ def _can_build_room(player) -> bool:
     )
 
 
+def _grow_family(player) -> None:
+    player.family_members += 1
+    player.newborns_this_round += 1
+
+
 def cannot_use(player, space) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
@@ -52,6 +57,9 @@ def cannot_use(player, space) -> str:
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
             return "need_spare_room"
+    if space.id == "family_growth_without_room":
+        if player.family_size() >= 5:
+            return "family_full"
     if space.id == "major_or_minor":
         if player.has_fireplace or player.clay < 2:
             return "cannot_build_fireplace"
@@ -111,9 +119,8 @@ def resolve_space(game, player, space) -> None:
         renovate_house(player.farm)
         return
 
-    if space.id == "family_growth":
-        player.family_members += 1
-        player.newborns_this_round += 1
+    if space.id in {"family_growth", "family_growth_without_room"}:
+        _grow_family(player)
         return
 
     if space.id == "vegetable_seeds":
