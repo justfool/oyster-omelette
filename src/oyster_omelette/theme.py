@@ -1,4 +1,4 @@
-"""畫面圖示。預設用接近的 emoji，可用名稱、環境變數或 JSON 指定主題。"""
+"""畫面圖示。沒指定就用 default 主題，可用名稱、環境變數或 JSON 改。"""
 
 from __future__ import annotations
 
@@ -75,7 +75,11 @@ TEXT_ICONS = {
     "stable": "舍",
 }
 
-EMOJI_ICONS = {
+DEFAULT_NAME = "default"
+THEMES_DIR = Path(__file__).resolve().parent / "themes"
+TEXT_ALIASES = frozenset({"text", "plain", "zh", "文字"})
+
+DEFAULT_ICONS = {
     "wood": "🪵",
     "clay": "🧱",
     "reed": "🌾",
@@ -134,10 +138,12 @@ EMOJI_ICONS = {
     "well": "⛲",
 }
 
+EMOJI_ICONS = DEFAULT_ICONS
+
 _BASES = {
-    "emoji": EMOJI_ICONS,
-    "default": EMOJI_ICONS,
-    "圖示": EMOJI_ICONS,
+    "default": DEFAULT_ICONS,
+    "emoji": DEFAULT_ICONS,
+    "圖示": DEFAULT_ICONS,
     "text": TEXT_ICONS,
     "plain": TEXT_ICONS,
     "zh": TEXT_ICONS,
@@ -164,34 +170,34 @@ class Theme:
 def build_theme(
     name: str,
     icons: dict[str, str] | None = None,
-    base: str = "emoji",
+    base: str = DEFAULT_NAME,
 ) -> Theme:
-    merged = dict(_BASES.get(base, EMOJI_ICONS))
+    merged = dict(_BASES.get(base, DEFAULT_ICONS))
     if icons:
         merged.update(icons)
     return Theme(name=name, icons=merged)
 
 
+DEFAULT_THEME = build_theme(DEFAULT_NAME)
+
+
+def builtin_theme_file(name: str = DEFAULT_NAME) -> Path:
+    return THEMES_DIR / f"{name}.json"
+
+
 def load_theme(spec: str | None = None) -> Theme:
     if spec is None:
-        spec = os.environ.get("OYSTER_THEME") or "emoji"
-    spec = spec.strip() or "emoji"
+        spec = os.environ.get("OYSTER_THEME") or DEFAULT_NAME
+    spec = spec.strip() or DEFAULT_NAME
     if _looks_like_path(spec):
         return _from_json(Path(spec))
-    key = spec.lower()
-    if key in _BASES:
-        return build_theme(key if key in {"emoji", "text"} else _canonical(key), base=key)
-    return build_theme("emoji")
+    if spec.lower() in TEXT_ALIASES:
+        return build_theme("text", base="text")
+    return DEFAULT_THEME
 
 
 def _is_word_icon(mark: str) -> bool:
     return bool(mark) and all("\u4e00" <= ch <= "\u9fff" for ch in mark)
-
-
-def _canonical(key: str) -> str:
-    if key in {"text", "plain", "zh", "文字"}:
-        return "text"
-    return "emoji"
 
 
 def _looks_like_path(spec: str) -> bool:
@@ -201,6 +207,6 @@ def _looks_like_path(spec: str) -> bool:
 def _from_json(path: Path) -> Theme:
     data = json.loads(path.read_text(encoding="utf-8"))
     name = str(data.get("name") or path.stem)
-    base = str(data.get("base") or "emoji")
+    base = str(data.get("base") or DEFAULT_NAME)
     icons = data.get("icons") or {}
     return build_theme(name, icons=icons, base=base)
