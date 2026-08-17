@@ -1,0 +1,325 @@
+"""單一行動格：資料、說明文字，以及可 focus 的格子 widget。"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from textual.widgets import Static
+
+from oyster_omelette.board import (
+    DEFAULT_ROUND_CARDS,
+    EXTRA_3P,
+    EXTRA_4P,
+    FIXED_SPACE_IDS_2P,
+)
+from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme
+
+SPACE_KEYS = "123456789abcdefghijk"
+
+NEEDS_CELL = frozenset(
+    {"farmland", "fences", "farm_expansion", "plow_and_or_sow"}
+)
+
+ZONE_FIXED = "fixed"
+ZONE_ROUND = "round"
+
+FIXED_COLUMNS = 5
+ROUND_COLUMNS = 7
+
+SPACE_BLURBS = {
+    "farm_expansion": "蓋房間（貼著既有房間；木屋 5 木+2 蘆）或蓋畜舍（2 木）。",
+    "meeting_place": "成為起始玩家，下回合先放。之後可打 1 張次要改良。",
+    "grain_seeds": "拿到 1 穀。",
+    "farmland": "耕 1 塊田。第一塊任意空地，之後要相鄰。",
+    "lessons": "打 1 張職業。2 人版第一張免費，之後 1 食。",
+    "day_laborer": "拿到 2 食物。不堆疊。",
+    "forest": "每回合補 3 木；拿走全部堆疊。",
+    "clay_pit": "每回合補 1 黏土；拿走全部堆疊。",
+    "reed_bank": "每回合補 1 蘆葦；拿走全部堆疊。",
+    "fishing": "每回合補 1 食物；拿走全部堆疊。",
+    "copse": "每回合補 2 木；拿走全部堆疊。3 人以上。",
+    "hollow": "每回合補 1 黏土；拿走全部堆疊。3 人以上。",
+    "grove": "每回合補 2 木；拿走全部堆疊。4 人。",
+    "traveling_players": "每回合補 1 食物；拿走全部堆疊。4 人。",
+    "lessons_3p": "打 1 張職業，費用 2 食。3 人以上。",
+    "fences": "圍籬，木頭用到不能再圍。",
+    "major_or_minor": "蓋 1 張主要改良，或打 1 張次要改良。",
+    "sheep": "每回合補 1 羊；拿走全部堆疊。住不下可煮或跑掉。",
+    "sow_and_or_bake": "播種且／或烤麵包。有壁爐才能烤。",
+    "family_growth": "生小孩（要空房）。之後可打 1 張次要。新生兒這回合不工作。",
+    "western_quarry": "每回合補 1 石；拿走全部堆疊。",
+    "vegetable_seeds": "拿到 1 菜。",
+    "wild_boar": "每回合補 1 野豬；拿走全部堆疊。",
+    "renovation": "整棟翻修（木→黏或黏→石），之後可再蓋主要或打次要。",
+    "cattle": "每回合補 1 牛；拿走全部堆疊。",
+    "eastern_quarry": "每回合補 1 石；拿走全部堆疊。",
+    "plow_and_or_sow": "耕田且／或播種。",
+    "family_growth_without_room": "沒空房也能生。新生兒這回合不工作。",
+    "renovation_and_fences": "先翻修，木頭夠再圍籬。",
+}
+
+
+@dataclass(frozen=True)
+class SpaceSlot:
+    space_id: str | None
+    zone: str
+    revealed: bool
+    face_down: bool
+    occupant: int | None
+    accumulated: int
+    resource: str | None
+    key: str
+    round_number: int | None = None
+    god_name: str | None = None
+    row: int = 0
+    col: int = 0
+
+    @property
+    def identity(self) -> str:
+        if self.space_id:
+            return self.space_id
+        return f"hidden-{self.round_number}"
+
+
+def extra_fixed_ids(game) -> tuple[str, ...]:
+    if getattr(game, "solo", False):
+        return ()
+    count = getattr(game, "player_count", len(game.players))
+    if count >= 4:
+        return EXTRA_4P
+    if count >= 3:
+        return EXTRA_3P
+    return ()
+
+
+def fixed_space_ids(game) -> tuple[str, ...]:
+    return tuple(FIXED_SPACE_IDS_2P) + extra_fixed_ids(game)
+
+
+def worker_icon(player_index: int, theme: Theme) -> str:
+    mark = theme.icon(f"worker_{player_index + 1}")
+    return mark or f"P{player_index + 1}"
+
+
+def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
+    god = game.god_mode if god_mode is None else god_mode
+    slots: list[SpaceSlot] = []
+    key_index = 0
+
+    for offset, space_id in enumerate(fixed_space_ids(game)):
+        space = game.space(space_id)
+        slots.append(
+            SpaceSlot(
+                space_id=space_id,
+                zone=ZONE_FIXED,
+                revealed=True,
+                face_down=False,
+                occupant=None if space is None else space.occupant,
+                accumulated=0 if space is None else space.accumulated,
+                resource=None if space is None else space.resource,
+                key=_key_at(key_index),
+                row=offset // FIXED_COLUMNS,
+                col=offset % FIXED_COLUMNS,
+            )
+        )
+        key_index += 1
+
+    revealed = list(game.board.revealed_round_cards)
+    upcoming = list(game.upcoming_round_cards())
+    total_round = max(len(DEFAULT_ROUND_CARDS), len(revealed) + len(upcoming))
+    for offset in range(total_round):
+        if offset < len(revealed):
+            space_id = revealed[offset]
+            space = game.space(space_id)
+            slots.append(
+                SpaceSlot(
+                    space_id=space_id,
+                    zone=ZONE_ROUND,
+                    revealed=True,
+                    face_down=False,
+                    occupant=None if space is None else space.occupant,
+                    accumulated=0 if space is None else space.accumulated,
+                    resource=None if space is None else space.resource,
+                    key=_key_at(key_index),
+                    round_number=offset + 1,
+                    row=offset // ROUND_COLUMNS,
+                    col=offset % ROUND_COLUMNS,
+                )
+            )
+        else:
+            upcoming_index = offset - len(revealed)
+            hidden_id = (
+                upcoming[upcoming_index] if upcoming_index < len(upcoming) else None
+            )
+            god_name = None
+            if god and hidden_id:
+                god_name = SPACE_NAMES.get(hidden_id, hidden_id)
+            slots.append(
+                SpaceSlot(
+                    space_id=None,
+                    zone=ZONE_ROUND,
+                    revealed=False,
+                    face_down=True,
+                    occupant=None,
+                    accumulated=0,
+                    resource=None,
+                    key=_key_at(key_index),
+                    round_number=offset + 1,
+                    god_name=god_name,
+                    row=offset // ROUND_COLUMNS,
+                    col=offset % ROUND_COLUMNS,
+                )
+            )
+        key_index += 1
+    return slots
+
+
+def slot_body(slot: SpaceSlot, theme: Theme) -> str:
+    if slot.face_down:
+        back = theme.icon("face_down") or "🂠"
+        if slot.god_name:
+            return f"{back} {slot.god_name}\n未翻開"
+        return f"{back}\n第{slot.round_number}回合"
+
+    title = theme.space_caption(slot.space_id or "")
+    pile = ""
+    if slot.resource and slot.accumulated:
+        pile = f"{theme.icon(slot.resource)}×{slot.accumulated}"
+    worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
+    first = f"{title} {pile}".rstrip()
+    if worker:
+        return f"{first}\n{worker}"
+    return first
+
+
+def inspect_text(slot: SpaceSlot, theme: Theme) -> str:
+    if slot.face_down:
+        if slot.god_name:
+            return (
+                f"未翻開回合卡：{slot.god_name}（第{slot.round_number}回合）。"
+                "上帝模式才看得到名稱。"
+            )
+        return f"第{slot.round_number}回合的卡還蓋著，翻開前看不到名稱。"
+
+    name = theme.space_caption(slot.space_id or "")
+    blurb = SPACE_BLURBS.get(slot.space_id or "", "")
+    if slot.resource:
+        icon = theme.icon(slot.resource)
+        if slot.accumulated:
+            pile = f"累積 {icon}×{slot.accumulated}"
+        else:
+            pile = "累積格目前是空的"
+    else:
+        pile = "不是累積格"
+
+    if slot.occupant is not None:
+        who = f"{worker_icon(slot.occupant, theme)} 玩家{slot.occupant + 1}站在這格"
+    else:
+        who = "目前沒人"
+
+    if slot.space_id in NEEDS_CELL:
+        need = "要選農場格。"
+    else:
+        need = "不用選農場格。"
+
+    bits = [name]
+    if blurb:
+        bits.append(blurb)
+    bits.append(f"{pile}。{who}。{need}")
+    return " ".join(bits)
+
+
+def selection_summary(slot: SpaceSlot, theme: Theme) -> str:
+    if slot.face_down:
+        back = theme.icon("face_down") or "🂠"
+        if slot.god_name:
+            return f"選取：{back} {slot.god_name}（未翻開）　I 說明"
+        return f"選取：{back} 第{slot.round_number}回合（蓋著）　I 說明"
+
+    name = theme.space_caption(slot.space_id or "")
+    pile = ""
+    if slot.resource and slot.accumulated:
+        pile = f"　{theme.icon(slot.resource)}×{slot.accumulated}"
+    if slot.occupant is not None:
+        who = f"　{worker_icon(slot.occupant, theme)}"
+    else:
+        who = "　無人"
+    return f"選取：{name}{pile}{who}　Enter 放工人　I 說明"
+
+
+def _key_at(index: int) -> str:
+    if 0 <= index < len(SPACE_KEYS):
+        return SPACE_KEYS[index]
+    return "?"
+
+
+class ActionSpaceWidget(Static, can_focus=True):
+    """一塊行動格：有邊框，可 focus，被佔用時站著工人圖示。"""
+
+    DEFAULT_CSS = """
+    ActionSpaceWidget {
+        border: round $primary;
+        width: 1fr;
+        height: 4;
+        padding: 0 1;
+        content-align: center middle;
+    }
+    ActionSpaceWidget:focus, ActionSpaceWidget.selected {
+        border: heavy $accent;
+        background: $accent 20%;
+        text-style: bold;
+    }
+    ActionSpaceWidget.face-down {
+        border: dashed $primary 40%;
+        color: $text-muted;
+    }
+    ActionSpaceWidget.occupied {
+        color: $text;
+    }
+    """
+
+    def __init__(
+        self,
+        slot: SpaceSlot,
+        theme: Theme | None = None,
+        selected: bool = False,
+    ) -> None:
+        self.slot = slot
+        self.look = theme if theme is not None else DEFAULT_THEME
+        super().__init__(
+            slot_body(slot, self.look),
+            classes=_slot_classes(slot, selected),
+        )
+        if slot.space_id:
+            self.border_title = SPACE_NAMES.get(slot.space_id, slot.space_id)
+        elif slot.round_number:
+            self.border_title = f"第{slot.round_number}回合"
+
+    def display_text(self) -> str:
+        return slot_body(self.slot, self.look)
+
+    def apply_slot(
+        self,
+        slot: SpaceSlot,
+        theme: Theme,
+        selected: bool = False,
+    ) -> None:
+        self.slot = slot
+        self.look = theme
+        self.update(slot_body(slot, theme))
+        self.set_classes(_slot_classes(slot, selected))
+        if slot.space_id:
+            self.border_title = SPACE_NAMES.get(slot.space_id, slot.space_id)
+        elif slot.round_number:
+            self.border_title = f"第{slot.round_number}回合"
+
+
+def _slot_classes(slot: SpaceSlot, selected: bool) -> str:
+    bits = []
+    if selected:
+        bits.append("selected")
+    if slot.face_down:
+        bits.append("face-down")
+    if slot.occupant is not None:
+        bits.append("occupied")
+    return " ".join(bits)

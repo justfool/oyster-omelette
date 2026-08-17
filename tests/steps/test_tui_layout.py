@@ -9,6 +9,7 @@ from oyster_omelette.tui.app import (
     minimap_text,
     should_show_farm_detail,
 )
+from oyster_omelette.tui.spaces import board_slots
 
 scenarios("tui_layout.feature")
 
@@ -31,10 +32,12 @@ def then_minimap_has_room_icon(game):
     assert theme.icon("wood_room") in minimap_text(game, theme)
 
 
-@then("行動板應排成兩欄")
-def then_board_is_two_columns(game):
-    lines = [line for line in board_text(game).splitlines() if line.strip()]
-    assert len(lines) < len(list(game.board.spaces))
+@then("行動板應分成固定區與回合卡區")
+def then_board_has_two_zones(game):
+    slots = board_slots(game)
+    zones = {slot.zone for slot in slots}
+    assert zones == {"fixed", "round"}
+    assert any(slot.space_id == "forest" and slot.zone == "fixed" for slot in slots)
 
 
 @then("沒有待選格時不展開詳細農場")
