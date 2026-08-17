@@ -46,7 +46,7 @@ KIND_MARK = {
 }
 
 
-def farm_text(player) -> str:
+def farm_text(player, title: str = "農場") -> str:
     from oyster_omelette.pastures import pasture_cells
 
     fenced = pasture_cells(player.farm)
@@ -66,7 +66,16 @@ def farm_text(player) -> str:
                 mark = f"{mark}{cell.crop_count}"
             parts.append(f"{mark:　<3}")
         lines.append(" ".join(parts))
-    return "\n".join(lines)
+    return title + "\n" + "\n".join(lines)
+
+
+def all_farms_text(game: Game) -> str:
+    blocks = []
+    turn = game.whose_turn()
+    for index, player in enumerate(game.players):
+        mark = "（行動中）" if turn == index else ""
+        blocks.append(farm_text(player, f"玩家{index + 1}{mark}"))
+    return "\n\n".join(blocks)
 
 
 def goods_text(player) -> str:
@@ -77,6 +86,15 @@ def goods_text(player) -> str:
         f"家人{player.family_size()} 未派{player.unplaced_workers} "
         f"討飯{player.begging}"
     )
+
+
+def all_goods_text(game: Game) -> str:
+    turn = game.whose_turn()
+    lines = []
+    for index, player in enumerate(game.players):
+        mark = "*" if turn == index else " "
+        lines.append(f"{mark}P{index + 1} {goods_text(player)}")
+    return "\n".join(lines)
 
 
 def board_text(game: Game) -> str:
@@ -111,7 +129,7 @@ class OysterOmeletteApp(App):
         height: 1fr;
     }
     #status {
-        height: 3;
+        height: 5;
         padding: 0 1;
     }
     """
@@ -125,8 +143,10 @@ class OysterOmeletteApp(App):
 
     def __init__(self) -> None:
         super().__init__()
-        self.game = Game.setup(player_count=1)
-        self.messages: list[str] = ["按 P 準備第 1 回合。數字／字母放工人。"]
+        self.game = Game.setup(player_count=2)
+        self.messages: list[str] = [
+            "2 人熱座。按 P 準備第 1 回合。數字／字母放工人。"
+        ]
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -146,9 +166,9 @@ class OysterOmeletteApp(App):
         self.refresh_view()
 
     def refresh_view(self) -> None:
-        player = self.game.players[0]
         turn = self.game.whose_turn()
         phase = "工作中" if self.game.work_phase else "等待準備／回家"
+        who = f"玩家{turn + 1}" if turn is not None else "—"
         harvest_hint = ""
         if (
             is_harvest_round(self.game.round)
@@ -157,11 +177,10 @@ class OysterOmeletteApp(App):
         ):
             harvest_hint = "　收成回合"
         self.query_one("#status", Static).update(
-            f"回合 {self.game.round}　{phase}　輪到 "
-            f"{'你' if turn == 0 else '-'}{harvest_hint}\n"
-            f"{goods_text(player)}"
+            f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}\n"
+            f"{all_goods_text(self.game)}"
         )
-        self.query_one("#farm", Static).update("農場\n" + farm_text(player))
+        self.query_one("#farm", Static).update(all_farms_text(self.game))
         self.query_one("#board", Static).update("行動板\n" + board_text(self.game))
         self.query_one("#log", Static).update("\n".join(self.messages))
 
@@ -200,18 +219,22 @@ class OysterOmeletteApp(App):
         if self.game.harvested:
             self.note("這一回合已經收成過了。")
             return
-        before = self.game.players[0].begging
+        before = [player.begging for player in self.game.players]
         self.game.harvest()
-        gained = self.game.players[0].begging - before
-        if gained:
-            self.note(f"家人回家並收成，拿了 {gained} 張討飯卡。")
+        bits = []
+        for index, player in enumerate(self.game.players):
+            gained = player.begging - before[index]
+            if gained:
+                bits.append(f"玩家{index + 1}討飯{gained}")
+        if bits:
+            self.note("家人回家並收成：" + "，".join(bits))
         else:
-            self.note("家人回家並收成，家人吃飽了。")
+            self.note("家人回家並收成，兩家都吃飽了。")
 
     def action_show_score(self) -> None:
-        detail = score_player(self.game.players[0])
-        parts = [f"{name} {value}" for name, value in detail.items()]
-        self.note("計分：" + "，".join(parts))
+        for index, player in enumerate(self.game.players):
+            detail = score_player(player)
+            self.note(f"玩家{index + 1} {detail['total']} 分")
 
     def on_key(self, event) -> None:
         if event.character in SPACE_KEYS:
@@ -226,9 +249,13 @@ class OysterOmeletteApp(App):
             self.note("沒有這個按鍵對應的格子。")
             return
         space_id = ids[index]
-        result = self.game.place_worker(0, space_id)
+        turn = self.game.whose_turn()
+        if turn is None:
+            self.note("沒有人可以放了，按 R 回家。")
+            return
+        result = self.game.place_worker(turn, space_id)
         if result.ok:
-            self.note(f"放到{SPACE_NAMES.get(space_id, space_id)}。")
+            self.note(f"玩家{turn + 1}放到{SPACE_NAMES.get(space_id, space_id)}。")
         else:
             self.note(f"不能放：{result.error}")
 
