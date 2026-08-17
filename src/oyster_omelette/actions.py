@@ -91,9 +91,32 @@ def _fence_block_reason(player) -> str:
     return ""
 
 
-def _do_fence(player) -> None:
-    cost = enclose_one_pasture(player.farm)
-    player.wood -= cost
+def _try_play_minor(player) -> None:
+    if player.minors_hand:
+        play_minor(player, player.minors_hand[0])
+
+
+def _try_play_major_or_minor(game, player) -> None:
+    major_id = choose_major(player, game.major_supply)
+    if major_id is None:
+        _try_play_minor(player)
+        return
+    take_major(player, game.major_supply, major_id)
+    if major_id in {"clay_oven", "stone_oven"}:
+        bake_best(player)
+    if major_id == "well":
+        player.well_food_left = well_food_rounds(game.round)
+
+
+def _do_fence(player, target: tuple[int, int] | None = None) -> None:
+    if target is not None:
+        cost = enclose_pasture_at(player.farm, target[0], target[1])
+        player.wood -= cost
+    while True:
+        cost = next_pasture_cost(player.farm)
+        if cost is None or player.wood < cost:
+            break
+        player.wood -= enclose_one_pasture(player.farm)
 
 
 def target_error(player, space, target: tuple[int, int] | None) -> str:
@@ -142,7 +165,7 @@ def cannot_use(player, space, game=None) -> str:
             return "family_full"
     if space.id == "major_or_minor":
         supply = game.major_supply if game is not None else []
-        if choose_major(player, supply) is None:
+        if choose_major(player, supply) is None and not player.minors_hand:
             return "cannot_build_fireplace"
     if space.id == "fences":
         return _fence_block_reason(player) or ""
@@ -206,11 +229,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
             elif player.wood >= 2:
                 player.wood -= 2
                 player.farm.cell(row, col).stable = True
-            if player.wood >= 2 and first_legal_stable(player.farm) is not None:
-                player.wood -= 2
-                build_one_stable(player.farm)
-            return
-        if _can_build_room(player):
+        while _can_build_room(player):
             resource, amount, reed = _room_cost(player)
             setattr(player, resource, getattr(player, resource) - amount)
             player.reed -= reed
@@ -222,6 +241,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
 
     if space.id == "renovation":
         _do_renovate(player)
+        _try_play_major_or_minor(game, player)
         return
 
     if space.id == "renovation_and_fences":
@@ -232,6 +252,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
 
     if space.id in {"family_growth", "family_growth_without_room"}:
         _grow_family(player)
+        _try_play_minor(player)
         return
 
     if space.id == "vegetable_seeds":
@@ -251,14 +272,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
         return
 
     if space.id == "major_or_minor":
-        major_id = choose_major(player, game.major_supply)
-        if major_id is None:
-            return
-        take_major(player, game.major_supply, major_id)
-        if major_id in {"clay_oven", "stone_oven"}:
-            bake_best(player)
-        if major_id == "well":
-            player.well_food_left = well_food_rounds(game.round)
+        _try_play_major_or_minor(game, player)
         return
 
     if space.id == "plow_and_or_sow":
@@ -267,11 +281,7 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
         return
 
     if space.id == "fences":
-        if target is not None:
-            cost = enclose_pasture_at(player.farm, target[0], target[1])
-            player.wood -= cost
-        else:
-            _do_fence(player)
+        _do_fence(player, target)
         return
 
     if space.id == "lessons":
