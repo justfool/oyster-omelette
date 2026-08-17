@@ -9,6 +9,22 @@ def test_each_player_is_dealt_seven_minors():
     assert len(game.players[1].minors_hand) == 7
 
 
+def test_traveling_minor_passes_to_the_left():
+    game = Game.setup(2)
+    game.prepare_round()
+    player = game.players[0]
+    other = game.players[1]
+    player.minors_hand = ["traveling_ale"]
+    before = len(other.minors_hand)
+    from oyster_omelette.cards import play_minor
+
+    play_minor(player, "traveling_ale", game)
+    assert player.food == 3
+    assert "traveling_ale" not in player.minors_played
+    assert "traveling_ale" in other.minors_hand
+    assert len(other.minors_hand) == before + 1
+
+
 def test_meeting_place_plays_wood_cart():
     game = Game.setup(1)
     game.prepare_round()
