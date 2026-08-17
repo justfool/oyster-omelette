@@ -51,7 +51,7 @@ KIND_MARK = {
 }
 
 
-def farm_text(player, title: str = "農場") -> str:
+def farm_text(player, title: str = "農場", legal: set | None = None) -> str:
     from oyster_omelette.pastures import pasture_cells
 
     fenced = pasture_cells(player.farm)
@@ -69,17 +69,36 @@ def farm_text(player, title: str = "農場") -> str:
                 mark = f"{mark}{cell.people}"
             elif cell.crop_count:
                 mark = f"{mark}{cell.crop_count}"
+            if legal is not None and (row, col) in legal:
+                mark = f"[{mark.strip()}]"
             parts.append(f"{mark:　<3}")
         lines.append(" ".join(parts))
     return title + "\n" + "\n".join(lines)
 
 
-def all_farms_text(game: Game) -> str:
+def legal_cells_for(player, space_id: str) -> set[tuple[int, int]]:
+    from types import SimpleNamespace
+
+    from oyster_omelette.actions import target_error
+
+    space = SimpleNamespace(id=space_id)
+    spots = set()
+    for row in range(player.farm.rows):
+        for col in range(player.farm.cols):
+            if not target_error(player, space, (row, col)):
+                spots.add((row, col))
+    return spots
+
+
+def all_farms_text(game: Game, pending_space: str | None = None) -> str:
     blocks = []
     turn = game.whose_turn()
     for index, player in enumerate(game.players):
         mark = "（行動中）" if turn == index else ""
-        blocks.append(farm_text(player, f"玩家{index + 1}{mark}"))
+        legal = None
+        if pending_space and turn == index:
+            legal = legal_cells_for(player, pending_space)
+        blocks.append(farm_text(player, f"玩家{index + 1}{mark}", legal))
     return "\n\n".join(blocks)
 
 
@@ -195,7 +214,9 @@ class OysterOmeletteApp(App):
             f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}\n"
             f"{all_goods_text(self.game)}"
         )
-        self.query_one("#farm", Static).update(all_farms_text(self.game))
+        self.query_one("#farm", Static).update(
+            all_farms_text(self.game, self.pending_space)
+        )
         self.query_one("#board", Static).update("行動板\n" + board_text(self.game))
         self.query_one("#log", Static).update("\n".join(self.messages))
 

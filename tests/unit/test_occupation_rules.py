@@ -30,6 +30,15 @@ def test_forester_gives_extra_wood_from_forest():
     assert player.wood == 4
 
 
+def test_clay_digger_gives_extra_clay():
+    game = Game.setup(1)
+    game.prepare_round()
+    player = game.players[0]
+    player.occupations_played = ["clay_digger"]
+    assert game.place_worker(0, "clay_pit").ok
+    assert player.clay == 2
+
+
 def test_second_lesson_costs_one_food():
     game = Game.setup(1)
     game.prepare_round()
