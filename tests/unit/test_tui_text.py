@@ -3,6 +3,7 @@
 from oyster_omelette.game import Game
 from oyster_omelette.theme import load_theme
 from oyster_omelette.tui.app import (
+    OysterOmeletteApp,
     all_farms_text,
     board_text,
     farm_text,
@@ -75,3 +76,9 @@ def test_god_panel_shows_upcoming_cards():
     assert "即將翻開" in text
     assert "圍籬" in text
     assert "羊市" in text
+
+
+def test_app_can_start_with_default_theme():
+    app = OysterOmeletteApp()
+    assert app.look.name == "default"
+    assert app.look.icon("wood") == "🪵"

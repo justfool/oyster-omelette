@@ -311,7 +311,7 @@ class OysterOmeletteApp(App):
     def __init__(self, theme: Theme | None = None) -> None:
         super().__init__()
         self.game = Game.setup(player_count=2)
-        self.theme = theme or load_theme()
+        self.look = theme or load_theme()
         self.pending_space: str | None = None
         self.pending_row: int | None = None
         self.god_actor: int = 0
@@ -352,19 +352,19 @@ class OysterOmeletteApp(App):
         god = "　上帝" if self.game.god_mode else ""
         self.query_one("#status", Static).update(
             f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}{god}\n"
-            f"{all_goods_text(self.game, self.theme)}"
+            f"{all_goods_text(self.game, self.look)}"
         )
-        board = "行動板\n" + board_text(self.game, self.theme)
+        board = "行動板\n" + board_text(self.game, self.look)
         if self.game.god_mode:
-            board += "\n\n" + god_panel(self.game, self.theme)
+            board += "\n\n" + god_panel(self.game, self.look)
         self.query_one("#board", Static).update(board)
         self.query_one("#minimap", Static).update(
-            "農場\n" + minimap_text(self.game, self.theme)
+            "農場\n" + minimap_text(self.game, self.look)
         )
         detail = self.query_one("#detail", Static)
         if should_show_farm_detail(self.pending_space, self.farm_open):
             detail.add_class("shown")
-            detail.update(all_farms_text(self.game, self.pending_space, self.theme))
+            detail.update(all_farms_text(self.game, self.pending_space, self.look))
         else:
             detail.remove_class("shown")
             detail.update("")
@@ -378,9 +378,9 @@ class OysterOmeletteApp(App):
             self.note("收合農場大圖。")
 
     def action_cycle_theme(self) -> None:
-        nxt = "text" if self.theme.name != "text" else "default"
-        self.theme = load_theme(nxt)
-        self.note(f"主題改為 {self.theme.name}。也可用 --theme 或 OYSTER_THEME 指定。")
+        nxt = "text" if self.look.name != "text" else "default"
+        self.look = load_theme(nxt)
+        self.note(f"主題改為 {self.look.name}。也可用 --theme 或 OYSTER_THEME 指定。")
 
     def action_next_actor(self) -> None:
         if not self.game.god_mode:
@@ -407,7 +407,7 @@ class OysterOmeletteApp(App):
             return
         self.game.prepare_round()
         card = self.game.board.revealed_round_cards[-1]
-        name = self.theme.space_caption(card)
+        name = self.look.space_caption(card)
         self.note(f"第 {self.game.round} 回合開始，翻開{name}。")
 
     def action_go_home(self) -> None:
@@ -500,7 +500,7 @@ class OysterOmeletteApp(App):
             self.pending_space = space_id
             self.pending_row = None
             self.note(
-                f"選{self.theme.space_caption(space_id)}的格子："
+                f"選{self.look.space_caption(space_id)}的格子："
                 "先按列 1-3，再按行 1-5。按 0 取消。"
             )
             return
@@ -520,7 +520,7 @@ class OysterOmeletteApp(App):
             if target is not None:
                 extra = f"（第{target[0] + 1}列第{target[1] + 1}格）"
             self.note(
-                f"玩家{turn + 1}放到{self.theme.space_caption(space_id)}{extra}。"
+                f"玩家{turn + 1}放到{self.look.space_caption(space_id)}{extra}。"
             )
         else:
             self.note(f"不能放：{result.error}")
