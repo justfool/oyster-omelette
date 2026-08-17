@@ -5,230 +5,66 @@ from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.widgets import Footer, Header, Static
 
-from oyster_omelette.farmyard import CellKind
 from oyster_omelette.game import Game
 from oyster_omelette.harvest import is_harvest_round
 from oyster_omelette.scoring import score_player
-from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme, load_theme
-
-SPACE_KEYS = "123456789abcdefghijk"
-
-NEEDS_CELL = frozenset(
-    {"farmland", "fences", "farm_expansion", "plow_and_or_sow"}
+from oyster_omelette.theme import DEFAULT_THEME, Theme, load_theme
+from oyster_omelette.tui.board_view import BoardView
+from oyster_omelette.tui.farm_view import (
+    FarmGrid,
+    all_farms_text,
+    cell_mark,
+    farm_text,
+    legal_cells_for,
+    minimap_farm,
+    minimap_text,
+    should_show_farm_detail,
 )
+from oyster_omelette.tui.goods_view import (
+    GoodsBar,
+    all_goods_text,
+    card_zh,
+    cards_text,
+    goods_text,
+)
+from oyster_omelette.tui.spaces import (
+    NEEDS_CELL,
+    SPACE_KEYS,
+    board_slots,
+    inspect_text,
+    selection_summary,
+)
+
+# 舊測試仍從這裡匯入這些名稱。
+__all__ = [
+    "NEEDS_CELL",
+    "OysterOmeletteApp",
+    "SPACE_KEYS",
+    "all_farms_text",
+    "all_goods_text",
+    "board_text",
+    "card_zh",
+    "cards_text",
+    "cell_mark",
+    "farm_text",
+    "god_panel",
+    "goods_text",
+    "legal_cells_for",
+    "main",
+    "minimap_farm",
+    "minimap_text",
+    "should_show_farm_detail",
+]
 
 
 def _theme(theme: Theme | None) -> Theme:
     return theme if theme is not None else DEFAULT_THEME
 
 
-def should_show_farm_detail(pending_space: str | None, farm_open: bool) -> bool:
-    return farm_open or pending_space is not None
-
-
-def cell_mark(cell, fenced: bool, theme: Theme | None = None, legal: bool = False) -> str:
-    look = _theme(theme)
-    if cell.kind == CellKind.WOOD_ROOM:
-        mark = look.icon("wood_room")
-    elif cell.kind == CellKind.CLAY_ROOM:
-        mark = look.icon("clay_room")
-    elif cell.kind == CellKind.STONE_ROOM:
-        mark = look.icon("stone_room")
-    elif cell.kind == CellKind.FIELD:
-        mark = look.icon("field")
-    elif fenced:
-        mark = look.icon("pasture")
-    else:
-        mark = look.icon("empty")
-    if cell.stable:
-        mark = look.icon("stable") if mark == look.icon("empty") else f"{mark}{look.icon('stable')}"
-    if cell.people:
-        mark = f"{mark}{cell.people}"
-    elif cell.crop_count:
-        mark = f"{mark}{cell.crop_count}"
-    if legal:
-        mark = f"[{mark}]"
-    return mark
-
-
-def farm_text(
-    player,
-    title: str = "農場",
-    legal: set | None = None,
-    theme: Theme | None = None,
-) -> str:
-    from oyster_omelette.pastures import pasture_cells
-
-    look = _theme(theme)
-    fenced = pasture_cells(player.farm)
-    lines = []
-    for row in range(player.farm.rows):
-        parts = []
-        for col in range(player.farm.cols):
-            cell = player.farm.cell(row, col)
-            legal_here = legal is not None and (row, col) in legal
-            parts.append(cell_mark(cell, (row, col) in fenced, look, legal_here))
-        lines.append(" ".join(parts))
-    return title + "\n" + "\n".join(lines)
-
-
-def minimap_farm(player, theme: Theme | None = None) -> list[str]:
-    from oyster_omelette.pastures import pasture_cells
-
-    look = _theme(theme)
-    fenced = pasture_cells(player.farm)
-    rows = []
-    for row in range(player.farm.rows):
-        cells = []
-        for col in range(player.farm.cols):
-            cell = player.farm.cell(row, col)
-            if cell.kind == CellKind.WOOD_ROOM:
-                mark = look.icon("wood_room")
-            elif cell.kind == CellKind.CLAY_ROOM:
-                mark = look.icon("clay_room")
-            elif cell.kind == CellKind.STONE_ROOM:
-                mark = look.icon("stone_room")
-            elif cell.kind == CellKind.FIELD:
-                mark = look.icon("field")
-            elif (row, col) in fenced:
-                mark = look.icon("pasture")
-            elif cell.stable:
-                mark = look.icon("stable")
-            else:
-                mark = look.icon("empty")
-            cells.append(mark)
-        rows.append("".join(cells))
-    return rows
-
-
-def minimap_text(game: Game, theme: Theme | None = None) -> str:
-    look = _theme(theme)
-    turn = game.whose_turn()
-    blocks = []
-    for index, player in enumerate(game.players):
-        star = "*" if turn == index else " "
-        rows = minimap_farm(player, look)
-        labeled = [f"{index + 1}{star}{rows[0]}"]
-        labeled.extend(f"  {row}" for row in rows[1:])
-        blocks.append("\n".join(labeled))
-    return "\n".join(blocks)
-
-
-def legal_cells_for(player, space_id: str) -> set[tuple[int, int]]:
-    from types import SimpleNamespace
-
-    from oyster_omelette.actions import target_error
-
-    space = SimpleNamespace(id=space_id)
-    spots = set()
-    for row in range(player.farm.rows):
-        for col in range(player.farm.cols):
-            if not target_error(player, space, (row, col)):
-                spots.add((row, col))
-    return spots
-
-
-def all_farms_text(
-    game: Game,
-    pending_space: str | None = None,
-    theme: Theme | None = None,
-) -> str:
-    look = _theme(theme)
-    blocks = []
-    turn = game.whose_turn()
-    for index, player in enumerate(game.players):
-        mark = "（行動中）" if turn == index else ""
-        legal = None
-        if pending_space and turn == index:
-            legal = legal_cells_for(player, pending_space)
-        blocks.append(farm_text(player, f"玩家{index + 1}{mark}", legal, look))
-    return "\n\n".join(blocks)
-
-
-def goods_text(player, theme: Theme | None = None) -> str:
-    look = _theme(theme)
-    keys = (
-        "wood",
-        "clay",
-        "reed",
-        "stone",
-        "grain",
-        "vegetable",
-        "food",
-        "sheep",
-        "wild_boar",
-        "cattle",
-    )
-    bits = [f"{look.icon(key)}{getattr(player, key)}" for key in keys]
-    bits.append(f"{look.icon('family')}{player.family_size()}")
-    bits.append(f"{look.icon('unplaced')}{player.unplaced_workers}")
-    bits.append(f"{look.icon('begging')}{player.begging}")
-    return " ".join(bits)
-
-
-def cards_text(player, theme: Theme | None = None) -> str:
-    look = _theme(theme)
-    if player.majors:
-        majors = ",".join(card_zh(card, look) for card in player.majors)
-    else:
-        majors = "無"
-    jobs = str(len(player.occupations_played))
-    minors = str(len(player.minors_played))
-    return f"改良 {majors}　職業{jobs}　次要{minors}"
-
-
-def all_goods_text(game: Game, theme: Theme | None = None) -> str:
-    look = _theme(theme)
-    turn = game.whose_turn()
-    lines = []
-    for index, player in enumerate(game.players):
-        mark = "*" if turn == index else " "
-        lines.append(f"{mark}P{index + 1} {goods_text(player, look)}")
-        lines.append(f"  {cards_text(player, look)}")
-    return "\n".join(lines)
-
-
-def card_zh(card_id: str, theme: Theme | None = None) -> str:
-    from oyster_omelette.cards import MINORS, OCCUPATIONS
-    from oyster_omelette.theme import MAJOR_NAMES
-
-    look = _theme(theme)
-    if card_id in OCCUPATIONS:
-        name = OCCUPATIONS[card_id][0]
-    elif card_id in MINORS:
-        name = MINORS[card_id][0]
-    elif card_id in MAJOR_NAMES:
-        name = MAJOR_NAMES[card_id]
-    else:
-        name = SPACE_NAMES.get(card_id, card_id)
-    mark = look.icon(card_id)
-    if mark and mark != name:
-        return f"{mark} {name}"
-    return name
-
-
-def god_panel(game: Game, theme: Theme | None = None) -> str:
-    look = _theme(theme)
-    upcoming = game.upcoming_round_cards()
-    future = " → ".join(card_zh(card, look) for card in upcoming) or "（沒了）"
-    supply = ",".join(card_zh(card, look) for card in game.major_supply) or "空"
-    lines = [
-        "【上帝模式】",
-        f"即將翻開：{future}",
-        f"公共改良：{supply}",
-    ]
-    for index, info in enumerate(game.hidden_info()):
-        jobs = "、".join(card_zh(card, look) for card in info["occupations"]) or "無"
-        mins = "、".join(card_zh(card, look) for card in info["minors"]) or "無"
-        lines.append(f"P{index + 1} 職業手牌：{jobs}")
-        lines.append(f"P{index + 1} 次要手牌：{mins}")
-    return "\n".join(lines)
-
-
 def _space_line(key: str, game: Game, space_id: str, theme: Theme) -> str:
     space = game.space(space_id)
-    pile = f" ×{space.accumulated}" if space.accumulated else ""
-    who = f" [{space.occupant + 1}]" if space.occupant is not None else ""
+    pile = f" ×{space.accumulated}" if space and space.accumulated else ""
+    who = f" [{space.occupant + 1}]" if space and space.occupant is not None else ""
     return f"{key} {theme.space_caption(space_id)}{pile}{who}"
 
 
@@ -253,6 +89,24 @@ def board_text(game: Game, theme: Theme | None = None, columns: int = 2) -> str:
     return _as_columns(items, columns=columns)
 
 
+def god_panel(game: Game, theme: Theme | None = None) -> str:
+    look = _theme(theme)
+    upcoming = game.upcoming_round_cards()
+    future = " → ".join(card_zh(card, look) for card in upcoming) or "（沒了）"
+    supply = ",".join(card_zh(card, look) for card in game.major_supply) or "空"
+    lines = [
+        "【上帝模式】",
+        f"即將翻開：{future}",
+        f"公共改良：{supply}",
+    ]
+    for index, info in enumerate(game.hidden_info()):
+        jobs = "、".join(card_zh(card, look) for card in info["occupations"]) or "無"
+        mins = "、".join(card_zh(card, look) for card in info["minors"]) or "無"
+        lines.append(f"P{index + 1} 職業手牌：{jobs}")
+        lines.append(f"P{index + 1} 次要手牌：{mins}")
+    return "\n".join(lines)
+
+
 class OysterOmeletteApp(App):
     TITLE = "oyster-omelette"
     SUB_TITLE = "農家樂（修訂版）"
@@ -262,50 +116,56 @@ class OysterOmeletteApp(App):
     }
     #status {
         height: auto;
-        min-height: 4;
-        max-height: 7;
+        min-height: 1;
+        max-height: 3;
         padding: 0 1;
+    }
+    #goods {
+        height: auto;
     }
     #main {
         height: 1fr;
-    }
-    #board {
-        border: heavy $accent;
-        padding: 0 1;
-        width: 1fr;
     }
     #minimap {
         border: round green;
         padding: 0 1;
         width: 22;
     }
-    #detail {
-        border: heavy cyan;
-        padding: 0 1;
-        height: auto;
-        display: none;
-    }
-    #detail.shown {
-        display: block;
-        min-height: 8;
-    }
-    #log {
+    #inspect {
         border: round $primary;
         padding: 0 1;
-        height: 6;
+        height: 5;
+    }
+    .player-tag {
+        width: 5;
+        height: 3;
+        content-align: center middle;
+    }
+    .card-line {
+        height: 1;
+        color: $text-muted;
     }
     """
     BINDINGS = [
         Binding("q", "quit", "離開"),
-        Binding("p", "prepare", "準備回合"),
+        Binding("p", "prepare", "準備"),
         Binding("r", "go_home", "回家"),
-        Binding("h", "do_harvest", "收成"),
+        Binding("h", "do_harvest", "收成", show=False),
         Binding("s", "show_score", "計分"),
-        Binding("question_mark", "help", "說明"),
-        Binding("g", "toggle_god", "上帝"),
-        Binding("tab", "next_actor", "換操作者"),
+        Binding("question_mark", "help", "按鍵"),
+        Binding("g", "toggle_god", "上帝", show=False),
+        Binding("tab", "next_actor", "換操作者", show=False),
         Binding("m", "toggle_farm", "農場"),
-        Binding("t", "cycle_theme", "主題"),
+        Binding("t", "cycle_theme", "主題", show=False),
+        Binding("enter", "place_selected", "放工人", priority=True),
+        Binding("space", "place_selected", "放工人", show=False, priority=True),
+        Binding("i", "inspect", "格子"),
+        Binding("d", "inspect", "格子", show=False),
+        Binding("up", "move_up", "上", show=False, priority=True),
+        Binding("down", "move_down", "下", show=False, priority=True),
+        Binding("left", "move_left", "左", show=False, priority=True),
+        Binding("right", "move_right", "右", show=False, priority=True),
+        Binding("escape", "cancel_pending", "取消", show=False),
     ]
 
     def __init__(self, theme: Theme | None = None) -> None:
@@ -317,17 +177,18 @@ class OysterOmeletteApp(App):
         self.god_actor: int = 0
         self.farm_open: bool = False
         self.messages: list[str] = [
-            "2 人熱座。按 P 準備第 1 回合。數字／字母放工人。M 看農場。"
+            "2 人熱座。方向鍵選格，Enter 放工人，I 看說明。按 P 準備第 1 回合。"
         ]
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield Static(id="status")
+        yield GoodsBar(id="goods")
         with Horizontal(id="main"):
-            yield Static(id="board")
+            yield BoardView(id="board")
             yield Static(id="minimap")
-        yield Static(id="detail")
-        yield Static(id="log")
+        yield FarmGrid(id="detail")
+        yield Static(id="inspect")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -335,8 +196,17 @@ class OysterOmeletteApp(App):
 
     def note(self, text: str) -> None:
         self.messages.append(text)
-        self.messages = self.messages[-8:]
+        self.messages = self.messages[-3:]
         self.refresh_view()
+
+    def _picking_farm(self) -> bool:
+        return self.pending_space is not None
+
+    def _board(self) -> BoardView:
+        return self.query_one(BoardView)
+
+    def _farm(self) -> FarmGrid:
+        return self.query_one(FarmGrid)
 
     def refresh_view(self) -> None:
         turn = self.game.whose_turn()
@@ -351,24 +221,109 @@ class OysterOmeletteApp(App):
             harvest_hint = "　收成回合"
         god = "　上帝" if self.game.god_mode else ""
         self.query_one("#status", Static).update(
-            f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}{god}\n"
-            f"{all_goods_text(self.game, self.look)}"
+            f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}{god}"
         )
-        board = "行動板\n" + board_text(self.game, self.look)
-        if self.game.god_mode:
-            board += "\n\n" + god_panel(self.game, self.look)
-        self.query_one("#board", Static).update(board)
+        self.query_one(GoodsBar).load(self.game, self.look)
+        board = self._board()
+        board.focus_spaces = not self._picking_farm()
+        board.load(self.game, self.look, god_mode=self.game.god_mode)
         self.query_one("#minimap", Static).update(
             "農場\n" + minimap_text(self.game, self.look)
         )
-        detail = self.query_one("#detail", Static)
-        if should_show_farm_detail(self.pending_space, self.farm_open):
-            detail.add_class("shown")
-            detail.update(all_farms_text(self.game, self.pending_space, self.look))
+        self._refresh_farm()
+        self._refresh_inspect()
+
+    def _refresh_farm(self) -> None:
+        farm = self._farm()
+        already_open = farm.has_class("shown")
+        if not should_show_farm_detail(self.pending_space, self.farm_open):
+            farm.remove_class("shown")
+            return
+        farm.add_class("shown")
+        turn = self.game.whose_turn()
+        if self.game.god_mode:
+            actor = self.god_actor
         else:
-            detail.remove_class("shown")
-            detail.update("")
-        self.query_one("#log", Static).update("\n".join(self.messages))
+            actor = turn if turn is not None else 0
+        player = self.game.players[actor]
+        legal = set()
+        picking = self._picking_farm()
+        if picking:
+            legal = legal_cells_for(player, self.pending_space or "")
+        others = []
+        for index, other in enumerate(self.game.players):
+            if index == actor:
+                continue
+            others.append(farm_text(other, f"玩家{index + 1}", None, self.look))
+        mark = "（行動中）" if turn == actor else ""
+        farm.show_player(
+            player,
+            self.look,
+            legal=legal,
+            title=f"玩家{actor + 1}{mark}　方向鍵選格　Enter 確認　0 取消",
+            others="\n".join(others),
+            picking=picking,
+            keep_cursor=picking and already_open,
+        )
+
+    def _refresh_inspect(self) -> None:
+        board = self._board()
+        if not board.slots:
+            board.load(self.game, self.look, god_mode=self.game.god_mode)
+        slot = board.selected_slot()
+        last = self.messages[-1] if self.messages else ""
+        lines = [selection_summary(slot, self.look), f"剛才：{last}"]
+        if self.game.god_mode:
+            upcoming = self.game.upcoming_round_cards()
+            future = " → ".join(card_zh(card, self.look) for card in upcoming[:4])
+            if len(self.game.upcoming_round_cards()) > 4:
+                future += " …"
+            lines.append(f"即將翻開：{future or '（沒了）'}")
+        self.query_one("#inspect", Static).update("\n".join(lines))
+
+    def action_move_up(self) -> None:
+        self._move("up")
+
+    def action_move_down(self) -> None:
+        self._move("down")
+
+    def action_move_left(self) -> None:
+        self._move("left")
+
+    def action_move_right(self) -> None:
+        self._move("right")
+
+    def _move(self, direction: str) -> None:
+        if self._picking_farm():
+            self._farm().move(direction)
+        else:
+            self._board().move(direction)
+        self._refresh_inspect()
+
+    def action_inspect(self) -> None:
+        slot = self._board().selected_slot()
+        self.note(inspect_text(slot, self.look))
+
+    def action_place_selected(self) -> None:
+        if self._picking_farm():
+            target = self._farm().selected_cell()
+            space_id = self.pending_space
+            self._clear_pending()
+            self._place_on(space_id, target)
+            return
+        slot = self._board().selected_slot()
+        if slot.face_down:
+            self.note("這張卡還沒翻開。")
+            return
+        if not slot.space_id:
+            self.note("沒有這個行動格。")
+            return
+        self._begin_or_place(slot.space_id)
+
+    def action_cancel_pending(self) -> None:
+        if self.pending_space:
+            self._clear_pending()
+            self.note("取消選格。")
 
     def action_toggle_farm(self) -> None:
         self.farm_open = not self.farm_open
@@ -450,8 +405,9 @@ class OysterOmeletteApp(App):
 
     def action_help(self) -> None:
         self.note(
-            "P 準備  R 回家  S 計分  G 上帝  M 農場  T 主題  ? 說明  Q 離開。"
-            "數字／字母放工人。耕田圍籬蓋房先選行動再按列1-3、行1-5。"
+            "方向鍵選格。Enter／空白放工人。I 看格子說明。"
+            "P 準備  R 回家  S 計分  G 上帝  M 農場  T 主題  ? 按鍵  Q 離開。"
+            "耕田圍籬蓋房先選行動再方向鍵選農場格。"
         )
 
     def action_show_score(self) -> None:
@@ -460,11 +416,16 @@ class OysterOmeletteApp(App):
             self.note(f"玩家{index + 1} {detail['total']} 分")
 
     def on_key(self, event) -> None:
-        if self.pending_space and event.character:
-            self._pick_cell_digit(event.character)
+        if not event.character:
             return
-        if event.character in SPACE_KEYS:
+        if self.pending_space:
+            if event.character in "012345":
+                self._pick_cell_digit(event.character)
+                event.stop()
+            return
+        if event.character in SPACE_KEYS and event.character not in "id":
             self.place_by_key(event.character)
+            event.stop()
 
     def _clear_pending(self) -> None:
         self.pending_space = None
@@ -478,7 +439,7 @@ class OysterOmeletteApp(App):
         if self.pending_row is None:
             if key in "123":
                 self.pending_row = int(key) - 1
-                self.note(f"第 {key} 列，再按行 1-5。")
+                self.note(f"第 {key} 列，再按行 1-5。或改用方向鍵後 Enter。")
             return
         if key in "12345":
             target = (self.pending_row, int(key) - 1)
@@ -488,20 +449,27 @@ class OysterOmeletteApp(App):
             return
 
     def place_by_key(self, key: str) -> None:
-        ids = list(self.game.board.spaces)
         if key not in SPACE_KEYS:
             return
         index = SPACE_KEYS.index(key)
-        if index >= len(ids):
+        slots = board_slots(self.game, god_mode=self.game.god_mode)
+        revealed = [slot for slot in slots if not slot.face_down]
+        if index >= len(revealed):
             self.note("沒有這個按鍵對應的格子。")
             return
-        space_id = ids[index]
+        space_id = revealed[index].space_id
+        if not space_id:
+            self.note("沒有這個按鍵對應的格子。")
+            return
+        self._begin_or_place(space_id)
+
+    def _begin_or_place(self, space_id: str) -> None:
         if space_id in NEEDS_CELL:
             self.pending_space = space_id
             self.pending_row = None
             self.note(
                 f"選{self.look.space_caption(space_id)}的格子："
-                "先按列 1-3，再按行 1-5。按 0 取消。"
+                "方向鍵選農場格後 Enter。或先按列 1-3，再按行 1-5。Esc／0 取消。"
             )
             return
         self._place_on(space_id, None)
