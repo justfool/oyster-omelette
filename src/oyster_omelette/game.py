@@ -31,6 +31,7 @@ class Player:
     family_members: int = 2
     begging: int = 0
     has_fireplace: bool = False
+    newborns_this_round: int = 0  # 本回合剛生、還沒工作；收成只吃 1
 
     def family_size(self) -> int:
         return self.family_members
@@ -116,6 +117,8 @@ class Game:
         return None
 
     def prepare_round(self) -> None:
+        for player in self.players:
+            player.newborns_this_round = 0
         self.round += 1
         self._flip_next_round_card()
         self.board.replenish()
