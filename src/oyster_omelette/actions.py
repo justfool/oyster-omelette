@@ -21,7 +21,10 @@ def add_resource(player, resource: str, amount: int) -> None:
 
 
 def _room_cost(player) -> tuple[str, int, int]:
-    if player.farm.house_material() == CellKind.CLAY_ROOM:
+    material = player.farm.house_material()
+    if material == CellKind.STONE_ROOM:
+        return ("stone", 5, 2)
+    if material == CellKind.CLAY_ROOM:
         return ("clay", 5, 2)
     return ("wood", 5, 2)
 
@@ -49,10 +52,15 @@ def cannot_use(player, space) -> str:
         if not _can_build_room(player) and not can_stable:
             return "cannot_build_room"
     if space.id == "renovation":
-        if player.farm.house_material() != CellKind.WOOD_ROOM:
-            return "cannot_renovate"
+        material = player.farm.house_material()
         rooms = player.farm.room_count()
-        if player.reed < 1 or player.clay < rooms:
+        if material == CellKind.STONE_ROOM:
+            return "cannot_renovate"
+        if player.reed < 1:
+            return "cannot_renovate"
+        if material == CellKind.WOOD_ROOM and player.clay < rooms:
+            return "cannot_renovate"
+        if material == CellKind.CLAY_ROOM and player.stone < rooms:
             return "cannot_renovate"
     if space.id == "family_growth":
         if player.farm.room_count() <= player.family_size():
@@ -115,7 +123,10 @@ def resolve_space(game, player, space) -> None:
     if space.id == "renovation":
         rooms = player.farm.room_count()
         player.reed -= 1
-        player.clay -= rooms
+        if player.farm.house_material() == CellKind.WOOD_ROOM:
+            player.clay -= rooms
+        else:
+            player.stone -= rooms
         renovate_house(player.farm)
         return
 
