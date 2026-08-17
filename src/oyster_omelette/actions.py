@@ -158,6 +158,8 @@ def cannot_use(player, space, game=None) -> str:
     if space.id == "renovation_and_fences":
         return _renovate_block_reason(player) or ""
     if space.id == "family_growth":
+        if player.family_size() >= 5:
+            return "family_full"
         if player.farm.room_count() <= player.family_size():
             return "need_spare_room"
     if space.id == "family_growth_without_room":
