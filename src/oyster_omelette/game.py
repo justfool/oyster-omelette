@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
-from oyster_omelette.actions import cannot_use, resolve_space
+from oyster_omelette.actions import cannot_use, resolve_space, target_error
 from oyster_omelette.board import ActionSpace, Board, deal_round_cards, two_player_board
 from oyster_omelette.cards import deal_minors, deal_occupations
 from oyster_omelette.majors import starting_supply
@@ -157,7 +157,12 @@ class Game:
         run_harvest(self)
         self.harvested = True
 
-    def place_worker(self, player_index: int, space_id: str) -> PlaceResult:
+    def place_worker(
+        self,
+        player_index: int,
+        space_id: str,
+        target: tuple[int, int] | None = None,
+    ) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
             return PlaceResult(ok=False, error="unknown_player")
         if not self.work_phase:
@@ -177,11 +182,14 @@ class Game:
         blocked = cannot_use(player, space, self)
         if blocked:
             return PlaceResult(ok=False, error=blocked)
+        blocked = target_error(player, space, target)
+        if blocked:
+            return PlaceResult(ok=False, error=blocked)
 
         take_one_person(player.farm)
         player.unplaced_workers -= 1
         space.occupant = player_index
-        resolve_space(self, player, space)
+        resolve_space(self, player, space, target)
 
         self._turn_from = (player_index + 1) % len(self.players)
         self.current_player_index = self.whose_turn()

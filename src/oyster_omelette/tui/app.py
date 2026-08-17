@@ -144,6 +144,8 @@ class OysterOmeletteApp(App):
     def __init__(self) -> None:
         super().__init__()
         self.game = Game.setup(player_count=2)
+        self.pending_space: str | None = None
+        self.pending_row: int | None = None
         self.messages: list[str] = [
             "2 人熱座。按 P 準備第 1 回合。數字／字母放工人。"
         ]
@@ -237,8 +239,32 @@ class OysterOmeletteApp(App):
             self.note(f"玩家{index + 1} {detail['total']} 分")
 
     def on_key(self, event) -> None:
+        if self.pending_space and event.character:
+            self._pick_cell_digit(event.character)
+            return
         if event.character in SPACE_KEYS:
             self.place_by_key(event.character)
+
+    def _clear_pending(self) -> None:
+        self.pending_space = None
+        self.pending_row = None
+
+    def _pick_cell_digit(self, key: str) -> None:
+        if key == "0":
+            self._clear_pending()
+            self.note("取消選格。")
+            return
+        if self.pending_row is None:
+            if key in "123":
+                self.pending_row = int(key) - 1
+                self.note(f"第 {key} 列，再按行 1-5。")
+            return
+        if key in "12345":
+            target = (self.pending_row, int(key) - 1)
+            space_id = self.pending_space
+            self._clear_pending()
+            self._place_on(space_id, target)
+            return
 
     def place_by_key(self, key: str) -> None:
         ids = list(self.game.board.spaces)
@@ -249,13 +275,29 @@ class OysterOmeletteApp(App):
             self.note("沒有這個按鍵對應的格子。")
             return
         space_id = ids[index]
+        if space_id in {"farmland", "fences", "farm_expansion"}:
+            self.pending_space = space_id
+            self.pending_row = None
+            self.note(
+                f"選{SPACE_NAMES.get(space_id, space_id)}的格子："
+                "先按列 1-3，再按行 1-5。按 0 取消。"
+            )
+            return
+        self._place_on(space_id, None)
+
+    def _place_on(self, space_id: str, target: tuple[int, int] | None) -> None:
         turn = self.game.whose_turn()
         if turn is None:
             self.note("沒有人可以放了，按 R 回家。")
             return
-        result = self.game.place_worker(turn, space_id)
+        result = self.game.place_worker(turn, space_id, target=target)
         if result.ok:
-            self.note(f"玩家{turn + 1}放到{SPACE_NAMES.get(space_id, space_id)}。")
+            extra = ""
+            if target is not None:
+                extra = f"（第{target[0] + 1}列第{target[1] + 1}格）"
+            self.note(
+                f"玩家{turn + 1}放到{SPACE_NAMES.get(space_id, space_id)}{extra}。"
+            )
         else:
             self.note(f"不能放：{result.error}")
 

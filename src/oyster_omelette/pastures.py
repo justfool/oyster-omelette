@@ -229,6 +229,29 @@ def first_legal_pasture_cell(farm: Farmyard) -> tuple[int, int] | None:
     return None
 
 
+def fence_cost_at(farm: Farmyard, row: int, col: int) -> int | None:
+    if not can_enclose_cell(farm, row, col):
+        return None
+    return _missing_edges(farm, row, col)
+
+
+def can_enclose_cell(farm: Farmyard, row: int, col: int) -> bool:
+    if (row, col) in pasture_cells(farm):
+        return False
+    if not _eligible(farm, row, col):
+        return False
+    return _adjacent_to_pasture(farm, row, col)
+
+
+def enclose_pasture_at(farm: Farmyard, row: int, col: int) -> int:
+    if not can_enclose_cell(farm, row, col):
+        return 0
+    cost = _missing_edges(farm, row, col)
+    if farm.fences.used() + cost > MAX_FENCES:
+        return 0
+    return _enclose_cell(farm, row, col)
+
+
 def enclose_one_pasture(farm: Farmyard) -> int:
     """圍出下一塊 1 格牧場。回傳用掉的木頭；圍不了回傳 0。"""
     spot = first_legal_pasture_cell(farm)
