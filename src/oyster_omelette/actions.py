@@ -13,6 +13,12 @@ from oyster_omelette.farmyard import (
     CellKind,
 )
 from oyster_omelette.animals import house_animals
+from oyster_omelette.majors import (
+    bake_best,
+    choose_major,
+    take_major,
+    well_food_rounds,
+)
 from oyster_omelette.pastures import enclose_one_pasture, next_pasture_cost
 
 
@@ -79,7 +85,7 @@ def _do_fence(player) -> None:
     player.wood -= cost
 
 
-def cannot_use(player, space) -> str:
+def cannot_use(player, space, game=None) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
         return "no_field_space"
@@ -98,7 +104,8 @@ def cannot_use(player, space) -> str:
         if player.family_size() >= 5:
             return "family_full"
     if space.id == "major_or_minor":
-        if player.has_fireplace or player.clay < 2:
+        supply = game.major_supply if game is not None else []
+        if choose_major(player, supply) is None:
             return "cannot_build_fireplace"
     if space.id == "fences":
         return _fence_block_reason(player) or ""
@@ -107,7 +114,14 @@ def cannot_use(player, space) -> str:
             player.grain > 0 or player.vegetable > 0
         )
         can_plow = space.id == "plow_and_or_sow" and first_legal_field(player.farm) is not None
-        can_bake = space.id == "sow_and_or_bake" and player.has_fireplace and player.grain > 0
+        can_bake = space.id == "sow_and_or_bake" and player.grain > 0 and (
+            player.has_fireplace or any(
+                card.startswith("fireplace")
+                or card.startswith("hearth")
+                or card.endswith("oven")
+                for card in player.majors
+            )
+        )
         if not can_sow and not can_plow and not can_bake:
             return "cannot_sow"
     return ""
@@ -171,14 +185,18 @@ def resolve_space(game, player, space) -> None:
 
     if space.id == "sow_and_or_bake":
         sow_fields(player)
-        if player.has_fireplace and player.grain > 0:
-            player.food += player.grain * 2
-            player.grain = 0
+        bake_best(player)
         return
 
     if space.id == "major_or_minor":
-        player.clay -= 2
-        player.has_fireplace = True
+        major_id = choose_major(player, game.major_supply)
+        if major_id is None:
+            return
+        take_major(player, game.major_supply, major_id)
+        if major_id in {"clay_oven", "stone_oven"}:
+            bake_best(player)
+        if major_id == "well":
+            player.well_food_left = well_food_rounds(game.round)
         return
 
     if space.id == "plow_and_or_sow":

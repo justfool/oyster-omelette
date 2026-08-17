@@ -113,6 +113,25 @@ def give_stone_and_reed(game: Game, number: int, stone: int, reed: int) -> None:
     player.reed = reed
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {clay:d} 黏土與 {stone:d} 石頭"))
+def give_clay_and_stone(game: Game, number: int, clay: int, stone: int) -> None:
+    player = game.players[number - 1]
+    player.clay = clay
+    player.stone = stone
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {wood:d} 木與 {stone:d} 石頭"))
+def give_wood_and_stone(game: Game, number: int, wood: int, stone: int) -> None:
+    player = game.players[number - 1]
+    player.wood = wood
+    player.stone = stone
+
+
+@when(parsers.parse("公共供應只剩下 {major_id}"))
+def only_one_major(game: Game, major_id: str) -> None:
+    game.major_supply = [major_id]
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 穀"))
 def give_grain(game: Game, number: int, count: int) -> None:
     game.players[number - 1].grain = count
@@ -457,6 +476,25 @@ def then_player_clay(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有壁爐"))
 def then_has_fireplace(game: Game, number: int) -> None:
     assert game.players[number - 1].has_fireplace
+
+
+@then(parsers.parse("玩家 {number:d} 應有灶"))
+def then_has_hearth(game: Game, number: int) -> None:
+    from oyster_omelette.majors import owns
+
+    assert owns(game.players[number - 1], "hearth")
+
+
+@then(parsers.parse("玩家 {number:d} 不應有壁爐牌"))
+def then_no_fireplace_card(game: Game, number: int) -> None:
+    from oyster_omelette.majors import owns
+
+    assert not owns(game.players[number - 1], "fireplace")
+
+
+@then(parsers.parse("玩家 {number:d} 應有黏土爐"))
+def then_has_clay_oven(game: Game, number: int) -> None:
+    assert "clay_oven" in game.players[number - 1].majors
 
 
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 羊"))

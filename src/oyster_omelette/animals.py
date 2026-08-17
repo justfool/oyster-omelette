@@ -1,12 +1,7 @@
 """把剛拿到的動物放進容量；多的煮掉或跑掉。"""
 
+from oyster_omelette.majors import can_cook, cook_table
 from oyster_omelette.pastures import animal_capacity
-
-COOK_FOOD = {
-    "sheep": 2,
-    "wild_boar": 2,
-    "cattle": 3,
-}
 
 
 def animal_total(player) -> int:
@@ -21,9 +16,9 @@ def house_animals(player, kind: str, amount: int) -> tuple[int, int, int]:
     setattr(player, kind, getattr(player, kind) + kept)
     cooked = 0
     fled = 0
-    if extra and player.has_fireplace:
+    if extra and can_cook(player):
         cooked = extra
-        player.food += extra * COOK_FOOD[kind]
+        player.food += extra * cook_table(player)[kind]
     else:
         fled = extra
     return kept, cooked, fled

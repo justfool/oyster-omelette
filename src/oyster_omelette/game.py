@@ -5,6 +5,7 @@ from typing import NamedTuple
 
 from oyster_omelette.actions import cannot_use, resolve_space
 from oyster_omelette.board import ActionSpace, Board, deal_round_cards, two_player_board
+from oyster_omelette.majors import starting_supply
 from oyster_omelette.farmyard import Farmyard, return_people_home, starting_farmyard, take_one_person
 
 
@@ -32,6 +33,8 @@ class Player:
     begging: int = 0
     has_fireplace: bool = False
     newborns_this_round: int = 0  # 本回合剛生、還沒工作；收成只吃 1
+    majors: list[str] = field(default_factory=list)
+    well_food_left: int = 0
 
     def family_size(self) -> int:
         return self.family_members
@@ -49,6 +52,7 @@ class Game:
     remaining_round_cards: list[str] = field(default_factory=list)
     current_player_index: int | None = 0
     work_phase: bool = False
+    major_supply: list[str] = field(default_factory=starting_supply)
     _turn_from: int = 0
 
     @classmethod
@@ -82,6 +86,7 @@ class Game:
             players=players,
             board=two_player_board(),
             remaining_round_cards=cards,
+            major_supply=starting_supply(),
         )
         game._turn_from = game.start_player_index()
         game.current_player_index = game.whose_turn()
@@ -119,6 +124,9 @@ class Game:
     def prepare_round(self) -> None:
         for player in self.players:
             player.newborns_this_round = 0
+            if player.well_food_left > 0:
+                player.food += 1
+                player.well_food_left -= 1
         self.round += 1
         self._flip_next_round_card()
         self.board.replenish()
@@ -151,7 +159,7 @@ class Game:
             return PlaceResult(ok=False, error="unknown_space")
         if space.is_occupied():
             return PlaceResult(ok=False, error="space_occupied")
-        blocked = cannot_use(player, space)
+        blocked = cannot_use(player, space, self)
         if blocked:
             return PlaceResult(ok=False, error=blocked)
 

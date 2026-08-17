@@ -110,6 +110,7 @@ def unused_spaces(player) -> int:
 
 def score_player(player) -> dict[str, int]:
     from oyster_omelette.farmyard import CellKind
+    from oyster_omelette.majors import major_points
     from oyster_omelette.pastures import pasture_count
 
     room_points = 0
@@ -131,6 +132,7 @@ def score_player(player) -> dict[str, int]:
         "rooms": room_points,
         "family": player.family_size() * 3,
         "begging": player.begging * -3,
+        "majors": major_points(player),
     }
     detail["total"] = sum(detail.values())
     return detail

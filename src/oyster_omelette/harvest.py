@@ -51,7 +51,10 @@ def breed_player(player) -> None:
 
 
 def harvest(game) -> None:
+    from oyster_omelette.majors import convert_crafts
+
     for player in game.players:
         take_crops(player)
+        convert_crafts(player)
         feed_player(player)
         breed_player(player)
