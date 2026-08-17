@@ -142,9 +142,9 @@ def resolve_space(game, player, space) -> None:
             setattr(player, resource, getattr(player, resource) - amount)
             player.reed -= reed
             build_one_room(player.farm)
-            return
-        player.wood -= 2
-        build_one_stable(player.farm)
+        if player.wood >= 2 and first_legal_stable(player.farm) is not None:
+            player.wood -= 2
+            build_one_stable(player.farm)
         return
 
     if space.id == "renovation":
