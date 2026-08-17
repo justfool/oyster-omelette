@@ -502,6 +502,11 @@ def then_played_occupations(game: Game, number: int, count: int) -> None:
     assert len(game.players[number - 1].occupations_played) == count
 
 
+@then(parsers.parse("玩家 {number:d} 已打出 {count:d} 張次要改良"))
+def then_played_minors(game: Game, number: int, count: int) -> None:
+    assert len(game.players[number - 1].minors_played) == count
+
+
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 羊"))
 def then_player_sheep(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].sheep == count

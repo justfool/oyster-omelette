@@ -26,12 +26,40 @@ def play_occupation(player, card_id: str) -> None:
     setattr(player, resource, getattr(player, resource) + amount)
 
 
-def deal_occupations(player_count: int) -> list[list[str]]:
-    """每人 7 張；卡不夠就循環發。"""
-    deck = list(OCCUPATION_IDS) * 4
+MINORS: dict[str, tuple[str, str, int]] = {
+    "wood_cart": ("運木車", "wood", 2),
+    "clay_pit_shovel": ("挖黏鏟", "clay", 1),
+    "fishing_rod": ("釣竿", "food", 2),
+    "grain_sack": ("穀袋", "grain", 1),
+    "veg_basket": ("菜籃", "vegetable", 1),
+    "stone_sled": ("運石橇", "stone", 1),
+    "reed_bundle": ("蘆葦捆", "reed", 1),
+}
+
+MINOR_IDS: tuple[str, ...] = tuple(MINORS.keys())
+
+
+def play_minor(player, card_id: str) -> None:
+    _name, resource, amount = MINORS[card_id]
+    player.minors_hand.remove(card_id)
+    player.minors_played.append(card_id)
+    setattr(player, resource, getattr(player, resource) + amount)
+
+
+def _deal(ids: tuple[str, ...], player_count: int) -> list[list[str]]:
+    deck = list(ids) * 4
     hands = []
     start = 0
     for _ in range(player_count):
         hands.append(deck[start : start + 7])
         start += 7
     return hands
+
+
+def deal_occupations(player_count: int) -> list[list[str]]:
+    """每人 7 張；卡不夠就循環發。"""
+    return _deal(OCCUPATION_IDS, player_count)
+
+
+def deal_minors(player_count: int) -> list[list[str]]:
+    return _deal(MINOR_IDS, player_count)

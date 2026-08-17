@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 from oyster_omelette.actions import cannot_use, resolve_space
 from oyster_omelette.board import ActionSpace, Board, deal_round_cards, two_player_board
-from oyster_omelette.cards import deal_occupations
+from oyster_omelette.cards import deal_minors, deal_occupations
 from oyster_omelette.majors import starting_supply
 from oyster_omelette.farmyard import Farmyard, return_people_home, starting_farmyard, take_one_person
 
@@ -38,6 +38,8 @@ class Player:
     well_food_left: int = 0
     occupations_hand: list[str] = field(default_factory=list)
     occupations_played: list[str] = field(default_factory=list)
+    minors_hand: list[str] = field(default_factory=list)
+    minors_played: list[str] = field(default_factory=list)
 
     def family_size(self) -> int:
         return self.family_members
@@ -92,9 +94,11 @@ class Game:
             remaining_round_cards=cards,
             major_supply=starting_supply(),
         )
-        hands = deal_occupations(player_count)
-        for player, hand in zip(players, hands):
-            player.occupations_hand = hand
+        job_hands = deal_occupations(player_count)
+        minor_hands = deal_minors(player_count)
+        for player, jobs, minors in zip(players, job_hands, minor_hands):
+            player.occupations_hand = jobs
+            player.minors_hand = minors
         game._turn_from = game.start_player_index()
         game.current_player_index = game.whose_turn()
         return game
