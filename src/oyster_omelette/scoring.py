@@ -110,6 +110,7 @@ def unused_spaces(player) -> int:
 
 def score_player(player) -> dict[str, int]:
     from oyster_omelette.farmyard import CellKind
+    from oyster_omelette.cards import occupation_points
     from oyster_omelette.majors import major_points
     from oyster_omelette.pastures import pasture_cells, pasture_count
 
@@ -138,6 +139,7 @@ def score_player(player) -> dict[str, int]:
         "family": player.family_size() * 3,
         "begging": player.begging * -3,
         "majors": major_points(player),
+        "cards": occupation_points(player),
     }
     leftover = player.wood + player.clay + player.reed + player.stone
     detail["leftover"] = leftover

@@ -205,10 +205,11 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
             house_animals(player, space.resource, space.accumulated)
         else:
             add_resource(player, space.resource, space.accumulated)
-            if space.resource == "wood":
-                from oyster_omelette.cards import bonus_wood
+            from oyster_omelette.cards import bonus_on_take
 
-                player.wood += bonus_wood(player)
+            extra = bonus_on_take(player, space.resource)
+            if extra:
+                add_resource(player, space.resource, extra)
         space.accumulated = 0
         return
 

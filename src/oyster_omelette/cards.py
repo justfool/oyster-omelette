@@ -10,6 +10,7 @@ OCCUPATIONS: dict[str, tuple[str, str, int]] = {
     "grain_sower": ("播種人", "grain", 1),
     "veg_grower": ("菜農", "vegetable", 1),
     "forester": ("林務員", "wood", 0),
+    "clay_digger": ("挖黏人", "clay", 0),
 }
 
 OCCUPATION_IDS: tuple[str, ...] = tuple(OCCUPATIONS.keys())
@@ -20,12 +21,22 @@ def occupation_cost(already_played: int) -> int:
     return 0 if already_played <= 0 else 1
 
 
-def bonus_wood(player) -> int:
+def bonus_on_take(player, resource: str) -> int:
     extra = 0
     for card in player.occupations_played:
-        if card == "forester":
+        if resource == "wood" and card == "forester":
+            extra += 1
+        if resource == "clay" and card == "clay_digger":
             extra += 1
     return extra
+
+
+def bonus_wood(player) -> int:
+    return bonus_on_take(player, "wood")
+
+
+def occupation_points(player) -> int:
+    return len(player.occupations_played) + len(player.minors_played)
 
 
 def play_occupation(player, card_id: str) -> None:
