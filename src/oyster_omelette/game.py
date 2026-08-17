@@ -40,6 +40,7 @@ class Player:
     occupations_played: list[str] = field(default_factory=list)
     minors_hand: list[str] = field(default_factory=list)
     minors_played: list[str] = field(default_factory=list)
+    food_per_adult: int = 2
 
     def family_size(self) -> int:
         return self.family_members
@@ -58,6 +59,8 @@ class Game:
     current_player_index: int | None = 0
     work_phase: bool = False
     harvested: bool = False
+    solo: bool = False
+    player_count: int = 1
     major_supply: list[str] = field(default_factory=starting_supply)
     _turn_from: int = 0
 
@@ -66,15 +69,21 @@ class Game:
         cls,
         player_count: int = 1,
         round_cards: list[str] | None = None,
+        solo: bool = False,
     ) -> "Game":
         if player_count < 1:
             raise ValueError("至少要有 1 位玩家")
+        if solo:
+            player_count = 1
 
         players = []
         for index in range(player_count):
             is_start_player = index == 0
-            # 修訂版：起始玩家 2 食物，其他人 3 食物。
-            food = 2 if is_start_player else 3
+            # 修訂版：起始玩家 2 食物，其他人 3 食物。單人開局 0 食。
+            if solo:
+                food = 0
+            else:
+                food = 2 if is_start_player else 3
             farm = starting_farmyard()
             family = farm.people_count()
             players.append(
@@ -84,15 +93,20 @@ class Game:
                     is_start_player=is_start_player,
                     unplaced_workers=family,
                     family_members=family,
+                    food_per_adult=3 if solo else 2,
                 )
             )
         # 正式遊戲各階段內洗牌；測試可注入固定順序。
         cards = deal_round_cards() if round_cards is None else list(round_cards)
+        from oyster_omelette.board import make_board
+
         game = cls(
             players=players,
-            board=two_player_board(),
+            board=make_board(player_count, solo=solo),
             remaining_round_cards=cards,
             major_supply=starting_supply(),
+            solo=solo,
+            player_count=player_count,
         )
         job_hands = deal_occupations(player_count)
         minor_hands = deal_minors(player_count)
@@ -148,6 +162,9 @@ class Game:
     def return_home(self) -> None:
         self._reset_workers()
         self.work_phase = False
+
+    def is_finished(self) -> bool:
+        return self.round >= 14 and not self.work_phase and self.harvested
 
     def harvest(self) -> None:
         from oyster_omelette.harvest import harvest as run_harvest

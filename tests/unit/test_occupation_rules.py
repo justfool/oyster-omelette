@@ -21,6 +21,15 @@ def test_first_lesson_is_free_wood_collector():
     assert occupation_cost(1) == 1
 
 
+def test_forester_gives_extra_wood_from_forest():
+    game = Game.setup(1)
+    game.prepare_round()
+    player = game.players[0]
+    player.occupations_played = ["forester"]
+    assert game.place_worker(0, "forest").ok
+    assert player.wood == 4
+
+
 def test_second_lesson_costs_one_food():
     game = Game.setup(1)
     game.prepare_round()

@@ -51,11 +51,18 @@ def given_two_player_game() -> Game:
     return Game.setup(player_count=2)
 
 
+@given("1 位單人農家樂", target_fixture="player_count")
+def given_solo(forced_round_cards: dict) -> int:
+    forced_round_cards["solo"] = True
+    return 1
+
+
 @when("完成開局設置", target_fixture="game")
 def setup_game(player_count: int, forced_round_cards: dict) -> Game:
     return Game.setup(
         player_count=player_count,
         round_cards=forced_round_cards["cards"],
+        solo=bool(forced_round_cards.get("solo")),
     )
 
 
