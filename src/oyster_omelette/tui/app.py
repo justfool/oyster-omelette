@@ -129,6 +129,33 @@ def all_goods_text(game: Game) -> str:
     return "\n".join(lines)
 
 
+def card_zh(card_id: str) -> str:
+    from oyster_omelette.cards import MINORS, OCCUPATIONS
+
+    if card_id in OCCUPATIONS:
+        return OCCUPATIONS[card_id][0]
+    if card_id in MINORS:
+        return MINORS[card_id][0]
+    return SPACE_NAMES.get(card_id, card_id)
+
+
+def god_panel(game: Game) -> str:
+    upcoming = game.upcoming_round_cards()
+    future = " → ".join(card_zh(card) for card in upcoming) or "（沒了）"
+    supply = ",".join(game.major_supply) if game.major_supply else "空"
+    lines = [
+        "【上帝模式】",
+        f"即將翻開：{future}",
+        f"公共改良：{supply}",
+    ]
+    for index, info in enumerate(game.hidden_info()):
+        jobs = "、".join(card_zh(card) for card in info["occupations"]) or "無"
+        mins = "、".join(card_zh(card) for card in info["minors"]) or "無"
+        lines.append(f"P{index + 1} 職業手牌：{jobs}")
+        lines.append(f"P{index + 1} 次要手牌：{mins}")
+    return "\n".join(lines)
+
+
 def board_text(game: Game) -> str:
     lines = []
     for index, space_id in enumerate(game.board.spaces):
@@ -172,6 +199,8 @@ class OysterOmeletteApp(App):
         Binding("h", "do_harvest", "收成"),
         Binding("s", "show_score", "計分"),
         Binding("question_mark", "help", "說明"),
+        Binding("g", "toggle_god", "上帝"),
+        Binding("tab", "next_actor", "換操作者"),
     ]
 
     def __init__(self) -> None:
@@ -179,6 +208,7 @@ class OysterOmeletteApp(App):
         self.game = Game.setup(player_count=2)
         self.pending_space: str | None = None
         self.pending_row: int | None = None
+        self.god_actor: int = 0
         self.messages: list[str] = [
             "2 人熱座。按 P 準備第 1 回合。數字／字母放工人。"
         ]
@@ -211,21 +241,41 @@ class OysterOmeletteApp(App):
             and not self.game.harvested
         ):
             harvest_hint = "　收成回合"
+        god = "　上帝" if self.game.god_mode else ""
         self.query_one("#status", Static).update(
-            f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}\n"
+            f"回合 {self.game.round}　{phase}　輪到 {who}{harvest_hint}{god}\n"
             f"{all_goods_text(self.game)}"
         )
         self.query_one("#farm", Static).update(
             all_farms_text(self.game, self.pending_space)
         )
-        self.query_one("#board", Static).update("行動板\n" + board_text(self.game))
+        board = "行動板\n" + board_text(self.game)
+        if self.game.god_mode:
+            board += "\n\n" + god_panel(self.game)
+        self.query_one("#board", Static).update(board)
         self.query_one("#log", Static).update("\n".join(self.messages))
 
+    def action_next_actor(self) -> None:
+        if not self.game.god_mode:
+            return
+        self.god_actor = (self.god_actor + 1) % len(self.game.players)
+        self.note(f"上帝指定玩家{self.god_actor + 1}操作。")
+
+    def action_toggle_god(self) -> None:
+        self.game.god_mode = not self.game.god_mode
+        if self.game.god_mode:
+            self.SUB_TITLE = "農家樂（上帝模式）"
+            self.god_actor = 0
+            self.note("上帝模式開啟：可略過大部分檢查，並顯示未翻開的回合卡與手牌。Tab 換操作者。")
+        else:
+            self.SUB_TITLE = "農家樂（修訂版）"
+            self.note("上帝模式關閉。")
+
     def action_prepare(self) -> None:
-        if self.game.work_phase:
+        if self.game.work_phase and not self.game.god_mode:
             self.note("這回合還沒回家。")
             return
-        if self.game.round >= 14:
+        if self.game.round >= 14 and not self.game.god_mode:
             self.note("14 回合打完了，按 S 看分數。")
             return
         self.game.prepare_round()
@@ -234,7 +284,7 @@ class OysterOmeletteApp(App):
         self.note(f"第 {self.game.round} 回合開始，翻開{name}。")
 
     def action_go_home(self) -> None:
-        if not self.game.work_phase:
+        if not self.game.work_phase and not self.game.god_mode:
             self.note("現在不在工作階段。")
             return
         self.game.return_home()
@@ -244,16 +294,16 @@ class OysterOmeletteApp(App):
             self.note("家人回家了。")
 
     def action_do_harvest(self) -> None:
-        if self.game.work_phase:
+        if self.game.work_phase and not self.game.god_mode:
             self.note("先回家再收成。")
             return
-        if not is_harvest_round(self.game.round):
+        if not is_harvest_round(self.game.round) and not self.game.god_mode:
             self.note("這一回合沒有收成。")
             return
         self._run_harvest()
 
     def _run_harvest(self) -> None:
-        if self.game.harvested:
+        if self.game.harvested and not self.game.god_mode:
             self.note("這一回合已經收成過了。")
             return
         before = [player.begging for player in self.game.players]
@@ -273,7 +323,7 @@ class OysterOmeletteApp(App):
 
     def action_help(self) -> None:
         self.note(
-            "P 準備  R 回家  S 計分  ? 說明  Q 離開。"
+            "P 準備  R 回家  S 計分  G 上帝  ? 說明  Q 離開。"
             "數字／字母放工人。耕田圍籬蓋房先選行動再按列1-3、行1-5。"
         )
 
@@ -330,7 +380,10 @@ class OysterOmeletteApp(App):
         self._place_on(space_id, None)
 
     def _place_on(self, space_id: str, target: tuple[int, int] | None) -> None:
-        turn = self.game.whose_turn()
+        if self.game.god_mode:
+            turn = self.god_actor
+        else:
+            turn = self.game.whose_turn()
         if turn is None:
             self.note("沒有人可以放了，按 R 回家。")
             return

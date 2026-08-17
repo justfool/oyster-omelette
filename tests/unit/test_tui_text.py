@@ -1,7 +1,13 @@
 """TUI 只負責把狀態畫成文字，規則不在這裡。"""
 
 from oyster_omelette.game import Game
-from oyster_omelette.tui.app import all_farms_text, board_text, farm_text, goods_text
+from oyster_omelette.tui.app import (
+    all_farms_text,
+    board_text,
+    farm_text,
+    god_panel,
+    goods_text,
+)
 
 
 def test_text_helpers_include_farm_and_spaces():
@@ -22,3 +28,11 @@ def test_two_player_farms_are_both_shown():
     assert "玩家1" in text
     assert "玩家2" in text
     assert "行動中" in text
+
+
+def test_god_panel_shows_upcoming_cards():
+    game = Game.setup(1, round_cards=["fences", "sheep"], god_mode=True)
+    text = god_panel(game)
+    assert "即將翻開" in text
+    assert "圍籬" in text
+    assert "羊市" in text
