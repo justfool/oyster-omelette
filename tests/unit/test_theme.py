@@ -69,3 +69,25 @@ def test_text_theme_does_not_prefix_resource_words_on_spaces():
     theme = load_theme("text")
     assert theme.space_caption("sheep") == "羊市"
     assert theme.space_caption("forest") == "森林"
+
+
+def test_default_theme_has_worker_and_face_down_icons():
+    theme = load_theme()
+    assert theme.icon("worker_1") == "🔵"
+    assert theme.icon("worker_2") == "🔴"
+    assert theme.icon("worker_3") == "🟢"
+    assert theme.icon("worker_4") == "🟡"
+    assert theme.icon("face_down") == "🂠"
+
+
+def test_text_theme_has_worker_and_face_down_words():
+    theme = load_theme("text")
+    assert theme.icon("worker_1") == "工1"
+    assert theme.icon("worker_2") == "工2"
+    assert theme.icon("face_down") == "蓋"
+
+
+def test_default_json_includes_worker_icons():
+    loaded = load_theme(str(builtin_theme_file()))
+    assert loaded.icon("worker_1") == DEFAULT_THEME.icon("worker_1")
+    assert loaded.icon("face_down") == DEFAULT_THEME.icon("face_down")

@@ -73,6 +73,11 @@ TEXT_ICONS = {
     "field": "田",
     "pasture": "牧",
     "stable": "舍",
+    "worker_1": "工1",
+    "worker_2": "工2",
+    "worker_3": "工3",
+    "worker_4": "工4",
+    "face_down": "蓋",
 }
 
 DEFAULT_NAME = "default"
@@ -100,6 +105,11 @@ DEFAULT_ICONS = {
     "field": "🌱",
     "pasture": "🟩",
     "stable": "🛖",
+    "worker_1": "🔵",
+    "worker_2": "🔴",
+    "worker_3": "🟢",
+    "worker_4": "🟡",
+    "face_down": "🂠",
     "farm_expansion": "🏠",
     "meeting_place": "🚩",
     "grain_seeds": "🌽",
