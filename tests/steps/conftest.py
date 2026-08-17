@@ -111,6 +111,11 @@ def give_grain(game: Game, number: int, count: int) -> None:
     game.players[number - 1].grain = count
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 食物"))
+def give_food(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].food = count
+
+
 @when(parsers.parse("玩家 {number:d} 已有壁爐"))
 def give_fireplace(game: Game, number: int) -> None:
     game.players[number - 1].has_fireplace = True

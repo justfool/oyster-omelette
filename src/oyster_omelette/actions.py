@@ -113,6 +113,7 @@ def resolve_space(game, player, space) -> None:
 
     if space.id == "family_growth":
         player.family_members += 1
+        player.newborns_this_round += 1
         return
 
     if space.id == "vegetable_seeds":
