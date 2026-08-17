@@ -13,7 +13,7 @@ from oyster_omelette.farmyard import (
     CellKind,
 )
 from oyster_omelette.animals import house_animals
-from oyster_omelette.cards import occupation_cost, play_occupation
+from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
 from oyster_omelette.majors import (
     bake_best,
     choose_major,
@@ -155,6 +155,8 @@ def resolve_space(game, player, space) -> None:
         for other in game.players:
             other.is_start_player = False
         player.is_start_player = True
+        if player.minors_hand:
+            play_minor(player, player.minors_hand[0])
         return
 
     if space.id == "farm_expansion":
