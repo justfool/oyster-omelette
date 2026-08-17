@@ -3,10 +3,14 @@
 from oyster_omelette.farmyard import (
     build_one_room,
     build_one_stable,
+    can_place_field,
+    can_place_room,
     empty_fields,
     first_legal_field,
     first_legal_room,
     first_legal_stable,
+    place_field,
+    place_room,
     plow_first_legal,
     renovate_house,
     sow_fields,
@@ -20,7 +24,13 @@ from oyster_omelette.majors import (
     take_major,
     well_food_rounds,
 )
-from oyster_omelette.pastures import enclose_one_pasture, next_pasture_cost
+from oyster_omelette.pastures import (
+    can_enclose_cell,
+    enclose_one_pasture,
+    enclose_pasture_at,
+    fence_cost_at,
+    next_pasture_cost,
+)
 
 
 def add_resource(player, resource: str, amount: int) -> None:
@@ -86,6 +96,32 @@ def _do_fence(player) -> None:
     player.wood -= cost
 
 
+def target_error(player, space, target: tuple[int, int] | None) -> str:
+    if target is None:
+        return ""
+    row, col = target
+    if space.id == "farmland":
+        if not can_place_field(player.farm, row, col):
+            return "illegal_cell"
+    if space.id == "fences":
+        cost = fence_cost_at(player.farm, row, col)
+        if cost is None:
+            return "illegal_cell"
+        if player.wood < cost:
+            return "cannot_fence"
+    if space.id == "farm_expansion":
+        can_room = _can_build_room(player) and can_place_room(player.farm, row, col)
+        try:
+            cell = player.farm.cell(row, col)
+            empty = cell.kind == CellKind.EMPTY and not cell.stable
+        except IndexError:
+            empty = False
+        can_stable = player.wood >= 2 and empty
+        if not can_room and not can_stable:
+            return "illegal_cell"
+    return ""
+
+
 def cannot_use(player, space, game=None) -> str:
     """不能使用此格時回傳原因，否則空字串。"""
     if space.id == "farmland" and first_legal_field(player.farm) is None:
@@ -134,7 +170,7 @@ def cannot_use(player, space, game=None) -> str:
     return ""
 
 
-def resolve_space(game, player, space) -> None:
+def resolve_space(game, player, space, target: tuple[int, int] | None = None) -> None:
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
             house_animals(player, space.resource, space.accumulated)
@@ -160,6 +196,20 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "farm_expansion":
+        if target is not None:
+            row, col = target
+            if _can_build_room(player) and can_place_room(player.farm, row, col):
+                resource, amount, reed = _room_cost(player)
+                setattr(player, resource, getattr(player, resource) - amount)
+                player.reed -= reed
+                place_room(player.farm, row, col)
+            elif player.wood >= 2:
+                player.wood -= 2
+                player.farm.cell(row, col).stable = True
+            if player.wood >= 2 and first_legal_stable(player.farm) is not None:
+                player.wood -= 2
+                build_one_stable(player.farm)
+            return
         if _can_build_room(player):
             resource, amount, reed = _room_cost(player)
             setattr(player, resource, getattr(player, resource) - amount)
@@ -189,7 +239,10 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "farmland":
-        plow_first_legal(player.farm)
+        if target is not None:
+            place_field(player.farm, target[0], target[1])
+        else:
+            plow_first_legal(player.farm)
         return
 
     if space.id == "sow_and_or_bake":
@@ -214,7 +267,11 @@ def resolve_space(game, player, space) -> None:
         return
 
     if space.id == "fences":
-        _do_fence(player)
+        if target is not None:
+            cost = enclose_pasture_at(player.farm, target[0], target[1])
+            player.wood -= cost
+        else:
+            _do_fence(player)
         return
 
     if space.id == "lessons":

@@ -169,6 +169,19 @@ def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> No
     last_place["result"] = game.place_worker(number - 1, space_id)
 
 
+@when(
+    parsers.parse(
+        "玩家 {number:d} 把工人放到 {space_id} 的第 {row:d} 列第 {col:d} 格"
+    )
+)
+def place_worker_at(
+    game: Game, last_place: dict, number: int, space_id: str, row: int, col: int
+) -> None:
+    last_place["result"] = game.place_worker(
+        number - 1, space_id, target=(row - 1, col - 1)
+    )
+
+
 @when(parsers.parse("玩家 {number:d} 把家人放到 {space_id}"), target_fixture="placed")
 def place_family(game: Game, last_place: dict, number: int, space_id: str):
     result = game.place_worker(number - 1, space_id)
