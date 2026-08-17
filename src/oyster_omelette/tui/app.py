@@ -93,12 +93,20 @@ def goods_text(player) -> str:
     )
 
 
+def cards_text(player) -> str:
+    majors = ",".join(player.majors) if player.majors else "無"
+    jobs = str(len(player.occupations_played))
+    minors = str(len(player.minors_played))
+    return f"改良 {majors}　職業{jobs}　次要{minors}"
+
+
 def all_goods_text(game: Game) -> str:
     turn = game.whose_turn()
     lines = []
     for index, player in enumerate(game.players):
         mark = "*" if turn == index else " "
         lines.append(f"{mark}P{index + 1} {goods_text(player)}")
+        lines.append(f"  {cards_text(player)}")
     return "\n".join(lines)
 
 
@@ -134,7 +142,7 @@ class OysterOmeletteApp(App):
         height: 1fr;
     }
     #status {
-        height: 5;
+        height: 8;
         padding: 0 1;
     }
     """

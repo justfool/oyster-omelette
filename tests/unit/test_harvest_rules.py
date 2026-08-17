@@ -36,6 +36,20 @@ def test_second_harvest_in_same_round_does_nothing():
     assert game.players[0].begging == first
 
 
+def test_fireplace_cooks_sheep_during_feed():
+    farm = starting_farmyard()
+    player = Player(
+        farm=farm,
+        food=0,
+        is_start_player=True,
+        sheep=2,
+        has_fireplace=True,
+    )
+    feed_player(player)
+    assert player.begging == 0
+    assert player.sheep == 0
+
+
 def test_enough_food_no_begging():
     farm = starting_farmyard()
     player = Player(farm=farm, food=4, is_start_player=True)

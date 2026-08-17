@@ -33,9 +33,18 @@ def feed_player(player) -> None:
     while need > 0 and player.grain > 0:
         player.grain -= 1
         need -= 1
+    from oyster_omelette.majors import can_cook, cook_table
+
+    veg_food = cook_table(player)["vegetable"] if can_cook(player) else 1
     while need > 0 and player.vegetable > 0:
         player.vegetable -= 1
-        need -= 1
+        need = max(0, need - veg_food)
+    if can_cook(player):
+        table = cook_table(player)
+        for kind in ("sheep", "wild_boar", "cattle"):
+            while need > 0 and getattr(player, kind) > 0:
+                setattr(player, kind, getattr(player, kind) - 1)
+                need = max(0, need - table[kind])
     player.begging += need
 
 
