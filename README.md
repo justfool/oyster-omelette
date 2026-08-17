@@ -17,6 +17,26 @@ uv run pytest
 
 終端機建議用 Windows Terminal。按 `Q` 離開。
 
+畫面以**行動板**為中心；個人農場平常只在右側迷你圖，按 `M` 或需要選格子時才展開大圖。資源與行動格預設用接近的 emoji，中文名稱仍會寫在旁邊。
+
+```powershell
+uv run oyster-omelette
+uv run oyster-omelette --theme text
+$env:OYSTER_THEME = "text"
+```
+
+自訂主題可傳一份 JSON（會疊在 `emoji` 或指定的 `base` 上）：
+
+```json
+{ "name": "mine", "base": "emoji", "icons": { "wood": "W", "forest": "F" } }
+```
+
+```powershell
+uv run oyster-omelette --theme D:\path\mine.json
+```
+
+遊戲內按 `T` 可在 emoji／文字主題之間切換。
+
 ## 開發方式：BDD + TDD
 
 新功能都走同一圈，不先寫一大坨實作。
@@ -45,7 +65,7 @@ src/oyster_omelette/tui/  只有畫面
 - 蓋木屋、生小孩、最便宜的壁爐與烤麵包
 - 圍籬、牧場、動物容量、畜舍、繁殖、翻修成黏土屋
 - 10 張主要改良、石頭屋、緊急生育
-- TUI 2 人熱座：P 準備、數字／字母放工人、選格（列 1-3 行 1-5）、R 回家並自動收成、S 計分、G 上帝模式、? 說明
+- TUI 2 人熱座：中央行動板、右側農場迷你圖、M 展開大圖、T 切換主題、P 準備、數字／字母放工人、選格（列 1-3 行 1-5）、R 回家並自動收成、S 計分、G 上帝模式、? 說明
 - 官方單人（Game.setup(solo=True)）、3／4 人加格
 
 還沒做：更複雜的「每當」卡效（林務員已做）、旅行卡轉手、次要的費用／前提。
