@@ -13,6 +13,7 @@ from oyster_omelette.farmyard import (
     CellKind,
 )
 from oyster_omelette.animals import house_animals
+from oyster_omelette.cards import occupation_cost, play_occupation
 from oyster_omelette.majors import (
     bake_best,
     choose_major,
@@ -109,6 +110,12 @@ def cannot_use(player, space, game=None) -> str:
             return "cannot_build_fireplace"
     if space.id == "fences":
         return _fence_block_reason(player) or ""
+    if space.id == "lessons":
+        if not player.occupations_hand:
+            return "cannot_play_occupation"
+        cost = occupation_cost(len(player.occupations_played))
+        if player.food < cost:
+            return "cannot_play_occupation"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
         can_sow = bool(empty_fields(player.farm)) and (
             player.grain > 0 or player.vegetable > 0
@@ -206,4 +213,10 @@ def resolve_space(game, player, space) -> None:
 
     if space.id == "fences":
         _do_fence(player)
+        return
+
+    if space.id == "lessons":
+        cost = occupation_cost(len(player.occupations_played))
+        player.food -= cost
+        play_occupation(player, player.occupations_hand[0])
         return
