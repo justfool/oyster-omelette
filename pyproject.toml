@@ -21,6 +21,9 @@ dev = [
     "pytest-bdd>=8.1.0",
 ]
 
+[tool.hatch.build.targets.wheel.force-include]
+"src/oyster_omelette/themes/default.json" = "oyster_omelette/themes/default.json"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]

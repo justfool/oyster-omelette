@@ -9,7 +9,7 @@ from oyster_omelette.farmyard import CellKind
 from oyster_omelette.game import Game
 from oyster_omelette.harvest import is_harvest_round
 from oyster_omelette.scoring import score_player
-from oyster_omelette.theme import SPACE_NAMES, Theme, load_theme
+from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme, load_theme
 
 SPACE_KEYS = "123456789abcdefghijk"
 
@@ -19,7 +19,7 @@ NEEDS_CELL = frozenset(
 
 
 def _theme(theme: Theme | None) -> Theme:
-    return theme if theme is not None else load_theme("emoji")
+    return theme if theme is not None else DEFAULT_THEME
 
 
 def should_show_farm_detail(pending_space: str | None, farm_open: bool) -> bool:
@@ -378,7 +378,7 @@ class OysterOmeletteApp(App):
             self.note("收合農場大圖。")
 
     def action_cycle_theme(self) -> None:
-        nxt = "text" if self.theme.name == "emoji" else "emoji"
+        nxt = "text" if self.theme.name != "text" else "default"
         self.theme = load_theme(nxt)
         self.note(f"主題改為 {self.theme.name}。也可用 --theme 或 OYSTER_THEME 指定。")
 
@@ -533,7 +533,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--theme",
         default=None,
-        help="emoji（預設）、text，或自訂 JSON 路徑。也可用環境變數 OYSTER_THEME。",
+        help="default（預設）、text，或自訂 JSON 路徑。也可用環境變數 OYSTER_THEME。",
     )
     args = parser.parse_args(argv)
     OysterOmeletteApp(theme=load_theme(args.theme)).run()

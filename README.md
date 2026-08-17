@@ -17,25 +17,28 @@ uv run pytest
 
 終端機建議用 Windows Terminal。按 `Q` 離開。
 
-畫面以**行動板**為中心；個人農場平常只在右側迷你圖，按 `M` 或需要選格子時才展開大圖。資源與行動格預設用接近的 emoji，中文名稱仍會寫在旁邊。
+畫面以**行動板**為中心；個人農場平常只在右側迷你圖，按 `M` 或需要選格子時才展開大圖。
+
+沒指定時使用內建 **`default`** 主題（資源與行動格用接近的 emoji，中文名稱寫在旁邊）。完整圖示表在 `src/oyster_omelette/themes/default.json`，複製後改圖示即可。
 
 ```powershell
 uv run oyster-omelette
 uv run oyster-omelette --theme text
+uv run oyster-omelette --theme default
 $env:OYSTER_THEME = "text"
 ```
 
-自訂主題可傳一份 JSON（會疊在 `emoji` 或指定的 `base` 上）：
+自訂主題可傳一份 JSON（會疊在 `default` 或指定的 `base` 上）：
 
 ```json
-{ "name": "mine", "base": "emoji", "icons": { "wood": "W", "forest": "F" } }
+{ "name": "mine", "base": "default", "icons": { "wood": "W", "forest": "F" } }
 ```
 
 ```powershell
 uv run oyster-omelette --theme D:\path\mine.json
 ```
 
-遊戲內按 `T` 可在 emoji／文字主題之間切換。
+遊戲內按 `T` 可在 default／文字主題之間切換。
 
 ## 開發方式：BDD + TDD
 
