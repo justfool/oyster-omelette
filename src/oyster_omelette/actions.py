@@ -2,7 +2,16 @@
 
 from oyster_omelette.animals import house_animals
 from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
-from oyster_omelette.effects import after_space, bonus_on_take
+from oyster_omelette.effects import (
+    after_renovate,
+    after_rooms_built,
+    after_space,
+    bonus_on_take,
+    can_skip_to_stone,
+    fence_discount,
+    room_cost,
+    stone_discount,
+)
 from oyster_omelette.farmyard import (
     CellKind,
     build_one_room,
@@ -38,12 +47,7 @@ def add_resource(player, resource: str, amount: int) -> None:
 
 
 def _room_cost(player) -> tuple[str, int, int]:
-    material = player.farm.house_material()
-    if material == CellKind.STONE_ROOM:
-        return ("stone", 5, 2)
-    if material == CellKind.CLAY_ROOM:
-        return ("clay", 5, 2)
-    return ("wood", 5, 2)
+    return room_cost(player)
 
 
 def _can_build_room(player) -> bool:
@@ -61,32 +65,51 @@ def _grow_family(player) -> None:
 
 
 def _renovate_block_reason(player) -> str:
+    if getattr(player, "cannot_renovate", False):
+        return "cannot_renovate"
     material = player.farm.house_material()
     rooms = player.farm.room_count()
     if material == CellKind.STONE_ROOM:
         return "cannot_renovate"
     if player.reed < 1:
         return "cannot_renovate"
-    if material == CellKind.WOOD_ROOM and player.clay < rooms:
+    skip = can_skip_to_stone(player)
+    if material == CellKind.WOOD_ROOM and not skip and player.clay < rooms:
         return "cannot_renovate"
-    if material == CellKind.CLAY_ROOM and player.stone < rooms:
-        return "cannot_renovate"
+    if material == CellKind.WOOD_ROOM and skip:
+        need = max(0, rooms - stone_discount(player, "renovate"))
+        if player.stone < need:
+            return "cannot_renovate"
+    if material == CellKind.CLAY_ROOM:
+        need = max(0, rooms - stone_discount(player, "renovate"))
+        if player.stone < need:
+            return "cannot_renovate"
     return ""
 
 
-def _do_renovate(player) -> None:
+def _do_renovate(player, game=None) -> None:
     rooms = player.farm.room_count()
+    before = player.farm.house_material()
     player.reed -= 1
-    if player.farm.house_material() == CellKind.WOOD_ROOM:
+    skip = can_skip_to_stone(player)
+    if before == CellKind.WOOD_ROOM and skip:
+        player.stone -= max(0, rooms - stone_discount(player, "renovate"))
+        renovate_house(player.farm)
+        renovate_house(player.farm)
+    elif before == CellKind.WOOD_ROOM:
         player.clay -= rooms
+        renovate_house(player.farm)
     else:
-        player.stone -= rooms
-    renovate_house(player.farm)
+        player.stone -= max(0, rooms - stone_discount(player, "renovate"))
+        renovate_house(player.farm)
+    after_renovate(game, player, before)
 
 
 def _fence_block_reason(player) -> str:
     cost = next_pasture_cost(player.farm)
-    if cost is None or player.wood < cost:
+    if cost is None:
+        return "cannot_fence"
+    if player.wood < max(0, cost - fence_discount(player)):
         return "cannot_fence"
     return ""
 
@@ -95,7 +118,7 @@ def _try_play_minor(player, game=None) -> None:
     from oyster_omelette.cards import can_play_minor
 
     for card_id in list(player.minors_hand):
-        if can_play_minor(player, card_id):
+        if can_play_minor(player, card_id, game):
             play_minor(player, card_id, game)
             return
 
@@ -105,7 +128,7 @@ def _try_play_major_or_minor(game, player) -> None:
     if major_id is None:
         _try_play_minor(player, game)
         return
-    take_major(player, game.major_supply, major_id)
+    take_major(player, game.major_supply, major_id, game)
     if major_id in {"clay_oven", "stone_oven"}:
         bake_best(player)
     if major_id == "well":
@@ -113,14 +136,22 @@ def _try_play_major_or_minor(game, player) -> None:
 
 
 def _do_fence(player, target: tuple[int, int] | None = None) -> None:
+    free = fence_discount(player)
     if target is not None:
         cost = enclose_pasture_at(player.farm, target[0], target[1])
-        player.wood -= cost
+        pay = max(0, cost - free)
+        player.wood -= pay
+        free = max(0, free - cost)
     while True:
         cost = next_pasture_cost(player.farm)
-        if cost is None or player.wood < cost:
+        if cost is None:
             break
-        player.wood -= enclose_one_pasture(player.farm)
+        pay = max(0, cost - free)
+        if player.wood < pay:
+            break
+        player.wood -= pay
+        free = max(0, free - cost)
+        enclose_one_pasture(player.farm)
 
 
 def target_error(player, space, target: tuple[int, int] | None) -> str:
@@ -235,6 +266,7 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
         return
 
     if space.id == "farm_expansion":
+        rooms_before = player.farm.room_count()
         if target is not None:
             row, col = target
             if _can_build_room(player) and can_place_room(player.farm, row, col):
@@ -253,15 +285,16 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
         if player.wood >= 2 and first_legal_stable(player.farm) is not None:
             player.wood -= 2
             build_one_stable(player.farm)
+        after_rooms_built(game, player, player.farm.room_count() - rooms_before)
         return
 
     if space.id == "renovation":
-        _do_renovate(player)
+        _do_renovate(player, game)
         _try_play_major_or_minor(game, player)
         return
 
     if space.id == "renovation_and_fences":
-        _do_renovate(player)
+        _do_renovate(player, game)
         if not _fence_block_reason(player):
             _do_fence(player)
         return

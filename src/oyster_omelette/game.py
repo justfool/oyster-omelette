@@ -46,6 +46,12 @@ class Player:
     minors_hand: list[str] = field(default_factory=list)
     minors_played: list[str] = field(default_factory=list)
     food_per_adult: int = 2
+    bonus_points: int = 0
+    round_goods: dict = field(default_factory=dict)
+    cannot_renovate: bool = False
+    prefer_vegetable: bool = False
+    flags: set = field(default_factory=set)
+    _game: object | None = None
 
     def family_size(self) -> int:
         return self.family_members
@@ -68,6 +74,7 @@ class Game:
     god_mode: bool = False
     player_count: int = 1
     major_supply: list[str] = field(default_factory=starting_supply)
+    last_harvest_round: int = 0
     _turn_from: int = 0
 
     @classmethod
@@ -166,6 +173,11 @@ class Game:
         self._reset_workers()
         self.work_phase = True
         self.harvested = False
+        from oyster_omelette.effects import after_round_start
+
+        for player in self.players:
+            player._game = self
+            after_round_start(self, player)
 
     def return_home(self) -> None:
         self._reset_workers()
@@ -199,6 +211,7 @@ class Game:
             return
         run_harvest(self)
         self.harvested = True
+        self.last_harvest_round = self.round
 
     def place_worker(
         self,
