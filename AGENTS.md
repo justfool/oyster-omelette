@@ -44,6 +44,16 @@
   - `after_play`／`AFTER_PLAY`
   - 以後回家／回合開始：`after_return_home`、`after_round_start`
 - 單張卡函式：`{卡id}_{時機}`，例如 `forester_on_take`、`A002_after_play`
+- 牌庫資料放 `decks/`（不要叫 catalog）。一張卡不要獨立一個檔。
+  ```
+  cards.py           Card、打出、發牌、合併後的 CARDS
+  decks/toy.py       玩具卡（測試樁）
+  decks/base.py      以後：基本盒 96 張資料
+  decks/artifex.py   以後：Artifex 120
+  decks/bubulcus.py  以後：Bubulcus 120
+  effects.py         入口與對照表
+  ```
+  效果函式按時機放（`take`／`space`／`play`），現在還少，先留在 `effects.py`。
 - 玩家下錯的動作回 `PlaceResult(ok, error)`，不要用例外當流程控制。程式錯誤（例如負的索引）才丟例外。
 - 資源維持平面整數欄位（`wood`、`clay`…），不要做 `Goods` 大抽象。
 - 註解只解釋非顯而易見的規則，用台灣繁體。
