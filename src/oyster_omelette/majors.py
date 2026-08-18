@@ -143,8 +143,9 @@ def bake_best(player) -> int:
     if not options:
         return 0
     food, used = max(options, key=lambda item: item[0])
-    if "baker" in getattr(player, "occupations_played", []):
-        food += used
+    from oyster_omelette.effects import extra_bake_food
+
+    food += extra_bake_food(player, used)
     player.grain -= used
     player.food += food
     return food
