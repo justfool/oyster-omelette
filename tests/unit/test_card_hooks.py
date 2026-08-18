@@ -50,6 +50,7 @@ def test_toy_deck_keeps_occupation_ids():
     assert "wood_collector" in OCCUPATION_IDS
     assert "forester" in CARDS
     assert CARDS["forester"].kind == "occupation"
+    assert CARDS["A116"].name_zh == "伐木工"
     assert "traveling_ale" in MINOR_IDS
     assert CARDS["traveling_ale"].traveling
     assert CARDS["hearty_stew"].cost == (("grain", 1),)

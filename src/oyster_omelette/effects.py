@@ -63,6 +63,10 @@ def clay_digger_on_take(_player, resource: str, _space_id: str) -> int:
     return 1 if resource == "clay" else 0
 
 
+def A116_on_take(_player, resource: str, _space_id: str) -> int:
+    return 1 if resource == "wood" else 0
+
+
 def baker_on_bake(_player, grain_used: int) -> int:
     return grain_used
 
@@ -70,6 +74,7 @@ def baker_on_bake(_player, grain_used: int) -> int:
 BONUS_ON_TAKE = {
     "forester": forester_on_take,
     "clay_digger": clay_digger_on_take,
+    "A116": A116_on_take,
 }
 AFTER_SPACE: dict = {}
 AFTER_PLAY: dict = {}

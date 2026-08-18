@@ -225,7 +225,7 @@
     中文：季節工人
     費用：—    前提：—    分數：—    難度：3
     卡文：Each time you use the "Day Laborer" action space, you get 1 additional grain. From round 6 on, you can choose to get 1 vegetable instead.
-[ ] A116
+[x] A116
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：建材
     英文：Wood Cutter
     中文：伐木工

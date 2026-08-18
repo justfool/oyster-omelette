@@ -30,6 +30,24 @@ def test_forester_gives_extra_wood_from_forest():
     assert player.wood == 4
 
 
+def test_wood_cutter_gives_extra_wood_from_forest():
+    game = Game.setup(1)
+    game.prepare_round()
+    player = game.players[0]
+    player.occupations_played = ["A116"]
+    assert game.place_worker(0, "forest").ok
+    assert player.wood == 4
+
+
+def test_wood_cutter_also_applies_to_copse():
+    game = Game.setup(3)
+    game.prepare_round()
+    player = game.players[0]
+    player.occupations_played = ["A116"]
+    assert game.place_worker(0, "copse").ok
+    assert player.wood == 3
+
+
 def test_clay_digger_gives_extra_clay():
     game = Game.setup(1)
     game.prepare_round()
