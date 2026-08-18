@@ -44,7 +44,7 @@ def test_after_space_hook_can_add_goods_without_editing_actions(monkeypatch):
     assert player.grain == 2
 
 
-def test_catalog_keeps_toy_occupation_ids():
+def test_toy_deck_keeps_occupation_ids():
     from oyster_omelette.cards import CARDS, OCCUPATION_IDS, MINOR_IDS
 
     assert "wood_collector" in OCCUPATION_IDS

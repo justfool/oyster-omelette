@@ -1,4 +1,4 @@
-"""職業與次要：卡表 + 打出／發牌。效果對照在 effects.py。"""
+"""職業與次要：卡型、打出、發牌。牌庫資料在 decks/，效果在 effects.py。"""
 
 from dataclasses import dataclass
 
@@ -17,11 +17,11 @@ class Card:
     vp: int = 0
 
 
-def _occupation(card_id: str, name_zh: str, resource: str = "", amount: int = 0) -> Card:
+def occupation(card_id: str, name_zh: str, resource: str = "", amount: int = 0) -> Card:
     return Card(id=card_id, name_zh=name_zh, kind="occupation", play_resource=resource, play_amount=amount)
 
 
-def _minor(
+def minor(
     card_id: str,
     name_zh: str,
     resource: str = "",
@@ -41,50 +41,30 @@ def _minor(
     )
 
 
-# 玩具卡先留當測試樁；正式牌庫接上後再退役。
-_TOY_CARDS = (
-    _occupation("wood_collector", "樵夫", "wood", 2),
-    _occupation("clay_worker", "黏土工", "clay", 2),
-    _occupation("reed_collector", "蘆葦採集", "reed", 1),
-    _occupation("day_labor_plus", "零工", "food", 2),
-    _occupation("stone_picker", "撿石人", "stone", 1),
-    _occupation("grain_sower", "播種人", "grain", 1),
-    _occupation("veg_grower", "菜農", "vegetable", 1),
-    _occupation("forester", "林務員"),
-    _occupation("clay_digger", "挖黏人"),
-    _occupation("baker", "麵包師"),
-    _minor("wood_cart", "運木車", "wood", 2),
-    _minor("clay_pit_shovel", "挖黏鏟", "clay", 1),
-    _minor("fishing_rod", "釣竿", "food", 2),
-    _minor("grain_sack", "穀袋", "grain", 1),
-    _minor("veg_basket", "菜籃", "vegetable", 1),
-    _minor("stone_sled", "運石橇", "stone", 1),
-    _minor("reed_bundle", "蘆葦捆", "reed", 1),
-    _minor("traveling_ale", "旅行麥酒", "food", 1, traveling=True),
-    _minor("hearty_stew", "大鍋菜", "food", 3, cost=(("grain", 1),)),
-)
+# Card／occupation／minor 先定義完，牌庫才能引用；正式庫之後在這裡一併併進 CARDS。
+from oyster_omelette.decks.toy import TOY_CARDS
 
-CARDS: dict[str, Card] = {card.id: card for card in _TOY_CARDS}
+CARDS: dict[str, Card] = {card.id: card for card in TOY_CARDS}
 
 OCCUPATION_IDS: tuple[str, ...] = tuple(
-    card.id for card in _TOY_CARDS if card.kind == "occupation"
+    card.id for card in TOY_CARDS if card.kind == "occupation"
 )
-MINOR_IDS: tuple[str, ...] = tuple(card.id for card in _TOY_CARDS if card.kind == "minor")
+MINOR_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind == "minor")
 
 # 舊測試與 TUI 仍讀這兩份 dict。
 OCCUPATIONS: dict[str, tuple[str, str, int]] = {
     card.id: (card.name_zh, card.play_resource, card.play_amount)
-    for card in _TOY_CARDS
+    for card in TOY_CARDS
     if card.kind == "occupation"
 }
 MINORS: dict[str, tuple[str, str, int]] = {
     card.id: (card.name_zh, card.play_resource, card.play_amount)
-    for card in _TOY_CARDS
+    for card in TOY_CARDS
     if card.kind == "minor"
 }
-TRAVELING_MINORS = frozenset(card.id for card in _TOY_CARDS if card.traveling)
+TRAVELING_MINORS = frozenset(card.id for card in TOY_CARDS if card.traveling)
 MINOR_COSTS: dict[str, dict[str, int]] = {
-    card.id: dict(card.cost) for card in _TOY_CARDS if card.cost
+    card.id: dict(card.cost) for card in TOY_CARDS if card.cost
 }
 
 
