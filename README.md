@@ -13,6 +13,8 @@ cd D:\work\toybox\oyster-omelette
 uv sync --group dev
 uv run oyster-omelette
 uv run pytest
+uv run ruff check
+uv run ruff format --check
 ```
 
 終端機建議用 Windows Terminal。按 `Q` 離開。

@@ -1,6 +1,10 @@
 """行動格立刻結算。還沒做完的格子只佔格、不改農場。"""
 
+from oyster_omelette.animals import house_animals
+from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
+from oyster_omelette.effects import after_space, bonus_on_take
 from oyster_omelette.farmyard import (
+    CellKind,
     build_one_room,
     build_one_stable,
     can_place_field,
@@ -14,11 +18,7 @@ from oyster_omelette.farmyard import (
     plow_first_legal,
     renovate_house,
     sow_fields,
-    CellKind,
 )
-from oyster_omelette.animals import house_animals
-from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
-from oyster_omelette.effects import after_space, bonus_on_take
 from oyster_omelette.majors import (
     bake_best,
     choose_major,
@@ -26,7 +26,6 @@ from oyster_omelette.majors import (
     well_food_rounds,
 )
 from oyster_omelette.pastures import (
-    can_enclose_cell,
     enclose_one_pasture,
     enclose_pasture_at,
     fence_cost_at,
@@ -179,24 +178,23 @@ def cannot_use(player, space, game=None) -> str:
     if space.id in {"lessons", "lessons_3p"}:
         if not player.occupations_hand:
             return "cannot_play_occupation"
-        cost = (
-            2
-            if space.id == "lessons_3p"
-            else occupation_cost(len(player.occupations_played))
-        )
+        cost = 2 if space.id == "lessons_3p" else occupation_cost(len(player.occupations_played))
         if player.food < cost:
             return "cannot_play_occupation"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
-        can_sow = bool(empty_fields(player.farm)) and (
-            player.grain > 0 or player.vegetable > 0
-        )
+        can_sow = bool(empty_fields(player.farm)) and (player.grain > 0 or player.vegetable > 0)
         can_plow = space.id == "plow_and_or_sow" and first_legal_field(player.farm) is not None
-        can_bake = space.id == "sow_and_or_bake" and player.grain > 0 and (
-            player.has_fireplace or any(
-                card.startswith("fireplace")
-                or card.startswith("hearth")
-                or card.endswith("oven")
-                for card in player.majors
+        can_bake = (
+            space.id == "sow_and_or_bake"
+            and player.grain > 0
+            and (
+                player.has_fireplace
+                or any(
+                    card.startswith("fireplace")
+                    or card.startswith("hearth")
+                    or card.endswith("oven")
+                    for card in player.majors
+                )
             )
         )
         if not can_sow and not can_plow and not can_bake:
@@ -306,11 +304,7 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
         return
 
     if space.id in {"lessons", "lessons_3p"}:
-        cost = (
-            2
-            if space.id == "lessons_3p"
-            else occupation_cost(len(player.occupations_played))
-        )
+        cost = 2 if space.id == "lessons_3p" else occupation_cost(len(player.occupations_played))
         player.food -= cost
         play_occupation(player, player.occupations_hand[0], game)
         return

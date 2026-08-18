@@ -9,6 +9,7 @@ def _default_fences():
 
     return empty_fences()
 
+
 ROWS = 3
 COLS = 5
 

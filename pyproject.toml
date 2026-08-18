@@ -19,6 +19,7 @@ build-backend = "hatchling.build"
 dev = [
     "pytest>=9.1.1",
     "pytest-bdd>=8.1.0",
+    "ruff>=0.16.3",
 ]
 
 [tool.hatch.build.targets.wheel.force-include]
@@ -28,3 +29,27 @@ dev = [
 testpaths = ["tests"]
 pythonpath = ["."]
 bdd_features_base_dir = "features"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "I",  # isort
+    "UP", # pyupgrade
+    "B",  # bugbear
+]
+ignore = [
+    "E501",  # 行長交給 ruff format
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Card／occupation／minor 先定義，decks 才能引用。
+"src/oyster_omelette/cards.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["oyster_omelette"]

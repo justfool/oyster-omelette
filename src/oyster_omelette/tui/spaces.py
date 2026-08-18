@@ -16,9 +16,7 @@ from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme
 
 SPACE_KEYS = "123456789abcdefghijk"
 
-NEEDS_CELL = frozenset(
-    {"farmland", "fences", "farm_expansion", "plow_and_or_sow"}
-)
+NEEDS_CELL = frozenset({"farmland", "fences", "farm_expansion", "plow_and_or_sow"})
 
 ZONE_FIXED = "fixed"
 ZONE_ROUND = "round"
@@ -148,9 +146,7 @@ def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
             )
         else:
             upcoming_index = offset - len(revealed)
-            hidden_id = (
-                upcoming[upcoming_index] if upcoming_index < len(upcoming) else None
-            )
+            hidden_id = upcoming[upcoming_index] if upcoming_index < len(upcoming) else None
             god_name = None
             if god and hidden_id:
                 god_name = SPACE_NAMES.get(hidden_id, hidden_id)

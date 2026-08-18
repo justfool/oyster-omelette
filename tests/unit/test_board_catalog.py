@@ -8,9 +8,7 @@ from oyster_omelette.board import (
 )
 from oyster_omelette.game import Game
 
-STAGE_1_CARDS = frozenset(
-    {"fences", "major_or_minor", "sheep", "sow_and_or_bake"}
-)
+STAGE_1_CARDS = frozenset({"fences", "major_or_minor", "sheep", "sow_and_or_bake"})
 
 
 def test_two_player_fixed_space_ids():

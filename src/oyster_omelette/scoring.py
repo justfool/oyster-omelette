@@ -109,8 +109,8 @@ def unused_spaces(player) -> int:
 
 
 def score_player(player) -> dict[str, int]:
-    from oyster_omelette.farmyard import CellKind
     from oyster_omelette.cards import occupation_points
+    from oyster_omelette.farmyard import CellKind
     from oyster_omelette.majors import major_points
     from oyster_omelette.pastures import pasture_cells, pasture_count
 
@@ -131,9 +131,7 @@ def score_player(player) -> dict[str, int]:
         "cattle": points_cattle(player.cattle),
         "unused": -unused_spaces(player),
         "fenced_stables": sum(
-            1
-            for row, col in pasture_cells(player.farm)
-            if player.farm.cell(row, col).stable
+            1 for row, col in pasture_cells(player.farm) if player.farm.cell(row, col).stable
         ),
         "rooms": room_points,
         "family": player.family_size() * 3,
@@ -143,7 +141,5 @@ def score_player(player) -> dict[str, int]:
     }
     leftover = player.wood + player.clay + player.reed + player.stone
     detail["leftover"] = leftover
-    detail["total"] = sum(
-        value for key, value in detail.items() if key != "leftover"
-    )
+    detail["total"] = sum(value for key, value in detail.items() if key != "leftover")
     return detail

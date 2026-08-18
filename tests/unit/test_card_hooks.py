@@ -45,7 +45,7 @@ def test_after_space_hook_can_add_goods_without_editing_actions(monkeypatch):
 
 
 def test_toy_deck_keeps_occupation_ids():
-    from oyster_omelette.cards import CARDS, OCCUPATION_IDS, MINOR_IDS
+    from oyster_omelette.cards import CARDS, MINOR_IDS, OCCUPATION_IDS
 
     assert "wood_collector" in OCCUPATION_IDS
     assert "forester" in CARDS

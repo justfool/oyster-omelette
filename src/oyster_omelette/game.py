@@ -6,8 +6,13 @@ from typing import NamedTuple
 from oyster_omelette.actions import cannot_use, resolve_space, target_error
 from oyster_omelette.board import ActionSpace, Board, deal_round_cards, two_player_board
 from oyster_omelette.cards import deal_minors, deal_occupations
+from oyster_omelette.farmyard import (
+    Farmyard,
+    return_people_home,
+    starting_farmyard,
+    take_one_person,
+)
 from oyster_omelette.majors import starting_supply
-from oyster_omelette.farmyard import Farmyard, return_people_home, starting_farmyard, take_one_person
 
 
 class PlaceResult(NamedTuple):
@@ -113,7 +118,7 @@ class Game:
         )
         job_hands = deal_occupations(player_count)
         minor_hands = deal_minors(player_count)
-        for player, jobs, minors in zip(players, job_hands, minor_hands):
+        for player, jobs, minors in zip(players, job_hands, minor_hands, strict=True):
             player.occupations_hand = jobs
             player.minors_hand = minors
         game._turn_from = game.start_player_index()
