@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from oyster_omelette.effects import after_playing
+from oyster_omelette.effects import after_play, bonus_on_score, bonus_on_take
 
 
 @dataclass(frozen=True)
@@ -98,20 +98,12 @@ def occupation_cost(already_played: int) -> int:
     return 0 if already_played <= 0 else 1
 
 
-def bonus_on_take(player, resource: str, space_id: str = "") -> int:
-    from oyster_omelette.effects import extra_on_take
-
-    return extra_on_take(player, resource, space_id)
-
-
 def bonus_wood(player) -> int:
     return bonus_on_take(player, "wood")
 
 
 def occupation_points(player) -> int:
-    from oyster_omelette.effects import extra_score
-
-    return len(player.occupations_played) + len(player.minors_played) + extra_score(player)
+    return len(player.occupations_played) + len(player.minors_played) + bonus_on_score(player)
 
 
 def _grant_play_goods(player, card: Card) -> None:
@@ -124,7 +116,7 @@ def play_occupation(player, card_id: str, game=None) -> None:
     player.occupations_hand.remove(card_id)
     player.occupations_played.append(card_id)
     _grant_play_goods(player, card)
-    after_playing(game, player, card_id)
+    after_play(game, player, card_id)
 
 
 def can_play_minor(player, card_id: str) -> bool:
@@ -151,7 +143,7 @@ def play_minor(player, card_id: str, game=None) -> None:
         nxt.minors_hand.append(card_id)
         return
     player.minors_played.append(card_id)
-    after_playing(game, player, card_id)
+    after_play(game, player, card_id)
 
 
 def _deal(ids: tuple[str, ...], player_count: int) -> list[list[str]]:

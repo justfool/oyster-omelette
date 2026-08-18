@@ -28,8 +28,22 @@
 
 - 狀態用 `dataclass`，不要 class 繼承樹。
 - 規則用普通函式（`place_worker`、`resolve_space`）。一個函式做一件事。
-- 卡片效果用「有名字的函式」對照，登錄在 `effects.py` 的 `ON_TAKE`／`AFTER_SPACE`／`ON_PLAY`／`ON_BAKE`／`ON_SCORE`。引擎只呼叫這些入口，**不要**在 `actions`／`harvest`／`majors` 裡寫 `if card == ...`。
-- **不要** decorator、事件匯流排、metaclass、Visitor。
+- 卡片效果用「有名字的函式」對照，登錄在 `effects.py`。引擎只呼叫這些入口，**不要**在 `actions`／`harvest`／`majors` 裡寫 `if card == ...`。
+- **不要** decorator、事件匯流排、metaclass、Visitor。不要用 `on_`／`emit`／`handle_`／`notify_` 當入口名。
+
+### 卡片對照表命名
+
+靜態表，不是訂閱。打出只記卡號；時機到了才查表。
+
+- **問數量**（回傳 `int`、只加總）：入口 `bonus_*`，表 `BONUS_*`
+  - `bonus_on_take`／`BONUS_ON_TAKE`
+  - `bonus_on_bake`／`BONUS_ON_BAKE`
+  - `bonus_on_score`／`BONUS_ON_SCORE`
+- **做副作用**（改狀態）：入口 `after_*`，表 `AFTER_*`
+  - `after_space`／`AFTER_SPACE`
+  - `after_play`／`AFTER_PLAY`
+  - 以後回家／回合開始：`after_return_home`、`after_round_start`
+- 單張卡函式：`{卡id}_{時機}`，例如 `forester_on_take`、`A002_after_play`
 - 玩家下錯的動作回 `PlaceResult(ok, error)`，不要用例外當流程控制。程式錯誤（例如負的索引）才丟例外。
 - 資源維持平面整數欄位（`wood`、`clay`…），不要做 `Goods` 大抽象。
 - 註解只解釋非顯而易見的規則，用台灣繁體。
