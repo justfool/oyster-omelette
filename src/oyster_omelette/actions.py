@@ -18,7 +18,7 @@ from oyster_omelette.farmyard import (
 )
 from oyster_omelette.animals import house_animals
 from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
-from oyster_omelette.effects import after_using_space, extra_on_take
+from oyster_omelette.effects import after_space, bonus_on_take
 from oyster_omelette.majors import (
     bake_best,
     choose_major,
@@ -206,7 +206,7 @@ def cannot_use(player, space, game=None) -> str:
 
 def resolve_space(game, player, space, target: tuple[int, int] | None = None) -> None:
     _apply_space(game, player, space, target)
-    after_using_space(game, player, space.id)
+    after_space(game, player, space.id)
 
 
 def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
@@ -215,7 +215,7 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
             house_animals(player, space.resource, space.accumulated)
         else:
             add_resource(player, space.resource, space.accumulated)
-            extra = extra_on_take(player, space.resource, space.id)
+            extra = bonus_on_take(player, space.resource, space.id)
             if extra:
                 add_resource(player, space.resource, extra)
         space.accumulated = 0
