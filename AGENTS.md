@@ -28,7 +28,8 @@
 
 - 狀態用 `dataclass`，不要 class 繼承樹。
 - 規則用普通函式（`place_worker`、`resolve_space`）。一個函式做一件事。
-- 卡片效果用「有名字的函式」對照，**不要** decorator、事件匯流排、metaclass、Visitor。
+- 卡片效果用「有名字的函式」對照，登錄在 `effects.py` 的 `ON_TAKE`／`AFTER_SPACE`／`ON_PLAY`／`ON_BAKE`／`ON_SCORE`。引擎只呼叫這些入口，**不要**在 `actions`／`harvest`／`majors` 裡寫 `if card == ...`。
+- **不要** decorator、事件匯流排、metaclass、Visitor。
 - 玩家下錯的動作回 `PlaceResult(ok, error)`，不要用例外當流程控制。程式錯誤（例如負的索引）才丟例外。
 - 資源維持平面整數欄位（`wood`、`clay`…），不要做 `Goods` 大抽象。
 - 註解只解釋非顯而易見的規則，用台灣繁體。

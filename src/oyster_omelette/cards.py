@@ -1,20 +1,96 @@
-"""職業卡。先做「打出就拿資源」的簡單卡。"""
+"""職業與次要：卡表 + 打出／發牌。效果對照在 effects.py。"""
 
-# id: (中文名, 打出時拿的資源, 數量)
+from dataclasses import dataclass
+
+from oyster_omelette.effects import after_playing
+
+
+@dataclass(frozen=True)
+class Card:
+    id: str
+    name_zh: str
+    kind: str  # occupation | minor
+    play_resource: str = ""
+    play_amount: int = 0
+    traveling: bool = False
+    cost: tuple[tuple[str, int], ...] = ()
+    vp: int = 0
+
+
+def _occupation(card_id: str, name_zh: str, resource: str = "", amount: int = 0) -> Card:
+    return Card(id=card_id, name_zh=name_zh, kind="occupation", play_resource=resource, play_amount=amount)
+
+
+def _minor(
+    card_id: str,
+    name_zh: str,
+    resource: str = "",
+    amount: int = 0,
+    *,
+    traveling: bool = False,
+    cost: tuple[tuple[str, int], ...] = (),
+) -> Card:
+    return Card(
+        id=card_id,
+        name_zh=name_zh,
+        kind="minor",
+        play_resource=resource,
+        play_amount=amount,
+        traveling=traveling,
+        cost=cost,
+    )
+
+
+# 玩具卡先留當測試樁；正式牌庫接上後再退役。
+_TOY_CARDS = (
+    _occupation("wood_collector", "樵夫", "wood", 2),
+    _occupation("clay_worker", "黏土工", "clay", 2),
+    _occupation("reed_collector", "蘆葦採集", "reed", 1),
+    _occupation("day_labor_plus", "零工", "food", 2),
+    _occupation("stone_picker", "撿石人", "stone", 1),
+    _occupation("grain_sower", "播種人", "grain", 1),
+    _occupation("veg_grower", "菜農", "vegetable", 1),
+    _occupation("forester", "林務員"),
+    _occupation("clay_digger", "挖黏人"),
+    _occupation("baker", "麵包師"),
+    _minor("wood_cart", "運木車", "wood", 2),
+    _minor("clay_pit_shovel", "挖黏鏟", "clay", 1),
+    _minor("fishing_rod", "釣竿", "food", 2),
+    _minor("grain_sack", "穀袋", "grain", 1),
+    _minor("veg_basket", "菜籃", "vegetable", 1),
+    _minor("stone_sled", "運石橇", "stone", 1),
+    _minor("reed_bundle", "蘆葦捆", "reed", 1),
+    _minor("traveling_ale", "旅行麥酒", "food", 1, traveling=True),
+    _minor("hearty_stew", "大鍋菜", "food", 3, cost=(("grain", 1),)),
+)
+
+CARDS: dict[str, Card] = {card.id: card for card in _TOY_CARDS}
+
+OCCUPATION_IDS: tuple[str, ...] = tuple(
+    card.id for card in _TOY_CARDS if card.kind == "occupation"
+)
+MINOR_IDS: tuple[str, ...] = tuple(card.id for card in _TOY_CARDS if card.kind == "minor")
+
+# 舊測試與 TUI 仍讀這兩份 dict。
 OCCUPATIONS: dict[str, tuple[str, str, int]] = {
-    "wood_collector": ("樵夫", "wood", 2),
-    "clay_worker": ("黏土工", "clay", 2),
-    "reed_collector": ("蘆葦採集", "reed", 1),
-    "day_labor_plus": ("零工", "food", 2),
-    "stone_picker": ("撿石人", "stone", 1),
-    "grain_sower": ("播種人", "grain", 1),
-    "veg_grower": ("菜農", "vegetable", 1),
-    "forester": ("林務員", "wood", 0),
-    "clay_digger": ("挖黏人", "clay", 0),
-    "baker": ("麵包師", "food", 0),
+    card.id: (card.name_zh, card.play_resource, card.play_amount)
+    for card in _TOY_CARDS
+    if card.kind == "occupation"
+}
+MINORS: dict[str, tuple[str, str, int]] = {
+    card.id: (card.name_zh, card.play_resource, card.play_amount)
+    for card in _TOY_CARDS
+    if card.kind == "minor"
+}
+TRAVELING_MINORS = frozenset(card.id for card in _TOY_CARDS if card.traveling)
+MINOR_COSTS: dict[str, dict[str, int]] = {
+    card.id: dict(card.cost) for card in _TOY_CARDS if card.cost
 }
 
-OCCUPATION_IDS: tuple[str, ...] = tuple(OCCUPATIONS.keys())
+
+def card_name(card_id: str) -> str:
+    card = CARDS.get(card_id)
+    return card.name_zh if card is not None else card_id
 
 
 def occupation_cost(already_played: int) -> int:
@@ -22,14 +98,10 @@ def occupation_cost(already_played: int) -> int:
     return 0 if already_played <= 0 else 1
 
 
-def bonus_on_take(player, resource: str) -> int:
-    extra = 0
-    for card in player.occupations_played:
-        if resource == "wood" and card == "forester":
-            extra += 1
-        if resource == "clay" and card == "clay_digger":
-            extra += 1
-    return extra
+def bonus_on_take(player, resource: str, space_id: str = "") -> int:
+    from oyster_omelette.effects import extra_on_take
+
+    return extra_on_take(player, resource, space_id)
 
 
 def bonus_wood(player) -> int:
@@ -37,38 +109,27 @@ def bonus_wood(player) -> int:
 
 
 def occupation_points(player) -> int:
-    return len(player.occupations_played) + len(player.minors_played)
+    from oyster_omelette.effects import extra_score
+
+    return len(player.occupations_played) + len(player.minors_played) + extra_score(player)
 
 
-def play_occupation(player, card_id: str) -> None:
-    _name, resource, amount = OCCUPATIONS[card_id]
+def _grant_play_goods(player, card: Card) -> None:
+    if card.play_resource and card.play_amount:
+        setattr(player, card.play_resource, getattr(player, card.play_resource) + card.play_amount)
+
+
+def play_occupation(player, card_id: str, game=None) -> None:
+    card = CARDS[card_id]
     player.occupations_hand.remove(card_id)
     player.occupations_played.append(card_id)
-    setattr(player, resource, getattr(player, resource) + amount)
-
-
-MINORS: dict[str, tuple[str, str, int]] = {
-    "wood_cart": ("運木車", "wood", 2),
-    "clay_pit_shovel": ("挖黏鏟", "clay", 1),
-    "fishing_rod": ("釣竿", "food", 2),
-    "grain_sack": ("穀袋", "grain", 1),
-    "veg_basket": ("菜籃", "vegetable", 1),
-    "stone_sled": ("運石橇", "stone", 1),
-    "reed_bundle": ("蘆葦捆", "reed", 1),
-    "traveling_ale": ("旅行麥酒", "food", 1),
-    "hearty_stew": ("大鍋菜", "food", 3),
-}
-
-TRAVELING_MINORS = frozenset({"traveling_ale"})
-MINOR_COSTS: dict[str, dict[str, int]] = {
-    "hearty_stew": {"grain": 1},
-}
-
-MINOR_IDS: tuple[str, ...] = tuple(MINORS.keys())
+    _grant_play_goods(player, card)
+    after_playing(game, player, card_id)
 
 
 def can_play_minor(player, card_id: str) -> bool:
-    for resource, amount in MINOR_COSTS.get(card_id, {}).items():
+    card = CARDS[card_id]
+    for resource, amount in card.cost:
         if getattr(player, resource) < amount:
             return False
     return True
@@ -77,12 +138,12 @@ def can_play_minor(player, card_id: str) -> bool:
 def play_minor(player, card_id: str, game=None) -> None:
     if not can_play_minor(player, card_id):
         return
-    for resource, amount in MINOR_COSTS.get(card_id, {}).items():
+    card = CARDS[card_id]
+    for resource, amount in card.cost:
         setattr(player, resource, getattr(player, resource) - amount)
-    _name, resource, amount = MINORS[card_id]
     player.minors_hand.remove(card_id)
-    setattr(player, resource, getattr(player, resource) + amount)
-    if card_id in TRAVELING_MINORS:
+    _grant_play_goods(player, card)
+    if card.traveling:
         if game is None or getattr(game, "solo", False) or len(game.players) < 2:
             return
         index = game.players.index(player)
@@ -90,6 +151,7 @@ def play_minor(player, card_id: str, game=None) -> None:
         nxt.minors_hand.append(card_id)
         return
     player.minors_played.append(card_id)
+    after_playing(game, player, card_id)
 
 
 def _deal(ids: tuple[str, ...], player_count: int) -> list[list[str]]:

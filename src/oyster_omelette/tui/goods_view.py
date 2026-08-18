@@ -40,14 +40,12 @@ def goods_text(player, theme: Theme | None = None) -> str:
 
 
 def card_zh(card_id: str, theme: Theme | None = None) -> str:
-    from oyster_omelette.cards import MINORS, OCCUPATIONS
+    from oyster_omelette.cards import CARDS, card_name
     from oyster_omelette.theme import MAJOR_NAMES, SPACE_NAMES
 
     look = _look(theme)
-    if card_id in OCCUPATIONS:
-        name = OCCUPATIONS[card_id][0]
-    elif card_id in MINORS:
-        name = MINORS[card_id][0]
+    if card_id in CARDS:
+        name = card_name(card_id)
     elif card_id in MAJOR_NAMES:
         name = MAJOR_NAMES[card_id]
     else:

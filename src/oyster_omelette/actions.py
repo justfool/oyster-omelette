@@ -18,6 +18,7 @@ from oyster_omelette.farmyard import (
 )
 from oyster_omelette.animals import house_animals
 from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
+from oyster_omelette.effects import after_using_space, extra_on_take
 from oyster_omelette.majors import (
     bake_best,
     choose_major,
@@ -204,14 +205,17 @@ def cannot_use(player, space, game=None) -> str:
 
 
 def resolve_space(game, player, space, target: tuple[int, int] | None = None) -> None:
+    _apply_space(game, player, space, target)
+    after_using_space(game, player, space.id)
+
+
+def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
             house_animals(player, space.resource, space.accumulated)
         else:
             add_resource(player, space.resource, space.accumulated)
-            from oyster_omelette.cards import bonus_on_take
-
-            extra = bonus_on_take(player, space.resource)
+            extra = extra_on_take(player, space.resource, space.id)
             if extra:
                 add_resource(player, space.resource, extra)
         space.accumulated = 0
@@ -308,5 +312,5 @@ def resolve_space(game, player, space, target: tuple[int, int] | None = None) ->
             else occupation_cost(len(player.occupations_played))
         )
         player.food -= cost
-        play_occupation(player, player.occupations_hand[0])
+        play_occupation(player, player.occupations_hand[0], game)
         return
