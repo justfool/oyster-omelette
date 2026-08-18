@@ -167,6 +167,11 @@ def set_sheep_pile(game: Game, count: int) -> None:
     game.space("sheep").accumulated = count
 
 
+@when(parsers.parse("玩家 {number:d} 已打出職業 {card_id}"))
+def play_occupation_in_front(game: Game, number: int, card_id: str) -> None:
+    game.players[number - 1].occupations_played.append(card_id)
+
+
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
 def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> None:
     last_place["result"] = game.place_worker(number - 1, space_id)

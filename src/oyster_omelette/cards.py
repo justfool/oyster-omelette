@@ -43,10 +43,12 @@ def minor(
     )
 
 
-# Card／occupation／minor 先定義完，牌庫才能引用；正式庫之後在這裡一併併進 CARDS。
+# Card／occupation／minor 先定義完，牌庫才能引用。發牌仍用玩具卡。
+from oyster_omelette.decks.base import BASE_CARDS
 from oyster_omelette.decks.toy import TOY_CARDS
 
-CARDS: dict[str, Card] = {card.id: card for card in TOY_CARDS}
+_ALL_CARDS = TOY_CARDS + BASE_CARDS
+CARDS: dict[str, Card] = {card.id: card for card in _ALL_CARDS}
 
 OCCUPATION_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind == "occupation")
 MINOR_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind == "minor")
@@ -54,17 +56,17 @@ MINOR_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind ==
 # 舊測試與 TUI 仍讀這兩份 dict。
 OCCUPATIONS: dict[str, tuple[str, str, int]] = {
     card.id: (card.name_zh, card.play_resource, card.play_amount)
-    for card in TOY_CARDS
+    for card in _ALL_CARDS
     if card.kind == "occupation"
 }
 MINORS: dict[str, tuple[str, str, int]] = {
     card.id: (card.name_zh, card.play_resource, card.play_amount)
-    for card in TOY_CARDS
+    for card in _ALL_CARDS
     if card.kind == "minor"
 }
-TRAVELING_MINORS = frozenset(card.id for card in TOY_CARDS if card.traveling)
+TRAVELING_MINORS = frozenset(card.id for card in _ALL_CARDS if card.traveling)
 MINOR_COSTS: dict[str, dict[str, int]] = {
-    card.id: dict(card.cost) for card in TOY_CARDS if card.cost
+    card.id: dict(card.cost) for card in _ALL_CARDS if card.cost
 }
 
 
