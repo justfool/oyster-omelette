@@ -1,0 +1,730 @@
+# oyster-omelette Deck B（Bubulcus）待辦
+# 只有 Bubulcus 擴充 120 張，不含基本盒那 48 張 B。
+# 基本盒 B 卡見 TODO-deck-base.txt。索引見 TODO-deck-x.txt。
+# 卡文來自 Agricola Database.csv。
+# 格式： [ ] 未做   [~] 部分完成   [x] 已完成
+
+================================================================
+Bubulcus 120（120）
+================================================================
+
+[ ] B001
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：農場規劃
+    英文：Upscale Lifestyle
+    中文：講究生活
+    費用：3 Wood    前提：—    分數：—    難度：4
+    卡文：You immediately get 5 clay and a "Renovation" action. If you take the action, you must pay the renovation cost.
+[ ] B003
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：行動加強
+    英文：Moonshine
+    中文：私釀
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Randomly select an occupation in your hand. Either play it for an occupation cost of 2 food, or give it to the player to your left.
+[ ] B004
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：建材
+    英文：Wood Pile
+    中文：木堆
+    費用：—    前提：—    分數：—    難度：2
+    卡文：You immediately get a number of wood equal to the number of people you have on accumulation spaces.
+[ ] B005
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：建材
+    英文：Store of Experience
+    中文：經驗倉
+    費用：—    前提：—    分數：—    難度：2
+    卡文：If you have 0-4/5/6/7 occupations left in hand, you immediately get 1 stone/reed/clay/wood.
+[ ] B006
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：建材
+    英文：Excursion to the Quarry
+    中文：採石遠足
+    費用：2 Food    前提：1 Occupation    分數：—    難度：2
+    卡文：You immediately get a number of stone equal to the number of people you have.
+[ ] B007
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：食物
+    英文：Wage
+    中文：工錢
+    費用：—    前提：—    分數：—    難度：2
+    卡文：You immediately get 2 food and 1 additional food for each major improvement you have from the bottom row of the supply board.
+[ ] B009
+    來源：Bubulcus    種類：次要    旅行卡：是    人數：—    分類：貨物
+    英文：Beating Rod
+    中文：拍打竿
+    費用：—    前提：—    分數：—    難度：3
+    卡文：You can immediately choose to either get 1 reed or exchange 1 reed for 1 cattle.
+[ ] B011
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Feedyard
+    中文：飼育場
+    費用：1 Clay,1 Grain    前提：—    分數：1    難度：7
+    卡文：This card can hold 1 animal for each pasture you have, even different types. After the breeding phase of each harvest, you get 1 food for each unused spot on this card.
+[ ] B012
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Stockyard
+    中文：畜欄
+    費用：1 Wood,1 Stone    前提：—    分數：1    難度：7
+    卡文：This card can hold up to 3 animals of the same type. (It is not considered a pasture).
+[ ] B014
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Hawktower
+    中文：鷹塔
+    費用：2 Clay    前提：Play in Round 7 or Before    分數：—    難度：6
+    卡文：Place a stone room on round space 12. If you live in a stone house at the start of the round, you can build the stone room at no cost. Otherwise, discard the stone room.
+[ ] B015
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Carpenter's Bench
+    中文：木匠凳
+    費用：1 Wood    前提：—    分數：—    難度：6
+    卡文：Immediately after each time you use a wood accumulation space, you can use the taken wood (and only that) to build exactly 1 pasture. If you do, one of the fences is free.
+[ ] B017
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Forest Plow
+    中文：林犁
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Each time you use a wood accumulation space, you can pay 2 wood to plow 1 field. Place the paid wood on the accumulation space (for the next visitor).
+[ ] B018
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Grassland Harrow
+    中文：草地耙
+    費用：2 Wood    前提：2 Occupations, 1 Building Resource in Your Supply    分數：—    難度：6
+    卡文：Add 1 to the current round for each building resource in your supply and place 1 field on the corresponding round space. A the start of the round, you can plow the field.
+[ ] B020
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Chain Float
+    中文：連環浮犁
+    費用：3 Wood    前提：—    分數：—    難度：4
+    卡文：Add 7, 8, and 9 to the current round and place 1 field on each corresponding round space. At the start of these rounds, you can plow the field.
+[ ] B021
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Hayloft Barn
+    中文：乾草倉
+    費用：3 Wood    前提：1 Occupation    分數：—    難度：6
+    卡文：Place 4 food on this card. Each time you obtain at least 1 grain, you also get 1 food from this card. Once it is empty, you get a "Family Growth Even without Room" action.
+[ ] B022
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Walking Boots
+    中文：步行靴
+    費用：—    前提：At Most 4 People    分數：—    難度：7
+    卡文：You immediately get 2 food. You must immediately place a person from your supply. If you do, in the next returning home phase, you must remove that person from play.
+[ ] B023
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Final Scenario
+    中文：最終劇本
+    費用：—    前提：Round 13 or Before    分數：—    難度：6
+    卡文：Place the action space card for round 14 face up in front of you. Only you can use it until it is placed on the game board.
+[ ] B026
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Agrarian Fences
+    中文：農籬
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use the "Grain Utilization" action space, you can take a "Build Fences" action instead of one of the two actions provide by the action space.
+[ ] B027
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Toolbox
+    中文：工具箱
+    費用：1 Wood    前提：—    分數：—    難度：6
+    卡文：In the work phase, after each turn in which you build at least 1 room, stable, or fence, you can build the "Joinery", "pottery", or Basketmaker's Workshop" major improvement.
+[ ] B028
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Forestry Studies
+    中文：林學
+    費用：2 Food    前提：—    分數：—    難度：5
+    卡文：Each time after you use the "Forest" accumulation space, you can return 2 wood to that space to play 1 occupation without paying an occupation costs.
+[ ] B029
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Cookery Lesson
+    中文：烹飪課
+    費用：2 Food    前提：—    分數：—    難度：4
+    卡文：Each time you use a "Lesson" action space and a cooking improvement on the same turn, you get 1 bonus point.
+[ ] B030
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Wood Palisades
+    中文：木柵
+    費用：1 Food    前提：—    分數：—    難度：6
+    卡文：Instead of a fence piece, you can place 2 wood from your supply on the fence spaces at the edge of your farmyard. These fence spaces with 2 wood are worth 1 bonus point.
+[ ] B031
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Pottery Yard
+    中文：陶場
+    費用：—    前提：Pottery (or an Upgrade Thereof)    分數：1    難度：3
+    卡文：During the scoring, if there are at least 2 orthogonally adjacent unused spaces in your farm, you get 2 bonus points. (You still get the negative points for those unused spaces.
+[ ] B032
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Kettle
+    中文：壺
+    費用：1 Clay    前提：1 Grain Field    分數：—    難度：4
+    卡文：At any time, you can exchange 1/3/5 grain for 3/4/5 food and 0/1/2 bonus points.
+[ ] B034
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Special Food
+    中文：特食
+    費用：—    前提：No Animal    分數：—    難度：4
+    卡文：The next time you take animals from an accumulation space and accommodate all of them on your farm, you get 1 bonus point for each of these animals.
+[ ] B035
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Hook Knife
+    中文：鉤刀
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Once this game, when you have 9/8/7/6/5/5 sheep on your farm in a 1-/2-3-/4-/5-/6- player game, you immediately get 2 bonus points.
+[ ] B037
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Grange
+    中文：穀倉莊
+    費用：—    前提：6 Field Tiles and All Animal Types    分數：3    難度：3
+    卡文：When you play this card, you immediately get 1 food.
+[ ] B038
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Future Building Site
+    中文：預定建地
+    費用：—    前提：Play in Round 4 or Before    分數：3    難度：6
+    卡文：Up until all other farmyard spaces are used, you cannot use the unused spaces that are orthogonally adjacent to your house.
+[ ] B040
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Brewery Pond
+    中文：釀造池
+    費用：—    前提：2 Occupations    分數：-1    難度：3
+    卡文：Each time you use the "Fishing" or "Reed Bank" accumulation space, you also get 1 grain and 1 wood.
+[ ] B041
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Hauberg
+    中文：矮林
+    費用：3 Food    前提：3 Occupations    分數：—    難度：4
+    卡文：Alternate placing 2 wood and 1 wild boar on the next 4 round spaces. You decide what to start with. At the start of these rounds, you get the goods.
+[ ] B042
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Forest Inn
+    中文：林間客棧
+    費用：1 Clay,1 Reed    前提：Play in Round 6 or Before    分數：—    難度：6
+    卡文：This is an action space for all. A player who uses it can exchange 5/7/9 wood for 8 wood and 2/4/7 food. When another player uses it, they must first pay you 1 food.
+[ ] B043
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Chophouse
+    中文：剁肉間
+    費用：2 Wood/2 Clay    前提：—    分數：1    難度：4
+    卡文：Each time you use the "Grain/Vegetable Seed" action space, place 1 food on each of the next 3/2 round spaces. At the start of these rounds, you get the food.
+[ ] B044
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Chick Stable
+    中文：雞舍
+    費用：1 Wood/1 Clay    前提：—    分數：—    難度：4
+    卡文：Add 3 and 4 to the current round and place 2 food on each corresponding round space. At the start of these rounds, you get the food.
+[ ] B046
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Club House
+    中文：會所
+    費用：3 Wood/2 Clay    前提：—    分數：1    難度：4
+    卡文：Place 1 food on each of the next 4 round spaces and 1 stone on the round space after that. At the start of these rounds, you get the respective good.
+[ ] B048
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Forest Stone
+    中文：林石
+    費用：2 Wood/1 Stone    前提：1 Occupation    分數：1    難度：6
+    卡文：Place 2 food on this card. Each time you use a wood accumulation space, move 1 of these food to your supply. Each time you use a stone accumulation space, add 2 food to this card.
+[ ] B049
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Scales
+    中文：天平
+    費用：1 Wood    前提：No Occupation    分數：—    難度：4
+    卡文：Each time after you place an improvement or occupation in front of you, if you then have the same number of improvements and occupations in play, you get 2 food.
+[ ] B051
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Digging Spade
+    中文：挖鏟
+    費用：1 Wood    前提：Play in Round 7 or Later    分數：—    難度：3
+    卡文：Each time you use a clay accumulation space, you also get a number of food equal to the number of wild boar in your farmyard.
+[ ] B052
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Growing Farm
+    中文：成長農場
+    費用：2 Clay,1 Reed    前提：see below    分數：2    難度：4
+    卡文：You can only play this card if you have at least as many pasture spaces as the number of completed rounds. If you do, you get a number of food equal to the current round.
+[ ] B053
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Sculpture Course
+    中文：雕塑課
+    費用：1 Grain    前提：—    分數：—    難度：4
+    卡文：At the end of each round that does not end with a harvest, you can use this card to exchange your choice of 1 wood for 2 food, or 1 stone for 4 food.
+[ ] B054
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Tumbrel
+    中文：糞車
+    費用：1 Wood    前提：—    分數：—    難度：3
+    卡文：When you play this card, you immediately get 2 food. Each time after you take an unconditional "Sow" action, you get 1 food for each stable you have.
+[ ] B055
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Maintenance Premium
+    中文：保養費
+    費用：—    前提：2 Occupations    分數：—    難度：6
+    卡文：Place 3 food on this card. Each time you use a wood accumulation space, you get 1 food from this card. Each time you renovate restock this card to 3 food.
+[ ] B058
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Crack Weeder
+    中文：裂鋤
+    費用：1 Wood    前提：—    分數：—    難度：3
+    卡文：When you play this card, you immediately get 1 food. For each vegetable you take from a field in the field phase of a harvest, you also get 1 food.
+[ ] B059
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Food Chest
+    中文：食物箱
+    費用：1 Wood    前提：—    分數：—    難度：3
+    卡文：If you play this card on the "Major Improvement" action space, you immediately get 4 food. Otherwise, you get only 2 food.
+[ ] B060
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Brewing Water
+    中文：釀造水
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you use the "Fishing" accumulation space, you can pay 1 grain to place 1 food on each of the next 6 round spaces. At the start of these rounds, you get the food.
+[ ] B063
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Tasting
+    中文：試飲
+    費用：2 Wood    前提：—    分數：1    難度：4
+    卡文：Each time you use a "Lessons" action space, before paying the occupation cost, you can exchange 1 grain for 4 food.
+[ ] B064
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Mill Wheel
+    中文：水車輪
+    費用：2 Wood    前提：—    分數：1    難度：3
+    卡文：Each time you use the "Grain Utilization" action space while the "Fishing" accumulation space is occupied, you get an additional 2 food.
+[ ] B065
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Grain Depot
+    中文：穀倉
+    費用：2 Wood/2 Clay/2 Stone    前提：—    分數：—    難度：4
+    卡文：If you paid wood/clay/stone for this card, place 1 grain on each of the next 2/3/4 round spaces. At the start of these rounds, you get the grain.
+[ ] B067
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Hand Truck
+    中文：手推車
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Each time before you take a "Bake Bread" action, you also get 1 grain for each of your people occupying an accumulation space.
+[ ] B069
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Potters Market
+    中文：陶市
+    費用：2 Wood    前提：—    分數：1    難度：4
+    卡文：At any time, you can pay 4 clay and 2 food. If you do, place 1 vegetable on each of the next 2 round spaces. At the start of these rounds, you get the vegetable.
+[ ] B070
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：New Purchase
+    中文：新採購
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Before the start of each round that ends with a harvest, you can buy one of each of the following crops: 2 Food → 1 Grain; 4 Food → 1 Vegetable
+[ ] B071
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Harvest House
+    中文：收成屋
+    費用：1 Wood,1 Clay,1 Reed    前提：—    分數：2    難度：3
+    卡文：When you play this card, if the number of completed harvests is equal to the number of occupations you played, you immediately get 1 food, 1 grain, and 1 vegetable.
+[ ] B072
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Love for Agriculture
+    中文：愛農
+    費用：—    前提：—    分數：—    難度：8
+    卡文：You can sow crops in pastures covering 1 or 2 farmyard spaces. If you do, these pastures are also considered fields and hold 1 and 2 animals less, respectively.
+[ ] B073
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Gift Basket
+    中文：禮籃
+    費用：1 Reed    前提：3 Occupations    分數：1    難度：3
+    卡文：When you play this card, if you have exactly 2/3/4/5 rooms, you immediately get 1 vegetable/food/grain/vegetable.
+[ ] B075
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Wood Workshop
+    中文：木工坊
+    費用：1 Clay    前提：1 Occupation    分數：—    難度：3
+    卡文：Each time before you play or build an improvement, you get 1 wood.
+[ ] B076
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Ceilings
+    中文：天花板
+    費用：1 Clay    前提：1 Occupation    分數：—    難度：4
+    卡文：Place 1 wood on the next 5 round spaces. At the start of these rounds, you get the wood. Remove the wood promised by this card from future round spaces the next time you renovate.
+[ ] B078
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Reed Belt
+    中文：蘆葦帶
+    費用：2 Food    前提：—    分數：—    難度：4
+    卡文：Place 1 reed on each of the remaining space for rounds 5, 8, 10, and 12. At the start of these rounds, you get the reed.
+[ ] B079
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Corf
+    中文：魚籠
+    費用：1 Reed    前提：—    分數：—    難度：5
+    卡文：Each time any player (including you) takes at least 3 stone from an accumulation space, you get 1 stone from the general supply.
+[ ] B081
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Handcart
+    中文：手拉車
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Before each work phase, you can take 1 building resource from at most one wood/clay/reed/stone accumulation space containing at least 6/5/4/4 building resources of the same type.
+[ ] B082
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Value Assets
+    中文：估價資產
+    費用：—    前提：—    分數：—    難度：3
+    卡文：After each harvest, you can buy exactly one of the following goods: 1 Food → 1 Wood; 1 Food → 1 Clay; 2 Food → 1 Reed; 2 Food → 1 Stone
+[ ] B083
+    來源：Bubulcus    種類：次要    旅行卡：否    人數：—    分類：動物
+    英文：Muddy Puddles
+    中文：泥窪
+    費用：2 Clay    前提：—    分數：—    難度：6
+    卡文：Pile (from bottom to top) 1 wild boar, 1 food, 1 cattle, 1 food, and 1 sheep on this card. At any time, you can pay 1 clay to take the top good.
+[ ] B085
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Farm Hand
+    中文：農場幫手
+    費用：—    前提：—    分數：—    難度：7
+    卡文：Once you have 4 field tiles arranged in a 2x2, you can use a "Build Stables" action to build a stable in the center of the 2x2. This stable provides room for a person but no animal.
+[ ] B086
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Truffle Searcher
+    中文：松露犬人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：This card can hold a number of wild boar equal to the number of completed feeding phases.
+[ ] B088
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Established Person
+    中文：安身人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：If your house has exactly 2 rooms, immediately renovate it without paying any building resources. If you do, you can immediately afterward take a "Build Fences" action.
+[ ] B090
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Cooperative Plower
+    中文：共耕人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you use the "Farmland" action space while the "Grain Seeds" action space is occupied, you can plow 1 additional field.
+[ ] B092
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Little Stick Knitter
+    中文：小枝編
+    費用：—    前提：—    分數：—    難度：5
+    卡文：From Round 5 on, each time you use the "sheep Market" accumulation space, you can also take a "Family Growth with Room Only" action.
+[ ] B093
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Confidant
+    中文：心腹
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Place 1 food from your supply on each of the next 2, 3, or 4 round spaces. At the start of these rounds, you get the food back and your choice of a "sow" or "Build Fences" action.
+[ ] B094
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Stock Protector
+    中文：存貨護衛
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time before you use the "Fencing" action space, you get 2 wood. Immediately after that "Fencing" action, you can place another person.
+[ ] B096
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Tree Farm Joiner
+    中文：樹場細木工
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Place 1 wood on each of the next 2 odd-numbered round spaces. At the start of these rounds, you get the wood and, immediately afterward, a "Minor Improvement" action.
+[ ] B100
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：分數
+    英文：Clutterer
+    中文：雜物人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：During scoring, you get 1 bonus point for each card played after this on that has "accumulation space(s)" in its text.
+[ ] B101
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：分數
+    英文：Furniture Carpenter
+    中文：家具木匠
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each harvest, if any player (including you) owns the Joinery or an upgrade thereof, you can buy exactly 1 bonus point for 2 food.
+[ ] B103
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：貨物
+    英文：Field Merchant
+    中文：田商
+    費用：—    前提：—    分數：—    難度：4
+    卡文：When you play this card, you immediately get 1 wood and 1 reed. Each time you decline a "Minor/Major Improvement" action, you get 1 food/vegetable instead.
+[ ] B105
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：貨物
+    英文：Case Builder
+    中文：箱匠
+    費用：—    前提：—    分數：—    難度：3
+    卡文：When you play this card, you immediately get 1 good of each of the following types, If you have at least 2 of that good in your supply already, food, grain, vegetable, reed, wood.
+[ ] B106
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Moral Crusader
+    中文：道德鬥士
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Immediately before the start of each round, if there are goods on the remaining round space that are promised to you, you get 1 food.
+[ ] B110
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Pavior
+    中文：鋪路人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：At the end of each preparation phase, if you have at least 1 stone in your supply, you get 1 food. In round 14, you get 1 vegetable instead.
+[ ] B111
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Rustic
+    中文：鄉土人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：For each clay room you build, you get 2 food and 1 bonus point. (this does not apply to stone rooms and renovated wood rooms.)
+[ ] B112
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：作物
+    英文：Silokeeper
+    中文：青貯看守
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you use the action space card that has been revealed right before the most recent harvest, you also get 1 grain.
+[ ] B113
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：作物
+    英文：Patch Caregiver
+    中文：畦看護
+    費用：—    前提：—    分數：—    難度：8
+    卡文：When you play this card, you can choose to buy 1 grain for 1 food, or 1 vegetable for 3 food. This card is a field.
+[ ] B115
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：作物
+    英文：Tinsmith Master
+    中文：錫匠師傅
+    費用：—    前提：—    分數：—    難度：6
+    卡文：You can hold 1 additional animal in each pasture without a stable. Each time you sow in a field, you can place 1 additional crop of the respective type in that field.
+[ ] B116
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Shoreforester
+    中文：岸林人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：When you play this card and each time 1 reed is placed on an empty "Reed Bank" accumulation space in the preparation phase, you get 1 wood.
+[ ] B117
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Informant
+    中文：線人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：When you play this card, you immediately get 1 wood. After each work phase, if you have more stone than clay in your supply, you get 1 wood.
+[ ] B119
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Lumberjack
+    中文：伐木者
+    費用：—    前提：—    分數：—    難度：4
+    卡文：You immediately get 1 wood. Additionally, place 1 wood on each of the next round spaces, up to the number of fences you built. At the start of these rounds, you get the wood.
+[ ] B120
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Sweep
+    中文：清掃人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time before you use the action space card left of the card that has been most recently placed on a round space, you get 2 clay.
+[ ] B122
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Mineralogist
+    中文：礦物學家
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you use a clay/stone accumulation space, you also get 1 of the other good, stone/clay.
+[ ] B124
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Trimmer
+    中文：修邊人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：In each work phase, after you enclose at least one farmyard space, you get 2 stone. (Subdividing an existing pasture does not count.)
+[ ] B125
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Estate Worker
+    中文：莊園工
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Place 1 wood, 1 clay, 1 reed, and 1 stone in this order on the next 4 round spaces. At the start of these rounds, you get the respective building resource.
+[ ] B127
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：農場規劃
+    英文：Seducer
+    中文：誘惑者
+    費用：—    前提：—    分數：—    難度：5
+    卡文：When you play this card in round 5 or later, you can immediately pay 1 stone, 1 grain, 1 vegetable, and 1 sheep to take a "Family Growth Even without Room" action.
+[ ] B128
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：農場規劃
+    英文：Plumber
+    中文：水管工
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time after you use the "Major Improvement" action space, you can take a "renovation" action, paying 2 clay or 2 stone less for the renovation.
+[ ] B129
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Seatmate
+    中文：同座
+    費用：—    前提：—    分數：—    難度：7
+    卡文：You can use the action space on round space 13 even if it is occupied by one or more people of the players to your immediate left and right.
+[ ] B130
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Full Peasant
+    中文：全農夫
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time after you use the "Grain Utilization" or "Fencing" action space while the other is unoccupied, you can pay 1 food to use the other space with the same person.
+[ ] B131
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Equipper
+    中文：裝備人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Immediately after each time you use a wood accumulation space, you can play a minor improvement.
+[ ] B132
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Estate Master
+    中文：莊園主
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Once you have no unused farmyard spaces left, you get 1 bonus point for each vegetable that you harvest.
+[ ] B133
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Village Peasant
+    中文：村農
+    費用：—    前提：—    分數：—    難度：5
+    卡文：At the start of scoring, you get a number of vegetables equal to the smallest of the numbers of major improvements, minor improvements, and occupations you have.
+[ ] B134
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Housebook Master
+    中文：家冊師
+    費用：—    前提：—    分數：—    難度：4
+    卡文：After playing this card, if you renovate to stone in round 13/12/11 or before, you immediately get 1/2/3 food and 1/2/3 bonus points.
+[ ] B135
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Nutrition Expert
+    中文：營養專家
+    費用：—    前提：—    分數：—    難度：5
+    卡文：At the start of each round, you can exchange a set comprised of 1 animal of any type, 1 grain, and 1 vegetable for 5 food and 2 bonus points.
+[ ] B137
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：貨物
+    英文：Wholesaler
+    中文：批發商
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Place 1 vegetable, 1 wild boar, 1 stone, and 1 cattle on this card. Each time you use an action space card on round spaces 8 to 11, you get the corresponding good from this card.
+[ ] B138
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：貨物
+    英文：Forest Guardian
+    中文：森林守護
+    費用：—    前提：—    分數：—    難度：6
+    卡文：When you play this card, you immediately get 2 wood. Each time before another player takes at least 5 wood from an accumulation space, they must first pay you 1 food.
+[ ] B139
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：食物
+    英文：Forest Scientist
+    中文：林學家
+    費用：—    前提：—    分數：—    難度：4
+    卡文：In the returning home phase of each round, if there is no wood left on the game board, you get 1 food—from round 5 on, even 2 food.
+[ ] B140
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：食物
+    英文：Farmyard Worker
+    中文：農場工
+    費用：—    前提：—    分數：—    難度：4
+    卡文：At the end of each work phase in which you placed at least 1 good on 1 of your farmyard spaces, you get 2 food.
+[ ] B141
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：作物
+    英文：Field Caretaker
+    中文：田看守
+    費用：—    前提：—    分數：—    難度：8
+    卡文：When you play this card, you can immediately exchange 0/1/3 clay for 1/2/3 grain. This card is a field.
+[ ] B143
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Clay Warden
+    中文：黏土看守
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time another player uses the "Hollow" accumulation space, you get 1 clay. In a 3-/4-player game, you also get 1 additional clay/food.
+[ ] B144
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Collier
+    中文：燒炭人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time after you use the "Clay Pit" or "Hollow" accumulation space, you get 1 wood. On "Clay Pit" you also get 1 additional reed.
+[ ] B146
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Illusionist
+    中文：幻術師
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use a building resource accumulation space, you can discard exactly 1 card from your hand to get 1 additional building resource of the accumulating type.
+[ ] B147
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：3+    分類：動物
+    英文：Huntsman
+    中文：獵人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time after you use a wood accumulation space, you can pay 1 grain to get 1 wild boar.
+[ ] B148
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：農場規劃
+    英文：Pet Broker
+    中文：寵物掮客
+    費用：—    前提：—    分數：—    難度：7
+    卡文：When you play this card, you immediately get 1 sheep. You can keep 1 sheep on each occupation in front of you.
+[ ] B149
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：農場規劃
+    英文：Open Air Farmer
+    中文：露天農
+    費用：—    前提：—    分數：—    難度：8
+    卡文：When you play this card, you remove exactly 3 stables in your supply from play to build a pasture covering 2 farmyard spaces. You only need to pay a total of 2 wood for fences
+[ ] B150
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Large-Scale Farmer
+    中文：大農
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time after you use the "Farm Expansion" or "Major Improvement" action space while the other is unoccupied, you can pay 1 food to use that other space with the same person.
+[ ] B151
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Little Peasant
+    中文：小農人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：You immediately get 1 stone. As long as you live in a wooden house with exactly 2 rooms, actions spaces—excluding Meeting Place—are not considered occupied for you.
+[ ] B152
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Junior Artist
+    中文：初級藝人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time after you use the "Day Laborer" action space, you can pay 1 food to use an unoccupied "Traveling Players" or "Lessons" action space with the same person.
+[ ] B153
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：分數
+    英文：Housemaster
+    中文：房屋大師
+    費用：—    前提：—    分數：—    難度：4
+    卡文：During scoring, total the point values of your major improvements. The smallest value counts double. If the total is at least 5/7/9/11, you get 1/2/3/4 bonus points.
+[ ] B154
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：分數
+    英文：Sheep Keeper
+    中文：羊看守
+    費用：—    前提：—    分數：—    難度：4
+    卡文：You can only play this card if you have less than 7 sheep. Once this game, when you have 7 sheep on your farm, you immediately get 3 bonus points and 2 food.
+[ ] B155
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：貨物
+    英文：Art Teacher
+    中文：藝術教師
+    費用：—    前提：—    分數：—    難度：5
+    卡文：When you play this card, you immediately get 1 wood and 1 reed. Each time you pay an occupation cost, you can use food from the "traveling Players" accumulation space.
+[ ] B157
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：Salter
+    中文：鹽工
+    費用：—    前提：—    分數：—    難度：5
+    卡文：At any time, you can pay 1 sheep/wild boar/cattle from you farm. If you do, place 1 food on each of the next 3/5/7 round spaces. At the start of these rounds, you get the food.
+[ ] B158
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：District Manager
+    中文：區管
+    費用：—    前提：—    分數：—    難度：4
+    卡文：At the end of each work phase, if you used both the "Forest" and "Grove" accumulation spaces, you get 5 food.
+[ ] B159
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：Lieutenant General
+    中文：中將
+    費用：—    前提：—    分數：—    難度：6
+    卡文：For each field tile that another player places next to an existing field tile, you get 1 food from the general supply. In round 14, you get 1 grain instead.
+[ ] B160
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：作物
+    英文：Pub Owner
+    中文：酒館老闆
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Immediately, when you play this card, and at the end of each work phase, in which the "Forest", "Clay Pit", and "Reed Bank" accumulation spaces are all occupied, you get 1 grain.
+[ ] B161
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：作物
+    英文：Weakling
+    中文：弱者
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time it is your turn in the work phase, if there are one or more accumulation spaces with 5+ goods on them and you do not use any of them, you get 1 vegetable.
+[ ] B162
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：建材
+    英文：Forest Clearer
+    中文：清林人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you obtain exactly 2/3/4 wood from a wood accumulation space, you get 1 additional wood and 1/0/1 food.
+[ ] B165
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Game Provider
+    中文：野味商
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Immediately before each harvest, you can discard 1/3/4 grain from different fields to get 1/2/3 wild boars.
+[ ] B167
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Stable Sergeant
+    中文：畜舍軍士
+    費用：—    前提：—    分數：—    難度：4
+    卡文：When you play this card, you can pay 2 food to get 1 sheep, 1 wild boar, and 1 cattle, but only if you can accommodate all three animals on your farm.
+[ ] B168
+    來源：Bubulcus    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Pasture Master
+    中文：牧場主
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you renovate, you get 2 food and 1 additional animal of the respective type in each of your pastures with stable.

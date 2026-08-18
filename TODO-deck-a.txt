@@ -1,0 +1,730 @@
+# oyster-omelette Deck A（Artifex）待辦
+# 只有 Artifex 擴充 120 張，不含基本盒那 48 張 A。
+# 基本盒 A 卡見 TODO-deck-base.txt。索引見 TODO-deck-x.txt。
+# 卡文來自 Agricola Database.csv。
+# 格式： [ ] 未做   [~] 部分完成   [x] 已完成
+
+================================================================
+Artifex 120（120）
+================================================================
+
+[ ] A001
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：農場規劃
+    英文：Shelter
+    中文：棚
+    費用：—    前提：—    分數：—    難度：4
+    卡文：You can immediately build a stable at no cost, but only if you place it in a pasture covering exactly 1 farmyard space.
+[ ] A003
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：行動加強
+    英文：Paper Knife
+    中文：裁紙刀
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Select 3 occupations in your hand. Select one of them randomly, which you can play immediately without paying an occupation cost.
+[ ] A004
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：建材
+    英文：Baseboards
+    中文：踢腳板
+    費用：2 Food/1 Grain    前提：—    分數：—    難度：2
+    卡文：You immediately get 1 wood for each room you have. If you have more rooms than people, you get 1 additional wood.
+[ ] A006
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：建材
+    英文：Storage Barn
+    中文：倉房
+    費用：—    前提：—    分數：—    難度：3
+    卡文：If you have the Well, Joinery, Pottery, and/or Basketmaker's Workshop, you immediately get 1 stone, 1 wood, 1 clay, and/or 1 reed, respectively.
+[ ] A007
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：食物
+    英文：Gardener's Knife
+    中文：園丁刀
+    費用：1 Wood    前提：—    分數：—    難度：2
+    卡文：You immediately get 1 food for each grain field you have and 1 grain for each vegetable field you have.
+[ ] A008
+    來源：Artifex    種類：次要    旅行卡：是    人數：—    分類：作物
+    英文：Food Basket
+    中文：食物籃
+    費用：1 Reed    前提：2 Occupations and 2 Improvements    分數：—    難度：2
+    卡文：You immediately get 1 grain and 1 vegetable.
+[ ] A010
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Wooden Shed
+    中文：木棚
+    費用：2 Wood,1 Reed    前提：Still in Wooden House    分數：—    難度：7
+    卡文：This card can only be played via a "Major Improvement" action. It provides room for one person. You may no longer renovate.
+[ ] A011
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Mud Patch
+    中文：泥地
+    費用：—    前提：—    分數：—    難度：7
+    卡文：When you play this card, you immediately get 1 wild boar. You can hold 1 wild boar on each of your unplanted field tiles.
+[ ] A013
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Renovation Company
+    中文：翻修公司
+    費用：4 Wood    前提：In Wooden House with Exactly 2 Rooms    分數：—    難度：5
+    卡文：When you play this card, you immediately get 3 clay. Immediately after, you can renovate without paying any building resources.
+[ ] A014
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Carpenter's Hammer
+    中文：木匠鎚
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Each time you build at least 2 wood/clay/stone rooms at once, you get a total discount of 2 reed as well as 2 wood/3 clay/4 stone.
+[ ] A015
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Carpenter's Axe
+    中文：木匠斧
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Each time after you use a wood accumulation space, if you then have at least 7 wood in your supply, you can build exactly 1 stable for 1 wood.
+[ ] A017
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Reclamation Plow
+    中文：開墾犁
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：After the next time you take animals from an accumulation space and accommodate all of them on your farm, you can plow 1 field.
+[ ] A018
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Wheel Plow
+    中文：輪犁
+    費用：2 Wood    前提：2 Occupations    分數：—    難度：6
+    卡文：Once this game, when you use the "Farmland" or Cultivation" action space with the first person you place in a round, you can plow 2 additional fields.
+[ ] A020
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：農場規劃
+    英文：Double-Turn Plow
+    中文：雙迴犁
+    費用：1 Grain,(+1 Food)    前提：Play in Round 3 (5) or Before    分數：—    難度：4
+    卡文：When you play this card, you can immediately plow up to 2 fields.
+[ ] A021
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Family Friend Home
+    中文：親友居
+    費用：—    前提：1 Occupation    分數：—    難度：6
+    卡文：Each time you take a "Build Rooms" action while having more rooms than people already, you also get a "Family Growth" action and 1 food.
+[ ] A022
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Telegram
+    中文：電報
+    費用：2 Food    前提：At Least 1 Fence in Supply    分數：1    難度：7
+    卡文：Add 1 to the current round for each fence in your supply and mark the corresponding round space. In that round only, you can place a person from your supply.
+[ ] A023
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Stone Company
+    中文：石材行
+    費用：2 Clay,1 Reed    前提：—    分數：1    難度：6
+    卡文：Immediately after each time you use a "Quarry" accumulation space, you get a "Major or Minor Improvement" action during which you must spend at least 1 stone.
+[ ] A025
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Bassinet
+    中文：搖籃
+    費用：1 Wood,1 Reed    前提：—    分數：—    難度：7
+    卡文：Each work phase, you can place a(nother) person on the first non-accumulating action space used by any player (including you), as long as there is only 1 person on that space.
+[ ] A027
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Oven Site
+    中文：設爐地
+    費用：—    前提：Both Fireplace and Cooking Hearth    分數：—    難度：5
+    卡文：When you play this card, you get 2 wood and you can immediately build the "Clay Oven" or "Stone Oven" major improvement. Either way, it only costs you 1 clay and 1 stone.
+[ ] A028
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：行動加強
+    英文：Forest School
+    中文：林間學堂
+    費用：1 Wood,1 Clay    前提：—    分數：1    難度：7
+    卡文：You can consider the "Lessons" action spaces not occupied. You can replace each food that an occupation costs with wood.
+[ ] A029
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Ale-Benches
+    中文：酒凳
+    費用：1 Wood    前提：2 Occupations    分數：—    難度：6
+    卡文：In the returning home phase of each round, you can pay exactly 1 grain from your supply to get 1 bonus point. If you do, each other player gets 1 food.
+[ ] A030
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Baking Sheet
+    中文：烤盤
+    費用：—    前提：No Grain Field    分數：—    難度：4
+    卡文：Each time you take a "Bake Bread" action, you can use this card to exchange exactly 1 grain for 2 food and 1 bonus point.
+[ ] A031
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Debt Security
+    中文：債據
+    費用：2 Food    前提：—    分數：—    難度：3
+    卡文：During scoring, you get 1 bonus point for each major improvement you have, up to the number of your unused farmyard spaces.
+[ ] A034
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Loppers
+    中文：修枝剪
+    費用：1 Wood    前提：2 Occupations    分數：—    難度：5
+    卡文：Each time you build 1 or more fences, you can also use this card to exchange 1 wood and 1 fence in your supply for 2 food and 1 bonus point.
+[ ] A035
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Swimming Class
+    中文：游泳課
+    費用：1 Food    前提：2 Occupations    分數：—    難度：6
+    卡文：In the returning home phase of each round, if you return a person from the "Fishing" accumulation space, you get 2 bonus points for each newborn that you return home.
+[ ] A036
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Facades Carving
+    中文：立面雕刻
+    費用：2 Clay,1 Reed    前提：Wood in Your Supply >= Current Round    分數：—    難度：5
+    卡文：When you play this card, you can exchange any number of food for 1 bonus point each, up to the number of completed harvests.
+[ ] A037
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Bucksaw
+    中文：框鋸
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Each time you renovate, you can also pay 1 wood to get 1 bonus point and 1 grain.
+[ ] A039
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：分數
+    英文：Chapel
+    中文：小聖堂
+    費用：3 Wood,2 Clay    前提：2 Occupations    分數：3    難度：6
+    卡文：This is an action space for all. A player who uses it gets 3 bonus points. If another player uses it, they must first pay you 1 grain.
+[ ] A040
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Potter's Yard
+    中文：陶場
+    費用：1 Wood,1 Reed    前提：At Most 7 Unused Farmyard Spaces    分數：—    難度：6
+    卡文：Immediately place 1 clay on each unused space in your farmyard. Each time you turn a space into a used space, you get the clay and you can immediately exchange it for 2 food.
+[ ] A041
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Vegetable Slicer
+    中文：切菜器
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Each time you upgrade a Fireplace to a Cooking Hearth, you immediately get 2 wood and 1 vegetable (not retroactively).
+[ ] A042
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：貨物
+    英文：Forest Lake Hut
+    中文：林湖小屋
+    費用：2 Clay    前提：—    分數：1    難度：2
+    卡文：Each time you use the "Fishing"/"Forest" accumulation space, you also get 1 wood/food.
+[ ] A043
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Farmyard Manure
+    中文：農場肥
+    費用：—    前提：1 Animal    分數：—    難度：4
+    卡文：Each time you build 1 or more stables in one turn, you place 1 food on each of the next 3 round spaces. At the start of these rounds, you get the food.
+[ ] A045
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Fire Protection Pond
+    中文：防火池
+    費用：1 Food    前提：Still in Wooden House    分數：—    難度：4
+    卡文：Once you no longer live in a wooden house, place 1 food on each of the next 6 round spaces. At the start of these rounds, you get the food.
+[ ] A046
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Claw Knife
+    中文：爪刀
+    費用：1 Wood    前提：Exactly 1 Pasture    分數：—    難度：4
+    卡文：Each time you use the "Sheep Market" accumulation space, place 1 food on each of the next 2 round spaces. At the start of these rounds, you get the food.
+[ ] A047
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Trellises
+    中文：棚架
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Immediately place 1 food on each of the next round spaces, up to the number of fences you have built. At the start of these rounds, you get the food.
+[ ] A048
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Shaving Horse
+    中文：刨木凳
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Each time after you obtain at least 1 wood, if you then have 5 or more wood in your supply, you can exchange 1 wood for 3 food. With 7 or more wood, you must do so.
+[ ] A049
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Nest Site
+    中文：巢位
+    費用：1 Food    前提：1 Occupation    分數：—    難度：4
+    卡文：Each time 1 reed is placed on a non-empty "Reed Bank" accumulation space during the preparation phase, you get 1 food.
+[ ] A051
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Drift-Net Boat
+    中文：流網船
+    費用：1 Wood,1 Reed    前提：—    分數：1    難度：2
+    卡文：Each time you use the "Fishing" accumulation space, you get an additional 2 food.
+[ ] A052
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Throwing Axe
+    中文：飛斧
+    費用：1 Wood    前提：Play in Round 7 or Later    分數：—    難度：4
+    卡文：Each time you use a wood accumulation space while there is at least 1 wild boar on the "Pig Market" accumulation space, you also get 2 food.
+[ ] A054
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Credit
+    中文：賒帳
+    費用：—    前提：At Most 3 Occupations    分數：—    難度：5
+    卡文：When you play this card, you immediately get 5 food. At the end of each round that does not end with a harvest, you must pay 1 food, or else take a begging marker.
+[ ] A057
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Milking Parlor
+    中文：擠乳間
+    費用：2 Wood    前提：At Least 4 Unused Farmyard Spaces    分數：1    難度：3
+    卡文：When you play this card, if you have at least 1/3/4 sheep, you immediately get 2/3/4 food. The same applies if you have at least 1/2/3 cattle.
+[ ] A058
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Asparagus Knife
+    中文：蘆筍刀
+    費用：1 Wood    前提：—    分數：—    難度：6
+    卡文：In the returning home phase of rounds 8, 10, and 12, you can take 1 vegetable from exactly 1 vegetable field. You can immediately exchange it for 3 food and 1 bonus point.
+[ ] A059
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Potato Ridger
+    中文：培土器
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：Each time after you harvest 1+ vegetables, if you then have 3+ vegetables in your supply, you can turn exactly 1 vegetable into 6 food. With 4+ vegetables, you must do so.
+[ ] A060
+    來源：Artifex    種類：次要／主要    旅行卡：否    人數：—    分類：食物
+    英文：Oriental Fireplace
+    中文：東方壁爐
+    費用：Return Fireplace/Cooking Hearth    前提：—    分數：1    難度：4
+    卡文：At any time: Vegetable → 4 Food; Sheep → 3 Food; Cattle → 5 Food "Bake Bread" action: Grain → 2 Food
+[ ] A061
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Winnowing Fan
+    中文：簸穀扇
+    費用：1 Reed    前提：Baking Improvement    分數：—    難度：5
+    卡文：After the field phase of each harvest, you can use a baking improvement but only to turn exactly 1 grain into food. (This is not considered a "Bake Bread" action.)
+[ ] A062
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Beer Keg
+    中文：啤酒桶
+    費用：1 Wood    前提：2 Grain in Your Supply    分數：—    難度：5
+    卡文：In the feeding phase of each harvest, you can use this card to exchange 1/2/3 grain for 0/1/2 bonus points and exactly 3 food.
+[ ] A064
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：食物
+    英文：Barley Mill
+    中文：大麥磨
+    費用：1 Wood,4 Clay/2 Stone    前提：—    分數：1    難度：3
+    卡文：In the field phase of each harvest, you get 1 food for each grain field that you harvest.
+[ ] A065
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Seed Pellets
+    中文：種丸
+    費用：—    前提：3 Fields    分數：—    難度：3
+    卡文：Each time before you take an unconditional "Sow" action, you get 1 grain.
+[ ] A066
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Feeding Dish
+    中文：飼盤
+    費用：1 Wood    前提：—    分數：—    難度：3
+    卡文：Each time you use an animal accumulation space while already having an animal of that type, you get 1 grain.
+[ ] A068
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Asparagus Gift
+    中文：蘆筍禮
+    費用：—    前提：1 Unplanted Field    分數：—    難度：4
+    卡文：Each time you build a number of fences equal to or greater than the current round, you immediately get 1 vegetable.
+[ ] A070
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Lifting Machine
+    中文：升降機
+    費用：1 Wood    前提：3 Fields    分數：—    難度：5
+    卡文：At the end of each round that does not end with a harvest, you can move 1 vegetable from one of your fields to your supply. (This is not considered a field phase.)
+[ ] A072
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Calcium Fertilizers
+    中文：鈣肥
+    費用：—    前提：No Field Tiles    分數：—    難度：5
+    卡文：Each time you use a "Quarry" accumulation space, add 1 additional good of the respective type to each of your planted fields growing a single type of crop.
+[ ] A073
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：作物
+    英文：Agricultural Fertilizers
+    中文：農肥
+    費用：—    前提：1 Pasture    分數：—    難度：5
+    卡文：Each time after you turn at least 2 unused spaces into used spaces in one action, you get an additional "Sow" action.
+[ ] A074
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Stable Tree
+    中文：畜舍樹
+    費用：1 Wood    前提：—    分數：—    難度：4
+    卡文：Each time you build 1 or more stables on your turn, place 1 wood on each of the next 3 round spaces. At the start of these rounds, you get the wood.
+[ ] A076
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Cob
+    中文：黏土磚
+    費用：1 Food    前提：—    分數：—    難度：4
+    卡文：At the start of each work phase, if you have at least 1 clay in your supply, you can exchange exactly 1 grain for 2 clay and 1 food.
+[ ] A077
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Hod
+    中文：灰斗
+    費用：1 Wood    前提：—    分數：—    難度：5
+    卡文：When you play this card, you immediately get 1 clay. Each time any player (including you) uses the "Pig Market" accumulation space, you immediately get 2 clay.
+[ ] A079
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Garden Hoe
+    中文：園鋤
+    費用：1 Wood    前提：—    分數：—    難度：3
+    卡文：Each time you take an unconditional "Sow" action planting vegetables in at least 1 field, you get 1 clay and 1 stone.
+[ ] A081
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Interim Storage
+    中文：暫存倉
+    費用：2 Food    前提：—    分數：—    難度：6
+    卡文：Each time you use a clay/reed/stone accumulation space, place 1 wood/clay/reed on this card. At the start of rounds 7, 11, and 14, move all the goods on this card to your supply.
+[ ] A082
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：建材
+    英文：Work Certificate
+    中文：工作證
+    費用：—    前提：3 Occupations    分數：—    難度：6
+    卡文：Each time after you use an action space, you can take 1 building resource from a building resource accumulation space with at least 4 building resources on it.
+[ ] A084
+    來源：Artifex    種類：次要    旅行卡：否    人數：—    分類：動物
+    英文：Silage
+    中文：青貯
+    費用：—    前提：2 Fields    分數：—    難度：7
+    卡文：In each returning home phase after which there is no harvest, you can pay exactly 1 grain—even from a field-to breed exactly one type of animal.
+[ ] A085
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Homekeeper
+    中文：守家人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：Exactly one clay or stone room in your house can hold an additional person if the room is adjacent to both a field and a pasture.
+[ ] A089
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Stable Planner
+    中文：畜舍規劃
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Add 3, 6, and 9 to the current round. You can place 1 stable on each corresponding round space. A the start of these rounds (not earlier), you can build the stable at no cost.
+[ ] A091
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
+    英文：Shifting Cultivator
+    中文：游耕人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you use a wood accumulation space, you can also play 3 food to plow 1 field.
+[ ] A093
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Bed Maker
+    中文：製床人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you add rooms to your house, you can also pay 1 wood and 1 grain to immediately get a "Family Growth with Room Only" action.
+[ ] A094
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Lazy Sowman
+    中文：懶播人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：Each time you decline an unconditional "Sow" action on your turn, you can immediately place another person on an action space of your choice (even if it is occupied).
+[ ] A095
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Angler
+    中文：釣者
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time after you use the "Fishing" Accumulation space while there are at most 2 food on that space, you get a "Major or Minor Improvement" action.
+[ ] A096
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Task Artisan
+    中文：任務匠
+    費用：—    前提：—    分數：—    難度：5
+    卡文：When you play this card and each time a stone accumulation space appears on a round space in the preparation phase, you get 1 wood and a "Minor Improvement" action.
+[ ] A097
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：行動加強
+    英文：Freshman
+    中文：新生
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you get a "Bake Bread" action, instead of taking the action, you can play an occupation without paying an occupation cost.
+[ ] A099
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：分數
+    英文：Fellow Grazer
+    中文：共牧人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：During scoring, you get 2 bonus points of reach pasture you have covering at least 3 farmyard spaces.
+[ ] A100
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：分數
+    英文：Curator
+    中文：館長
+    費用：—    前提：—    分數：—    難度：5
+    卡文：In the returning home phase of each round, if you return at least 3 people from accumulation spaces, you can buy 1 bonus point for 1 food.
+[ ] A101
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：分數
+    英文：Cookery Outfitter
+    中文：廚具商
+    費用：—    前提：—    分數：—    難度：3
+    卡文：During scoring, you get 1 bonus point for each cooking improvement you have.
+[ ] A103
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：貨物
+    英文：Portmonger
+    中文：港貨商
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you take 1/2/3+ food from a food accumulation space, you also get 1 vegetable/grain/reed.
+[ ] A104
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：貨物
+    英文：Wood Harvester
+    中文：收木人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：In the field phase of each harvest, you get 1 wood/1 food for each wood accumulation space with exactly 2 wood/at least 3 wood.
+[ ] A105
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：貨物
+    英文：Barrow Pusher
+    中文：推車人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：For each new field tile you get, you also get 1 clay and 1 food.
+[ ] A106
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Slurry Spreader
+    中文：漿肥人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：In the field phase of each harvest, each time you take the last grain/vegetable from a field, you also get 2 food/1 food.
+[ ] A107
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Catcher
+    中文：捕捉人
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you place your 1st/2nd/3rd person in a round on a building resource accumulation space with exactly 5/4/3 building resources, you get 1 food.
+[ ] A109
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：食物
+    英文：Small Trader
+    中文：小販
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you take a "Major or Minor Improvement" action to play an improvement from your hand, you also get 3 food.
+[ ] A113
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：作物
+    英文：Heresy Teacher
+    中文：異端教師
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time you use a "Lessons" action space, you get 1 vegetable in each of your fields with at least 3 grain and no vegetable. Place the vegetable below the grain.
+[ ] A115
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：作物
+    英文：Chief Forester
+    中文：林務長
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you use a wood accumulation space, you also get a "Sow" action for exactly 1 field.
+[ ] A117
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Wood Carrier
+    中文：運木人
+    費用：—    前提：—    分數：—    難度：2
+    卡文：When you play this card, you immediately get 1 wood fore each improvement in front of you.
+[ ] A118
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Treegardener
+    中文：樹園丁
+    費用：—    前提：—    分數：—    難度：4
+    卡文：In the field phase of each harvest, you get 1 wood and you can buy up to 2 additional wood for 1 food each.
+[ ] A121
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Clay Puncher
+    中文：搗黏人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：When you play this card and each time after you use a "Lessons" action space or the "Clay Pit" accumulation space, you get 1 clay.
+[ ] A122
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Pan Baker
+    中文：鍋麵包師
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time you use the "Grain Utilization" action space, you also get 2 clay and 1 wood.
+[ ] A124
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Knapper
+    中文：打石人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：Each time before you use an action space card on round spaces 5 to 7, you get 1 stone.
+[ ] A126
+    來源：Artifex    種類：職業    旅行卡：否    人數：1+    分類：建材
+    英文：Master Workman
+    中文：匠頭
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time before you use an action space card on round spaces 1/2/3/4, you get 1 wood/clay/reed/stone.
+[ ] A127
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：農場規劃
+    英文：Lodger
+    中文：寄宿客
+    費用：—    前提：—    分數：—    難度：7
+    卡文：This card provides room for one person, but only until the returning home phase of round 9. If, by then, there is no room elsewhere for that person, remove it from play.
+[ ] A128
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：農場規劃
+    英文：Riparian Builder
+    中文：岸邊匠
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time another player uses the "Reed Bank" accumulation space, you can build a room: if you build a clay/stone room, you get a discount of 1 clay/2 stone.
+[ ] A129
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Swagman
+    中文：遊包客
+    費用：—    前提：—    分數：—    難度：8
+    卡文：Immediately after each time you use the "Farm Expansion" or "Grain Seeds" action space, you can use the respective other space with the same person (even if it is occupied).
+[ ] A130
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Mummy's Boy
+    中文：媽寶
+    費用：—    前提：—    分數：—    難度：8
+    卡文：Once per round, when placing a person after your first two, you can place it on the action space with your 2nd person and use that space again. (Mark the action space).
+[ ] A131
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：行動加強
+    英文：Craft Teacher
+    中文：工藝教師
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time after you build the major improvement "Joinery", "Pottery", and "Basketmaker's Workshop", you can play up to 2 occupations without paying an occupation cost.
+[ ] A132
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Publican
+    中文：酒館主
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time before another player takes an unconditional "Sow" action, you can give them 1 grain from your supply to get 1 bonus point.
+[ ] A134
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Full Farmer
+    中文：全農
+    費用：—    前提：—    分數：—    難度：3
+    卡文：When you play this card, you immediately get 1 wood and 1 clay. During scoring, you get 1 bonus point for each pasture you have holding the maximum number of animals.
+[ ] A135
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Animal Reeve
+    中文：牲口督
+    費用：—    前提：—    分數：—    難度：6
+    卡文：If there are still 1/3/6/9 complete rounds left to play, you immediately get 1/2/3/4 wood. During scoring, each player with 2+/3+/4+ animals of each type gets 1/3/5 bonus points.
+[ ] A136
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：分數
+    英文：Drudgery Reeve
+    中文：苦工督
+    費用：—    前提：—    分數：—    難度：6
+    卡文：If there are still 1/3/6/9 complete rounds left to play, you immediately get 1/2/3/4 wood. During scoring, each player with 1+/2+/3+ building resources of each type gets 1/3/5 bonus points.
+[ ] A137
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：貨物
+    英文：Riverine Shepherd
+    中文：河岸牧人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use the "Sheep Market" or "Reed Bank" accumulation space, you can also take 1 good from the respective other accumulation space, if possible.
+[ ] A139
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：食物
+    英文：Hollow Warden
+    中文：凹地看守
+    費用：—    前提：—    分數：—    難度：4
+    卡文：When you play this card, you immediately get a "Major Improvement" action to build a Fireplace. Each time you use the "Hollow" accumulation space, you also get 1 food.
+[ ] A140
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：食物
+    英文：Shovel Bearer
+    中文：持鏟人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use the "Clay Pit" or "Hollow" accumulation space, you also get a number of food equal to the amount of clay on the respective other accumulation space.
+[ ] A141
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：作物
+    英文：Turnip Farmer
+    中文：蕪菁農
+    費用：—    前提：—    分數：—    難度：4
+    卡文：At the start of the returning home phase of each round, if both the "Day Laborer" and "Grain Seeds" action spaces are occupied, you get 1 vegetable.
+[ ] A142
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：作物
+    英文：Cordmaker
+    中文：製繩人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time any player (including you) takes at least 2 reed from the "Reed Bank" accumulation space, you can choose to take 1 grain or buy 1 vegetable for 2 food.
+[ ] A144
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Sequestrator
+    中文：扣押人
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Place 3 reed and 4 clay on this card. The next player to have 3 pastures/5 field tiles get the 3 reed/4 clay (not retroactively).
+[ ] A145
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Ropemaker
+    中文：繩匠
+    費用：—    前提：—    分數：—    難度：3
+    卡文：At the end of each harvest, you get 1 reed from the general supply.
+[ ] A146
+    來源：Artifex    種類：職業    旅行卡：否    人數：3+    分類：建材
+    英文：Storehouse Steward
+    中文：倉房管家
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you take exactly 2/3/4/5 food from a food accumulation space, you also get 1 stone/reed/clay/wood. (If you take 6 or more food, you do not get a bonus good).
+[ ] A148
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：農場規劃
+    英文：Woolgrower
+    中文：養毛人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：This card can hold a number of sheep equal to the number of completed feeding phases.
+[ ] A149
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：農場規劃
+    英文：House Artist
+    中文：房屋藝人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use the "Traveling Players" accumulation space, you also get a "Build Rooms" action. Each room you build during the action costs you 1 reed less.
+[ ] A150
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Stagehand
+    中文：場務
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time another player uses the "Traveling Players" accumulation space, you can take your choice of a "Build Fences", "Build Stables", or "Build Rooms" action.
+[ ] A151
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Minstrel
+    中文：吟遊人
+    費用：—    前提：—    分數：—    難度：6
+    卡文：At the start of each returning home phase, if only one action space card on round space 1 to 4 is unoccupied, you can use that action space.
+[ ] A152
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：行動加強
+    英文：Night-School Student
+    中文：夜校生
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each returning home phase in which no player returns a person from a "Lessons" action space, you can play an occupation for an occupation cost of 1 food.
+[ ] A153
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：分數
+    英文：Pig Owner
+    中文：豬主
+    費用：—    前提：—    分數：—    難度：3
+    卡文：The first time after you play this card that you have 5 wild boars on your farm, you immediately get 3 bonus points.
+[ ] A154
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：分數
+    英文：Paymaster
+    中文：出納
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time another player uses a food accumulation space, you can give them 1 grain from your supply to get 1 bonus point.
+[ ] A156
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：貨物
+    英文：Buyer
+    中文：買手
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time another player uses a reed, stone, sheep, or wild boar accumulation space, you can pay them 1 food to get 1 good of the respective type from the general supply.
+[ ] A157
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：Bohemian
+    中文：波希人
+    費用：—    前提：—    分數：—    難度：3
+    卡文：At the start of each returning home phase, if at least one "Lessons" action space is unoccupied, you get 1 food.
+[ ] A158
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：Culinary Artist
+    中文：料理師
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time another player uses the "Traveling Players" accumulation space, you can exchange your choice of 1 grain/sheep/vegetable for 4/5/7 food.
+[ ] A159
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：食物
+    英文：Joiner of the Sea
+    中文：海上細木工
+    費用：—    前提：—    分數：—    難度：6
+    卡文：Each time another player uses the "Fishing"/"Reed Bank" accumulation space, you can give them 1 wood to get 2 food/3 food from the general supply.
+[ ] A161
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：作物
+    英文：Patch Caretaker
+    中文：畦看守
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you use an accumulation space while already having used another accumulation space for the same type of good that work phase, you also get 1 vegetable.
+[ ] A162
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：建材
+    英文：Forest Tallyman
+    中文：林計人
+    費用：—    前提：—    分數：—    難度：7
+    卡文：Each time both the "Forest" and "Clay Pit" accumulation spaces are occupied, you can use the gap between them as an action space to get 2 clay and 3 wood.
+[ ] A163
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：建材
+    英文：Building Expert
+    中文：建築專家
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Each time you use the "Resource Market" action space with the 1st/2nd/3rd/4th/5th person you place, you also get 1 wood/clay/reed/stone/stone.
+[ ] A164
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Wood Worker
+    中文：木工
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you take wood from an accumulation space, you can exchange 1 wood for 1 sheep. Place the wood on the accumulation space.
+[ ] A166
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Haydryer
+    中文：乾草人
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Immediately before each harvest, you can buy 1 cattle for 4 food minus 1 food for each pasture you have. (The minimum cost is 0).
+[ ] A167
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Breeder Buyer
+    中文：繁殖買手
+    費用：—    前提：—    分數：—    難度：5
+    卡文：Each time you build at least 1 wood/clay/stone room and at least 1 stable on the same turn, you also get 1 sheep/wild boar/cattle.
+[ ] A168
+    來源：Artifex    種類：職業    旅行卡：否    人數：4+    分類：動物
+    英文：Animal Teacher
+    中文：馴獸教師
+    費用：—    前提：—    分數：—    難度：4
+    卡文：Immediately after each time you use a "Lessons" action space, you can also buy 1 sheep/wild boar/cattle for 0/1/2 food.
