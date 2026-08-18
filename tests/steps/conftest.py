@@ -38,11 +38,7 @@ def given_first_round_card(forced_round_cards: dict, card_id: str) -> None:
 
 @given(parsers.parse("回合卡依序為 {first} 與 {second}"))
 def given_two_round_cards(forced_round_cards: dict, first: str, second: str) -> None:
-    rest = [
-        card
-        for card in DEFAULT_ROUND_CARDS
-        if card not in {first, second}
-    ]
+    rest = [card for card in DEFAULT_ROUND_CARDS if card not in {first, second}]
     forced_round_cards["cards"] = [first, second] + rest
 
 
@@ -176,17 +172,11 @@ def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> No
     last_place["result"] = game.place_worker(number - 1, space_id)
 
 
-@when(
-    parsers.parse(
-        "玩家 {number:d} 把工人放到 {space_id} 的第 {row:d} 列第 {col:d} 格"
-    )
-)
+@when(parsers.parse("玩家 {number:d} 把工人放到 {space_id} 的第 {row:d} 列第 {col:d} 格"))
 def place_worker_at(
     game: Game, last_place: dict, number: int, space_id: str, row: int, col: int
 ) -> None:
-    last_place["result"] = game.place_worker(
-        number - 1, space_id, target=(row - 1, col - 1)
-    )
+    last_place["result"] = game.place_worker(number - 1, space_id, target=(row - 1, col - 1))
 
 
 @when(parsers.parse("玩家 {number:d} 把家人放到 {space_id}"), target_fixture="placed")
@@ -361,14 +351,8 @@ def then_space_vacant(game: Game, space_id: str) -> None:
     assert game.space(space_id).occupant is None
 
 
-@then(
-    parsers.parse(
-        "玩家 {number:d} 的第 {row:d} 列第 {col:d} 格應有 {count:d} 位家人"
-    )
-)
-def then_player_cell_people(
-    game: Game, number: int, row: int, col: int, count: int
-) -> None:
+@then(parsers.parse("玩家 {number:d} 的第 {row:d} 列第 {col:d} 格應有 {count:d} 位家人"))
+def then_player_cell_people(game: Game, number: int, row: int, col: int, count: int) -> None:
     cell = game.players[number - 1].farm.cell(row - 1, col - 1)
     assert cell.people == count
 

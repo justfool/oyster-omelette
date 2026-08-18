@@ -191,7 +191,7 @@ def _fill_grid(
                 )
             )
         return
-    for offset, (widget, slot) in enumerate(zip(children, slots)):
+    for offset, (widget, slot) in enumerate(zip(children, slots, strict=True)):
         widget.apply_slot(
             slot,
             theme,

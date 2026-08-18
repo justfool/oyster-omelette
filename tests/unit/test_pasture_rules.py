@@ -4,8 +4,8 @@ from oyster_omelette.farmyard import starting_farmyard
 from oyster_omelette.pastures import (
     animal_capacity,
     enclose_one_pasture,
-    pasture_count,
     pasture_cells,
+    pasture_count,
 )
 
 

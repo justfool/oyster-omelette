@@ -1,7 +1,7 @@
 """行動板分區、選格、說明與工人圖示。"""
 
 import pytest
-from pytest_bdd import scenarios, then, when, parsers
+from pytest_bdd import parsers, scenarios, then, when
 
 from oyster_omelette.theme import load_theme
 from oyster_omelette.tui.board_view import BoardView
@@ -35,9 +35,7 @@ def when_enable_god(game):
     game.god_mode = True
 
 
-@then(
-    "固定區應包含農場擴建、聚會所、穀種、耕地、上課、日工、森林、黏土坑、蘆葦岸、漁場"
-)
+@then("固定區應包含農場擴建、聚會所、穀種、耕地、上課、日工、森林、黏土坑、蘆葦岸、漁場")
 def then_fixed_zone_has_two_player_spaces(game):
     ids = [slot.space_id for slot in board_slots(game) if slot.zone == "fixed"]
     assert ids == [
@@ -56,21 +54,13 @@ def then_fixed_zone_has_two_player_spaces(game):
 
 @then("回合卡區應有 1 張已翻開")
 def then_one_round_card_revealed(game):
-    revealed = [
-        slot
-        for slot in board_slots(game)
-        if slot.zone == "round" and slot.revealed
-    ]
+    revealed = [slot for slot in board_slots(game) if slot.zone == "round" and slot.revealed]
     assert len(revealed) == 1
 
 
 @then("回合卡區應有蓋著的空位")
 def then_round_zone_has_face_down(game):
-    hidden = [
-        slot
-        for slot in board_slots(game)
-        if slot.zone == "round" and slot.face_down
-    ]
+    hidden = [slot for slot in board_slots(game) if slot.zone == "round" and slot.face_down]
     assert hidden
 
 

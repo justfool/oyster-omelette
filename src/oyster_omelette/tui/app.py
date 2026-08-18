@@ -227,9 +227,7 @@ class OysterOmeletteApp(App):
         board = self._board()
         board.focus_spaces = not self._picking_farm()
         board.load(self.game, self.look, god_mode=self.game.god_mode)
-        self.query_one("#minimap", Static).update(
-            "農場\n" + minimap_text(self.game, self.look)
-        )
+        self.query_one("#minimap", Static).update("農場\n" + minimap_text(self.game, self.look))
         self._refresh_farm()
         self._refresh_inspect()
 
@@ -487,9 +485,7 @@ class OysterOmeletteApp(App):
             extra = ""
             if target is not None:
                 extra = f"（第{target[0] + 1}列第{target[1] + 1}格）"
-            self.note(
-                f"玩家{turn + 1}放到{self.look.space_caption(space_id)}{extra}。"
-            )
+            self.note(f"玩家{turn + 1}放到{self.look.space_caption(space_id)}{extra}。")
         else:
             self.note(f"不能放：{result.error}")
 

@@ -3,7 +3,6 @@
 import random
 from dataclasses import dataclass, field
 
-
 # 每回合準備時加上的資源與數量；沒拿走就堆疊。
 ACCUMULATION: dict[str, tuple[str, int]] = {
     "forest": ("wood", 3),

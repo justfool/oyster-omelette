@@ -1,8 +1,9 @@
 """工人擺放、回合順序、結算與回家。"""
 
+from tests.error_text import matches
+
 from oyster_omelette.farmyard import CellKind
 from oyster_omelette.game import Game, PlaceResult
-from tests.error_text import matches
 
 
 def _ready_two_player() -> Game:

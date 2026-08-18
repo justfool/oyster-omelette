@@ -2,7 +2,6 @@
 
 from oyster_omelette.farmyard import starting_farmyard
 from oyster_omelette.game import Game, Player
-from oyster_omelette.harvest import harvest
 from oyster_omelette.majors import (
     ALL_MAJORS,
     bake_best,

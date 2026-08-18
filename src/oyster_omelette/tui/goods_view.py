@@ -119,8 +119,7 @@ class GoodsBar(Vertical):
             mark = "*" if turn == index else " "
             chips = [Static(f"{mark}P{index + 1}", classes="player-tag")]
             chips.extend(
-                GoodsChip(f"{label}\n{text}")
-                for label, text in goods_groups(player, theme)
+                GoodsChip(f"{label}\n{text}") for label, text in goods_groups(player, theme)
             )
             self.mount(PlayerGoods(*chips))
             self.mount(Static(f"  {cards_text(player, theme)}", classes="card-line"))

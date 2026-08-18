@@ -1,8 +1,8 @@
 """翻修：木屋一次全部變成黏土屋。"""
 
 from oyster_omelette.farmyard import CellKind, renovate_house, starting_farmyard
-from oyster_omelette.scoring import score_player
 from oyster_omelette.game import Player
+from oyster_omelette.scoring import score_player
 
 
 def test_renovate_turns_all_wood_rooms_to_clay():

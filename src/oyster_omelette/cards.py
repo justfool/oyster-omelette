@@ -18,7 +18,9 @@ class Card:
 
 
 def occupation(card_id: str, name_zh: str, resource: str = "", amount: int = 0) -> Card:
-    return Card(id=card_id, name_zh=name_zh, kind="occupation", play_resource=resource, play_amount=amount)
+    return Card(
+        id=card_id, name_zh=name_zh, kind="occupation", play_resource=resource, play_amount=amount
+    )
 
 
 def minor(
@@ -46,9 +48,7 @@ from oyster_omelette.decks.toy import TOY_CARDS
 
 CARDS: dict[str, Card] = {card.id: card for card in TOY_CARDS}
 
-OCCUPATION_IDS: tuple[str, ...] = tuple(
-    card.id for card in TOY_CARDS if card.kind == "occupation"
-)
+OCCUPATION_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind == "occupation")
 MINOR_IDS: tuple[str, ...] = tuple(card.id for card in TOY_CARDS if card.kind == "minor")
 
 # 舊測試與 TUI 仍讀這兩份 dict。

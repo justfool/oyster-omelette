@@ -18,9 +18,10 @@
 
 ## 技術棧
 
-- Python 3.12、uv、Textual、pytest、pytest-bdd。
+- Python 3.12、uv、Textual、pytest、pytest-bdd、Ruff。
 - 終端機建議 Windows Terminal。
 - 跑測試：`uv run pytest`。跑遊戲：`uv run oyster-omelette`。
+- 檢查：`uv run ruff check`。格式化：`uv run ruff format`。設定在 `pyproject.toml` 的 `[tool.ruff]`。
 
 ## 程式怎麼寫
 

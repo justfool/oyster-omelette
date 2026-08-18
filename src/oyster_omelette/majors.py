@@ -1,7 +1,5 @@
 """修訂版 10 張主要改良。效果用普通函式，自動選付得起的下一張。"""
 
-from dataclasses import dataclass
-
 ALL_MAJORS: tuple[str, ...] = (
     "fireplace_2",
     "fireplace_3",

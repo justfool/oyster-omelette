@@ -187,13 +187,9 @@ def test_app_arrows_and_inspect_and_place():
             assert "木" in inspect or "森林" in inspect
             await pilot.press("enter")
             await pilot.pause()
-            forest = next(
-                slot for slot in view.slots if slot.space_id == "forest"
-            )
+            forest = next(slot for slot in view.slots if slot.space_id == "forest")
             assert forest.occupant == 0
-            assert DEFAULT_THEME.icon("worker_1") in slot_body(
-                forest, app.look
-            )
+            assert DEFAULT_THEME.icon("worker_1") in slot_body(forest, app.look)
 
     asyncio.run(go())
 
