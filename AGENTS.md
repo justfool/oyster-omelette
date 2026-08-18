@@ -43,7 +43,12 @@
 - **做副作用**（改狀態）：入口 `after_*`，表 `AFTER_*`
   - `after_space`／`AFTER_SPACE`
   - `after_play`／`AFTER_PLAY`
-  - 以後回家／回合開始：`after_return_home`、`after_round_start`
+  - `after_round_start`／`AFTER_ROUND_START`
+  - `after_harvest_fields`／`AFTER_HARVEST`
+  - `after_rooms_built`／`AFTER_ROOMS`
+  - `after_renovate`／`AFTER_RENOVATE`
+  - `after_improvement`／`AFTER_IMPROVEMENT`
+  - 以後回家：`after_return_home`
 - 單張卡函式：`{卡id}_{時機}`，例如 `forester_on_take`、`A002_after_play`
 - 牌庫資料放 `decks/`（不要叫 catalog）。一張卡不要獨立一個檔。
   ```

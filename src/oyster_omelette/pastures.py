@@ -155,7 +155,7 @@ def pasture_count(farm: Farmyard) -> int:
     return len(find_pastures(farm))
 
 
-def animal_capacity(farm: Farmyard) -> int:
+def animal_capacity(farm: Farmyard, extra_per_pasture: int = 0) -> int:
     """每格牧場 2 隻；牧場內畜舍讓該牧場加倍。沒圍的畜舍 +1。房子寵物 1 隻。"""
     capacity = 1
     fenced: set[tuple[int, int]] = set()
@@ -163,6 +163,7 @@ def animal_capacity(farm: Farmyard) -> int:
         fenced |= group
         doubled = any(farm.cell(row, col).stable for row, col in group)
         capacity += 2 * len(group) * (2 if doubled else 1)
+        capacity += extra_per_pasture
     for row in range(farm.rows):
         for col in range(farm.cols):
             if (row, col) in fenced:
@@ -170,6 +171,12 @@ def animal_capacity(farm: Farmyard) -> int:
             if farm.cell(row, col).stable:
                 capacity += 1
     return capacity
+
+
+def capacity_for(player) -> int:
+    from oyster_omelette.effects import extra_pasture_capacity
+
+    return animal_capacity(player.farm, extra_pasture_capacity(player))
 
 
 def _missing_edges(farm: Farmyard, row: int, col: int) -> int:

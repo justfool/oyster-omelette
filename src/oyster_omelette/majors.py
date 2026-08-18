@@ -76,7 +76,14 @@ def cook_table(player) -> dict[str, int]:
 
 
 def _can_pay(player, major_id: str) -> bool:
-    for resource, amount in COSTS[major_id].items():
+    from oyster_omelette.effects import stone_discount, wood_discount_on_improvement
+
+    costs = dict(COSTS[major_id])
+    if "wood" in costs:
+        costs["wood"] = max(0, costs["wood"] - wood_discount_on_improvement(player))
+    if "stone" in costs:
+        costs["stone"] = max(0, costs["stone"] - stone_discount(player, "major"))
+    for resource, amount in costs.items():
         if getattr(player, resource) < amount:
             return False
     return True
@@ -100,7 +107,14 @@ def choose_major(player, supply: list[str]) -> str | None:
 def _pay(player, major_id: str) -> None:
     if major_id.startswith("hearth") and owns(player, "fireplace"):
         return
-    for resource, amount in COSTS[major_id].items():
+    from oyster_omelette.effects import stone_discount, wood_discount_on_improvement
+
+    costs = dict(COSTS[major_id])
+    if "wood" in costs:
+        costs["wood"] = max(0, costs["wood"] - wood_discount_on_improvement(player))
+    if "stone" in costs:
+        costs["stone"] = max(0, costs["stone"] - stone_discount(player, "major"))
+    for resource, amount in costs.items():
         setattr(player, resource, getattr(player, resource) - amount)
 
 
@@ -112,7 +126,7 @@ def _return_fireplace(player, supply: list[str]) -> None:
             return
 
 
-def take_major(player, supply: list[str], major_id: str) -> None:
+def take_major(player, supply: list[str], major_id: str, game=None) -> None:
     supply.remove(major_id)
     if major_id.startswith("hearth") and owns(player, "fireplace"):
         _return_fireplace(player, supply)
@@ -121,6 +135,9 @@ def take_major(player, supply: list[str], major_id: str) -> None:
     player.majors.append(major_id)
     if major_id.startswith("fireplace") or major_id.startswith("hearth"):
         player.has_fireplace = True
+    from oyster_omelette.effects import after_improvement
+
+    after_improvement(game, player)
 
 
 def bake_best(player) -> int:

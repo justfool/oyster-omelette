@@ -59,8 +59,8 @@ Artifex／Bubulcus 等基本盒接上後再做。7～8 等容量／佔格／工�
 ================================================================
 進度總覽
 ================================================================
-[~] 基本盒 A 1/48           TODO-deck-base.txt
-[ ] 基本盒 B 0/48           TODO-deck-base.txt
+[~] 基本盒 A 29/48          TODO-deck-base.txt（難度 1～4 已接）
+[~] 基本盒 B 35/48          TODO-deck-base.txt（難度 1～4 已接）
 [ ] Artifex（Deck A 擴充）0/120   TODO-deck-a.txt
 [ ] Bubulcus（Deck B 擴充）0/120  TODO-deck-b.txt
 [ ] 5／6 人職業 A／B 0/24   還沒建檔
