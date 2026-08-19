@@ -97,6 +97,11 @@ def give_wood(game: Game, number: int, count: int) -> None:
     game.players[number - 1].wood = count
 
 
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 蘆葦"))
+def give_reed(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].reed = count
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 黏土"))
 def give_clay(game: Game, number: int, count: int) -> None:
     game.players[number - 1].clay = count
@@ -524,3 +529,329 @@ def then_played_minors(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 應有 {count:d} 羊"))
 def then_player_sheep(game: Game, number: int, count: int) -> None:
     assert game.players[number - 1].sheep == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 菜"))
+def then_player_vegetable(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].vegetable == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 野豬"))
+def then_player_boar(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].wild_boar == count
+
+
+@then(parsers.parse("玩家 {number:d} 應有 {count:d} 牛"))
+def then_player_cattle(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].cattle == count
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 菜"))
+def give_vegetable(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].vegetable = count
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 野豬"))
+def give_boar(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].wild_boar = count
+
+
+@when(parsers.parse("玩家 {number:d} 身上有 {count:d} 牛"))
+def give_cattle(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].cattle = count
+
+
+@when(parsers.parse("玩家 {number:d} 的家人數設為 {count:d}"))
+def set_family_size(game: Game, number: int, count: int) -> None:
+    player = game.players[number - 1]
+    player.family_members = count
+    player.unplaced_workers = count
+
+
+@when("規則檢查改為上帝模式")
+def enable_god_mode(game: Game) -> None:
+    game.god_mode = True
+
+
+@when(parsers.parse("玩家 {number:d} 的次要手牌改為 {card_id}"))
+def set_minor_hand(game: Game, number: int, card_id: str) -> None:
+    game.players[number - 1].minors_hand = [card_id]
+
+
+@when(parsers.parse("玩家 {number:d} 打出次要 {card_id}"))
+def do_play_minor(game: Game, number: int, card_id: str) -> None:
+    from oyster_omelette.cards import play_minor
+
+    play_minor(game.players[number - 1], card_id, game)
+
+
+@then(parsers.parse("玩家 {number:d} 不能打出次要 {card_id}"))
+def then_cannot_play_minor(game: Game, number: int, card_id: str) -> None:
+    from oyster_omelette.cards import can_play_minor
+
+    assert not can_play_minor(game.players[number - 1], card_id, game)
+
+
+@then(parsers.parse("玩家 {number:d} 手牌應有 {count:d} 張職業"))
+def then_occupation_hand(game: Game, number: int, count: int) -> None:
+    assert len(game.players[number - 1].occupations_hand) == count
+
+
+@then(parsers.parse("玩家 {number:d} 手牌應有 {count:d} 張次要"))
+def then_minor_hand(game: Game, number: int, count: int) -> None:
+    assert len(game.players[number - 1].minors_hand) == count
+
+
+@then(parsers.parse("玩家 {number:d} 的次要手牌應包含 {card_id}"))
+def then_hand_has_minor(game: Game, number: int, card_id: str) -> None:
+    assert card_id in game.players[number - 1].minors_hand
+
+
+@then(parsers.parse("玩家 {number:d} 的次要手牌不應包含 {card_id}"))
+def then_hand_lacks_minor(game: Game, number: int, card_id: str) -> None:
+    assert card_id not in game.players[number - 1].minors_hand
+
+
+@then(parsers.parse("玩家 {number:d} 面前不應有次要 {card_id}"))
+def then_minor_not_played(game: Game, number: int, card_id: str) -> None:
+    assert card_id not in game.players[number - 1].minors_played
+
+
+@then(parsers.parse("遊戲應有行動格 {space_id}"))
+def then_has_space(game: Game, space_id: str) -> None:
+    assert game.space(space_id) is not None
+
+
+@then(parsers.parse("遊戲不應有行動格 {space_id}"))
+def then_no_space(game: Game, space_id: str) -> None:
+    assert game.space(space_id) is None
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格田上應有 {count:d} 菜"))
+def then_field_vegetable(game: Game, row: int, col: int, count: int) -> None:
+    cell = game.players[0].farm.cell(row - 1, col - 1)
+    assert cell.crop == "vegetable"
+    assert cell.crop_count == count
+
+
+@then(parsers.parse("玩家 {number:d} 應持有主要改良 {major_id}"))
+def then_owns_major(game: Game, number: int, major_id: str) -> None:
+    assert major_id in game.players[number - 1].majors
+
+
+@then("遊戲應已結束")
+def then_game_finished(game: Game) -> None:
+    assert game.is_finished()
+
+
+@then("遊戲應尚未結束")
+def then_game_not_finished(game: Game) -> None:
+    assert not game.is_finished()
+
+
+@when("連續準備到第 14 回合，收成回合都收成")
+def play_through_round_14(game: Game) -> None:
+    from oyster_omelette.harvest import is_harvest_round
+
+    while game.round < 14:
+        game.prepare_round()
+        game.return_home()
+        if is_harvest_round(game.round):
+            game.harvest()
+
+
+@when("連續準備 14 個回合並在每回合結束後回家")
+def prepare_fourteen_rounds(game: Game) -> None:
+    for _ in range(14):
+        game.prepare_round()
+        game.return_home()
+
+
+@then("已翻開回合卡張數依階段應為 4、3、2、2、2、1")
+def then_stage_distribution(game: Game) -> None:
+    from oyster_omelette.board import DEFAULT_ROUND_CARDS, STAGE_SIZES
+
+    revealed = game.board.revealed_round_cards
+    assert len(revealed) == 14
+    start = 0
+    for size in STAGE_SIZES:
+        chunk = set(revealed[start : start + size])
+        expected = set(DEFAULT_ROUND_CARDS[start : start + size])
+        assert chunk == expected
+        start += size
+
+
+@then(parsers.parse("第 {round_number:d} 回合應是收成回合"))
+def then_is_harvest_round(round_number: int) -> None:
+    from oyster_omelette.harvest import is_harvest_round
+
+    assert is_harvest_round(round_number)
+
+
+@then(parsers.parse("第 {round_number:d} 回合不應是收成回合"))
+def then_is_not_harvest_round(round_number: int) -> None:
+    from oyster_omelette.harvest import is_harvest_round
+
+    assert not is_harvest_round(round_number)
+
+
+@then(parsers.parse("玩家 {number:d} 的田地計分應為 {points:d}"))
+def then_field_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["fields"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的牧場計分應為 {points:d}"))
+def then_pasture_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["pastures"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的穀物計分應為 {points:d}"))
+def then_grain_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["grain"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的蔬菜計分應為 {points:d}"))
+def then_veg_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["vegetables"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的羊計分應為 {points:d}"))
+def then_sheep_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["sheep"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的野豬計分應為 {points:d}"))
+def then_boar_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["wild_boar"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的牛計分應為 {points:d}"))
+def then_cattle_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["cattle"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的未使用空地計分應為 {points:d}"))
+def then_unused_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["unused"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的家人計分應為 {points:d}"))
+def then_family_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["family"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的討飯計分應為 {points:d}"))
+def then_begging_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["begging"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的總分應為 {points:d}"))
+def then_total_score(game: Game, number: int, points: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["total"] == points
+
+
+@then(parsers.parse("玩家 {number:d} 的剩餘建材應為 {count:d}"))
+def then_leftover(game: Game, number: int, count: int) -> None:
+    from oyster_omelette.scoring import score_player
+
+    assert score_player(game.players[number - 1])["leftover"] == count
+
+
+@when(parsers.parse("玩家 {number:d} 的穀物設為 {count:d}"))
+def set_grain(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].grain = count
+
+
+@when(parsers.parse("玩家 {number:d} 已有 {count:d} 張討飯卡"))
+def set_begging(game: Game, number: int, count: int) -> None:
+    game.players[number - 1].begging = count
+
+
+@when(parsers.parse("玩家 {number:d} 已用掉 {count:d} 段籬笆"))
+def fill_fences(game: Game, number: int, count: int) -> None:
+    farm = game.players[number - 1].farm
+    added = 0
+    for r, row in enumerate(farm.fences.horizontal):
+        for c in range(len(row)):
+            if added >= count:
+                return
+            if not farm.fences.horizontal[r][c]:
+                farm.fences.horizontal[r][c] = True
+                added += 1
+    for r, row in enumerate(farm.fences.vertical):
+        for c in range(len(row)):
+            if added >= count:
+                return
+            if not farm.fences.vertical[r][c]:
+                farm.fences.vertical[r][c] = True
+                added += 1
+
+
+@then(parsers.parse("玩家 {number:d} 的籬笆段數應為 {count:d}"))
+def then_fence_count(game: Game, number: int, count: int) -> None:
+    assert game.players[number - 1].farm.fences.used() == count
+
+
+@when(parsers.parse("玩家 {number:d} 已蓋 {count:d} 間畜舍"))
+def place_many_stables(game: Game, number: int, count: int) -> None:
+    from oyster_omelette.farmyard import build_one_stable
+
+    for _ in range(count):
+        assert build_one_stable(game.players[number - 1].farm)
+
+
+@when(parsers.parse("玩家 {number:d} 圍出一塊 2 格牧場並在兩格都蓋畜舍"))
+def two_cell_pasture_two_stables(game: Game, number: int) -> None:
+    from oyster_omelette.pastures import (
+        set_fence_east,
+        set_fence_north,
+        set_fence_south,
+        set_fence_west,
+    )
+
+    farm = game.players[number - 1].farm
+    # 第 1 列第 2、3 格合成一塊 2 格牧場。
+    set_fence_north(farm.fences, 0, 1)
+    set_fence_north(farm.fences, 0, 2)
+    set_fence_south(farm.fences, 0, 1)
+    set_fence_south(farm.fences, 0, 2)
+    set_fence_west(farm.fences, 0, 1)
+    set_fence_east(farm.fences, 0, 2)
+    farm.cell(0, 1).stable = True
+    farm.cell(0, 2).stable = True
+
+
+@when(parsers.parse("玩家 {number:d} 已有主要改良 {major_id}"))
+def give_major(game: Game, number: int, major_id: str) -> None:
+    player = game.players[number - 1]
+    if major_id not in player.majors:
+        player.majors.append(major_id)
+    if major_id.startswith("fireplace"):
+        player.has_fireplace = True
+
+
+@then(parsers.parse("玩家 {number:d} 應有灶牌 {major_id}"))
+def then_specific_hearth(game: Game, number: int, major_id: str) -> None:
+    assert major_id in game.players[number - 1].majors

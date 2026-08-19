@@ -29,6 +29,15 @@ Feature: 行動板與工人擺放
     Then 上次放置應失敗且原因包含 not_your_turn
     And day_laborer 應沒有人
 
+  Scenario: 回家後可以收成，再準備下一回合
+    When 完成開局設置
+    And 準備下一回合
+    And 所有家人回家
+    And 進行收成
+    And 準備下一回合
+    Then 目前回合應為 2
+    And 輪到玩家 1
+
   Scenario: 日工拿到 2 食物、穀種拿到 1 穀
     When 完成開局設置
     And 準備下一回合

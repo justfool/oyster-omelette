@@ -40,6 +40,7 @@ POINTS: dict[str, int] = {
     "well": 4,
 }
 
+# 數字以主要改良卡文為準：壁爐羊／豬 2、牛 3、菜 2；灶羊 2、豬 3、牛 4、菜 3。
 COOK_FOOD = {
     "sheep": 2,
     "wild_boar": 2,

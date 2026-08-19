@@ -7,3 +7,12 @@ Feature: 官方單人
     Then 起始玩家應有 0 食物
     When 準備下一回合
     Then 森林應有 2 木
+
+  Scenario: 單人大人收成吃 3 食
+    Given 1 位單人農家樂
+    When 完成開局設置
+    And 玩家 1 身上有 6 食物
+    And 進行收成
+    Then 玩家 1 應有 0 食物
+    And 玩家 1 應有 0 張討飯卡
+

@@ -35,3 +35,23 @@ Feature: 新生兒收成
     Then 玩家 1 應有 0 食物
     And 玩家 1 應有 1 張討飯卡
     And 玩家 1 的家人數應為 3
+
+  Scenario: 連續兩次回合各生 1 人，家人變成 4
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 family_growth
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 身上有 5 木與 2 蘆葦
+    And 玩家 1 放置工人到 farm_expansion
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 放置工人到 family_growth
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 身上有 5 木與 2 蘆葦
+    And 玩家 1 放置工人到 farm_expansion
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 放置工人到 family_growth
+    Then 上次放置應成功
+    And 玩家 1 的家人數應為 4

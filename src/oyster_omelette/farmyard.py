@@ -280,7 +280,7 @@ def sow_fields(player) -> bool:
 
 
 def return_people_home(farm: Farmyard, count: int) -> None:
-    """家人回到房間：每間 1 人，多的先留在第一間。"""
+    """家人回到房間：每間 1 人，多的先留在第一間。沒房間也能生時家人可以多於房間。"""
     for row in farm.cells:
         for cell in row:
             cell.people = 0
