@@ -1,4 +1,4 @@
-"""修訂版基本盒職業／次要。先接難度 1～4。發牌仍用玩具卡。"""
+"""修訂版基本盒職業／次要。正式遊戲用 deal='base' 發這副；測試預設仍用玩具卡。"""
 
 from oyster_omelette.cards import minor, occupation
 
@@ -28,10 +28,10 @@ BASE_CARDS = (
     occupation("A119", "拾薪人"),
     occupation("A120", "黏土屋匠"),
     occupation("A125", "聖職者"),
-    occupation("A133", "吹牛者"),
-    occupation("A138", "魚叉手"),
-    occupation("A143", "石匠"),
-    occupation("A155", "魔術師"),
+    occupation("A133", "吹牛者", players="3+"),
+    occupation("A138", "魚叉手", players="3+"),
+    occupation("A143", "石匠", players="3+"),
+    occupation("A155", "魔術師", players="4+"),
     minor("B002", "迷你牧場", traveling=True, cost=(("food", 2),)),
     minor("B008", "攤位", traveling=True, cost=(("grain", 1),)),
     minor("B013", "木匠廂房", cost=(("wood", 1), ("stone", 1))),
@@ -64,7 +64,7 @@ BASE_CARDS = (
     occupation("B121", "地質學家"),
     occupation("B123", "壓頂人"),
     occupation("B126", "木匠"),
-    occupation("B142", "菜販"),
-    occupation("B156", "倉管"),
-    occupation("B166", "餵牛人"),
+    occupation("B142", "菜販", players="3+"),
+    occupation("B156", "倉管", players="4+"),
+    occupation("B166", "餵牛人", players="4+"),
 )

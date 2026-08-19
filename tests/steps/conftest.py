@@ -53,12 +53,18 @@ def given_solo(forced_round_cards: dict) -> int:
     return 1
 
 
+@given("發牌改用基本盒")
+def given_base_deal(forced_round_cards: dict) -> None:
+    forced_round_cards["deal"] = "base"
+
+
 @when("完成開局設置", target_fixture="game")
 def setup_game(player_count: int, forced_round_cards: dict) -> Game:
     return Game.setup(
         player_count=player_count,
         round_cards=forced_round_cards["cards"],
         solo=bool(forced_round_cards.get("solo")),
+        deal=forced_round_cards.get("deal", "toy"),
     )
 
 
@@ -635,6 +641,27 @@ def then_occupation_hand(game: Game, number: int, count: int) -> None:
 @then(parsers.parse("玩家 {number:d} 手牌應有 {count:d} 張次要"))
 def then_minor_hand(game: Game, number: int, count: int) -> None:
     assert len(game.players[number - 1].minors_hand) == count
+
+
+@then(parsers.parse("玩家 {number:d} 的職業手牌都是基本盒卡"))
+def then_jobs_are_base(game: Game, number: int) -> None:
+    from oyster_omelette.decks.base import BASE_CARDS
+
+    base_ids = {card.id for card in BASE_CARDS}
+    assert all(card_id in base_ids for card_id in game.players[number - 1].occupations_hand)
+
+
+@then("兩人手牌職業不重複")
+def then_jobs_unique(game: Game) -> None:
+    seen: list[str] = []
+    for player in game.players:
+        seen.extend(player.occupations_hand)
+    assert len(seen) == len(set(seen))
+
+
+@then(parsers.parse("玩家 {number:d} 的職業手牌不應有 {card_id}"))
+def then_job_hand_lacks(game: Game, number: int, card_id: str) -> None:
+    assert card_id not in game.players[number - 1].occupations_hand
 
 
 @then(parsers.parse("玩家 {number:d} 的次要手牌應包含 {card_id}"))

@@ -22,11 +22,24 @@ class Card:
     cost: tuple[tuple[str, int], ...] = ()
     vp: int = 0
     prereq: str = ""
+    players: str = "1+"
 
 
-def occupation(card_id: str, name_zh: str, resource: str = "", amount: int = 0) -> Card:
+def occupation(
+    card_id: str,
+    name_zh: str,
+    resource: str = "",
+    amount: int = 0,
+    *,
+    players: str = "1+",
+) -> Card:
     return Card(
-        id=card_id, name_zh=name_zh, kind="occupation", play_resource=resource, play_amount=amount
+        id=card_id,
+        name_zh=name_zh,
+        kind="occupation",
+        play_resource=resource,
+        play_amount=amount,
+        players=players,
     )
 
 
@@ -51,6 +64,7 @@ def minor(
         cost=cost,
         vp=vp,
         prereq=prereq,
+        players="1+",
     )
 
 
@@ -206,12 +220,57 @@ def _deal(ids: tuple[str, ...], player_count: int) -> list[list[str]]:
     return hands
 
 
-def deal_occupations(player_count: int) -> list[list[str]]:
-    """每人 7 張；卡不夠就循環發。"""
+def _players_ok(mark: str, player_count: int) -> bool:
+    if mark in {"", "1+", "—"}:
+        return True
+    if mark == "3+":
+        return player_count >= 3
+    if mark in {"4+", "4"}:
+        return player_count >= 4
+    return True
+
+
+def _base_ids(kind: str, player_count: int) -> list[str]:
+    from oyster_omelette.decks.base import BASE_CARDS
+
+    ids = []
+    for card in BASE_CARDS:
+        if card.kind != kind:
+            continue
+        if kind == "occupation" and not _players_ok(card.players, player_count):
+            continue
+        ids.append(card.id)
+    return ids
+
+
+def _deal_unique(ids: list[str], player_count: int, rng) -> list[list[str]]:
+    deck = list(ids)
+    rng.shuffle(deck)
+    need = player_count * 7
+    if len(deck) < need:
+        raise ValueError("基本盒可發的卡不夠每人 7 張")
+    hands = []
+    start = 0
+    for _ in range(player_count):
+        hands.append(deck[start : start + 7])
+        start += 7
+    return hands
+
+
+def deal_occupations(player_count: int, source: str = "toy", rng=None) -> list[list[str]]:
+    """每人 7 張。toy：循環玩具卡。base：基本盒洗牌、依人數過濾。"""
+    if source == "base":
+        import random
+
+        return _deal_unique(_base_ids("occupation", player_count), player_count, rng or random)
     return _deal(OCCUPATION_IDS, player_count)
 
 
-def deal_minors(player_count: int) -> list[list[str]]:
+def deal_minors(player_count: int, source: str = "toy", rng=None) -> list[list[str]]:
+    if source == "base":
+        import random
+
+        return _deal_unique(_base_ids("minor", player_count), player_count, rng or random)
     return _deal(MINOR_IDS, player_count)
 
 

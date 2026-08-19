@@ -29,6 +29,16 @@ def test_three_player_paid_lessons_cost_two_food():
     assert player.occupations_played
 
 
+def test_base_deal_filters_four_player_occupations():
+    game = Game.setup(2, deal="base")
+    hands = game.players[0].occupations_hand + game.players[1].occupations_hand
+    assert len(hands) == 14
+    assert len(set(hands)) == 14
+    assert "A155" not in hands
+    assert "B166" not in hands
+    assert all(card_id[0] in {"A", "B"} for card_id in hands)
+
+
 def test_two_player_board_has_no_three_player_spaces():
     game = Game.setup(2)
     assert game.space("grove_3p") is None
