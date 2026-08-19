@@ -42,8 +42,11 @@ from oyster_omelette.majors import (
 from oyster_omelette.pastures import (
     enclose_one_pasture,
     enclose_pasture_at,
+    enclose_shape,
     fence_cost_at,
     next_pasture_cost,
+    shape_block_reason,
+    shape_cost,
 )
 
 
@@ -148,8 +151,20 @@ def _try_play_major_or_minor(game, player) -> None:
         player.well_food_left = well_food_rounds(game.round)
 
 
-def _do_fence(player, target: tuple[int, int] | None = None) -> None:
+def _do_fence(
+    player,
+    target: tuple[int, int] | None = None,
+    cells: set[tuple[int, int]] | None = None,
+) -> None:
     free = fence_discount(player)
+    if cells:
+        cost = shape_cost(player.farm, cells)
+        if cost is None:
+            return
+        pay = max(0, cost - free)
+        player.wood -= pay
+        enclose_shape(player.farm, cells)
+        return
     if target is not None:
         cost = enclose_pasture_at(player.farm, target[0], target[1])
         pay = max(0, cost - free)
@@ -167,7 +182,22 @@ def _do_fence(player, target: tuple[int, int] | None = None) -> None:
         enclose_one_pasture(player.farm)
 
 
-def target_error(player, space, target: tuple[int, int] | None) -> str:
+def target_error(
+    player,
+    space,
+    target: tuple[int, int] | None,
+    cells: set[tuple[int, int]] | None = None,
+) -> str:
+    if cells:
+        if space.id != "fences":
+            return "illegal_cell"
+        blocked = shape_block_reason(player.farm, cells)
+        if blocked:
+            return blocked
+        cost = shape_cost(player.farm, cells) or 0
+        if player.wood < max(0, cost - fence_discount(player)):
+            return "cannot_fence"
+        return ""
     if target is None:
         return ""
     row, col = target
@@ -246,12 +276,24 @@ def cannot_use(player, space, game=None) -> str:
     return ""
 
 
-def resolve_space(game, player, space, target: tuple[int, int] | None = None) -> None:
-    _apply_space(game, player, space, target)
+def resolve_space(
+    game,
+    player,
+    space,
+    target: tuple[int, int] | None = None,
+    cells: set[tuple[int, int]] | None = None,
+) -> None:
+    _apply_space(game, player, space, target, cells)
     after_space(game, player, space.id)
 
 
-def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
+def _apply_space(
+    game,
+    player,
+    space,
+    target: tuple[int, int] | None,
+    cells: set[tuple[int, int]] | None = None,
+) -> None:
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
             house_animals(player, space.resource, space.accumulated)
@@ -346,7 +388,7 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
         return
 
     if space.id == "fences":
-        _do_fence(player, target)
+        _do_fence(player, target, cells)
         return
 
     if space.id in {"lessons", "lessons_3p", "lessons_4p"}:

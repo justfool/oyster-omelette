@@ -194,6 +194,41 @@ def place_worker_at(
     last_place["result"] = game.place_worker(number - 1, space_id, target=(row - 1, col - 1))
 
 
+@when(
+    parsers.parse(
+        "玩家 {number:d} 把工人放到 fences 圍第 {r1:d} 列第 {c1:d} 格與第 {r2:d} 列第 {c2:d} 格"
+    )
+)
+def place_fence_two_cells(
+    game: Game, last_place: dict, number: int, r1: int, c1: int, r2: int, c2: int
+) -> None:
+    cells = {(r1 - 1, c1 - 1), (r2 - 1, c2 - 1)}
+    last_place["result"] = game.place_worker(number - 1, "fences", cells=cells)
+
+
+@when(
+    parsers.parse(
+        "玩家 {number:d} 把工人放到 fences 圍第 {r1:d} 列第 {c1:d} 格、第 {r2:d} 列第 {c2:d} 格、"
+        "第 {r3:d} 列第 {c3:d} 格與第 {r4:d} 列第 {c4:d} 格"
+    )
+)
+def place_fence_four_cells(
+    game: Game,
+    last_place: dict,
+    number: int,
+    r1: int,
+    c1: int,
+    r2: int,
+    c3: int,
+    c2: int,
+    r3: int,
+    r4: int,
+    c4: int,
+) -> None:
+    cells = {(r1 - 1, c1 - 1), (r2 - 1, c2 - 1), (r3 - 1, c3 - 1), (r4 - 1, c4 - 1)}
+    last_place["result"] = game.place_worker(number - 1, "fences", cells=cells)
+
+
 @when(parsers.parse("玩家 {number:d} 把家人放到 {space_id}"), target_fixture="placed")
 def place_family(game: Game, last_place: dict, number: int, space_id: str):
     result = game.place_worker(number - 1, space_id)
