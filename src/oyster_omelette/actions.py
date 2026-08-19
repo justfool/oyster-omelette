@@ -1,7 +1,12 @@
 """行動格立刻結算。還沒做完的格子只佔格、不改農場。"""
 
 from oyster_omelette.animals import house_animals
-from oyster_omelette.cards import occupation_cost, play_minor, play_occupation
+from oyster_omelette.cards import (
+    lessons_4p_cost,
+    occupation_cost,
+    play_minor,
+    play_occupation,
+)
 from oyster_omelette.effects import (
     after_renovate,
     after_rooms_built,
@@ -40,6 +45,14 @@ from oyster_omelette.pastures import (
     fence_cost_at,
     next_pasture_cost,
 )
+
+
+def _lessons_food_cost(player, space_id: str) -> int:
+    if space_id == "lessons_3p":
+        return 2
+    if space_id == "lessons_4p":
+        return lessons_4p_cost(len(player.occupations_played))
+    return occupation_cost(len(player.occupations_played))
 
 
 def add_resource(player, resource: str, amount: int) -> None:
@@ -165,7 +178,7 @@ def target_error(player, space, target: tuple[int, int] | None) -> str:
         cost = fence_cost_at(player.farm, row, col)
         if cost is None:
             return "illegal_cell"
-        if player.wood < cost:
+        if player.wood < max(0, cost - fence_discount(player)):
             return "cannot_fence"
     if space.id == "farm_expansion":
         can_room = _can_build_room(player) and can_place_room(player.farm, row, col)
@@ -206,10 +219,10 @@ def cannot_use(player, space, game=None) -> str:
             return "cannot_build_fireplace"
     if space.id == "fences":
         return _fence_block_reason(player) or ""
-    if space.id in {"lessons", "lessons_3p"}:
+    if space.id in {"lessons", "lessons_3p", "lessons_4p"}:
         if not player.occupations_hand:
             return "cannot_play_occupation"
-        cost = 2 if space.id == "lessons_3p" else occupation_cost(len(player.occupations_played))
+        cost = _lessons_food_cost(player, space.id)
         if player.food < cost:
             return "cannot_play_occupation"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
@@ -336,8 +349,20 @@ def _apply_space(game, player, space, target: tuple[int, int] | None) -> None:
         _do_fence(player, target)
         return
 
-    if space.id in {"lessons", "lessons_3p"}:
-        cost = 2 if space.id == "lessons_3p" else occupation_cost(len(player.occupations_played))
-        player.food -= cost
+    if space.id in {"lessons", "lessons_3p", "lessons_4p"}:
+        player.food -= _lessons_food_cost(player, space.id)
         play_occupation(player, player.occupations_hand[0], game)
+        return
+
+    if space.id == "resource_market_3p":
+        # 沒指定時暫定拿蘆葦；TUI 之後再讓玩家選蘆或石。
+        chosen = "reed"
+        setattr(player, chosen, getattr(player, chosen) + 1)
+        player.food += 1
+        return
+
+    if space.id == "resource_market_4p":
+        player.reed += 1
+        player.stone += 1
+        player.food += 1
         return

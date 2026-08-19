@@ -20,3 +20,18 @@ Feature: 畜舍
     And 玩家 1 身上有 2 木
     And 玩家 1 放置工人到 farm_expansion
     Then 玩家 1 的動物容量應為 5
+
+  Scenario: 同一牧場兩間畜舍容量再乘一次
+    Given 1 位玩家的農家樂修訂版
+    When 完成開局設置
+    And 玩家 1 圍出一塊 2 格牧場並在兩格都蓋畜舍
+    Then 玩家 1 的動物容量應為 17
+
+  Scenario: 最多 4 間畜舍
+    Given 1 位玩家的農家樂修訂版
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 已蓋 4 間畜舍
+    And 玩家 1 身上有 2 木
+    And 玩家 1 放置工人到 farm_expansion
+    Then 上次放置應失敗且原因包含 cannot_build_room

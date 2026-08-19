@@ -273,7 +273,7 @@ def B091_after_space(_game, player, space_id: str) -> None:
 
 
 def B108_after_space(_game, player, space_id: str) -> None:
-    if space_id in {"forest", "copse", "grove"}:
+    if space_id in {"forest", "grove_3p", "grove_4p", "copse_4p"}:
         bake_best(player)
 
 
@@ -290,7 +290,7 @@ def B142_after_space(_game, player, space_id: str) -> None:
 
 
 def B156_after_space(_game, player, space_id: str) -> None:
-    if space_id != "resource_market":
+    if space_id not in {"resource_market", "resource_market_3p", "resource_market_4p"}:
         return
     if player.prefer_vegetable:
         grant(player, "grain", 1)

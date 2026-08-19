@@ -24,3 +24,32 @@ Feature: 播種
     And 玩家 1 放置工人到 farmland
     And 玩家 1 放置工人到 sow_and_or_bake
     Then 上次放置應失敗且原因包含 cannot_sow
+
+  Scenario: 有菜會播成田上 2 菜
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 玩家 1 身上有 1 菜
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 上次放置應成功
+    And 玩家 1 應有 0 菜
+    And 第 1 列第 2 格田上應有 2 菜
+
+  Scenario: 目前一次會把所有空田先穀後菜播滿
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 身上有 2 穀
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 第 1 列第 2 格田上應有 3 穀
+    And 第 1 列第 3 格田上應有 3 穀
+    And 玩家 1 應有 0 穀

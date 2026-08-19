@@ -14,7 +14,7 @@ from oyster_omelette.board import (
 )
 from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme
 
-SPACE_KEYS = "123456789abcdefghijk"
+SPACE_KEYS = "123456789abcdefghijklmnopqrstuvwxyz"
 
 NEEDS_CELL = frozenset({"farmland", "fences", "farm_expansion", "plow_and_or_sow"})
 
@@ -35,11 +35,16 @@ SPACE_BLURBS = {
     "clay_pit": "每回合補 1 黏土；拿走全部堆疊。",
     "reed_bank": "每回合補 1 蘆葦；拿走全部堆疊。",
     "fishing": "每回合補 1 食物；拿走全部堆疊。",
-    "copse": "每回合補 2 木；拿走全部堆疊。3 人以上。",
-    "hollow": "每回合補 1 黏土；拿走全部堆疊。3 人以上。",
-    "grove": "每回合補 2 木；拿走全部堆疊。4 人。",
-    "traveling_players": "每回合補 1 食物；拿走全部堆疊。4 人。",
-    "lessons_3p": "打 1 張職業，費用 2 食。3 人以上。",
+    "grove_3p": "每回合補 2 木；拿走全部堆疊。3 人局。",
+    "hollow_3p": "每回合補 1 黏土；拿走全部堆疊。3 人局。",
+    "resource_market_3p": "拿 1 蘆或 1 石，以及 1 食。沒指定時拿蘆葦。3 人局。",
+    "lessons_3p": "打 1 張職業，費用 2 食。3 人局。",
+    "copse_4p": "每回合補 1 木；拿走全部堆疊。4 人局。",
+    "grove_4p": "每回合補 2 木；拿走全部堆疊。4 人局。",
+    "hollow_4p": "每回合補 2 黏土；拿走全部堆疊。4 人局。",
+    "resource_market_4p": "拿 1 蘆、1 石與 1 食。4 人局。",
+    "traveling_players": "每回合補 1 食物；拿走全部堆疊。4 人局。",
+    "lessons_4p": "打 1 張職業。遊戲中第 1、2 張在此格 1 食，之後 2 食。4 人局。",
     "fences": "圍籬，木頭用到不能再圍。",
     "major_or_minor": "蓋 1 張主要改良，或打 1 張次要改良。",
     "sheep": "每回合補 1 羊；拿走全部堆疊。住不下可煮或跑掉。",
@@ -83,9 +88,9 @@ def extra_fixed_ids(game) -> tuple[str, ...]:
     if getattr(game, "solo", False):
         return ()
     count = getattr(game, "player_count", len(game.players))
-    if count >= 4:
+    if count == 4:
         return EXTRA_4P
-    if count >= 3:
+    if count == 3:
         return EXTRA_3P
     return ()
 

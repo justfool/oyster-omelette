@@ -18,3 +18,30 @@ Feature: 壁爐
     And 玩家 1 放置工人到 sow_and_or_bake
     Then 玩家 1 應有 0 穀物
     And 玩家 1 應有 4 食物
+
+  Scenario: 灶把 1 穀烤成 3 食
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡依序為 major_or_minor 與 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 公共供應只剩下 hearth_4
+    And 玩家 1 身上有 4 黏土
+    And 玩家 1 放置工人到 major_or_minor
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 身上有 1 穀
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 玩家 1 應有 0 穀物
+    And 玩家 1 應有 5 食物
+
+  Scenario: 同時有壁爐與黏土爐時烤選較好的爐
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 已有主要改良 fireplace_2
+    And 玩家 1 已有主要改良 clay_oven
+    And 玩家 1 身上有 1 穀
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 玩家 1 應有 0 穀物
+    And 玩家 1 應有 7 食物

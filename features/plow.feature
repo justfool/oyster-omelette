@@ -27,3 +27,4 @@ Feature: 耕田
     Then 第 1 列第 1 格應是木屋
     When 玩家 1 放置工人到 farmland
     Then 第 1 列第 1 格應是木屋
+

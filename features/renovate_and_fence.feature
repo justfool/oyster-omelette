@@ -37,3 +37,17 @@ Feature: 翻修後圍籬
     Then 上次放置應失敗且原因包含 cannot_renovate
     And 第 1 列第 1 格應是木屋
     And 玩家 1 的牧場數應為 0
+
+  Scenario: 翻修成功但籬笆已滿 15 段，仍算做完行動
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 renovation_and_fences
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 身上有 2 黏土與 1 蘆葦
+    And 玩家 1 身上有 4 木
+    And 玩家 1 已用掉 15 段籬笆
+    And 玩家 1 放置工人到 renovation_and_fences
+    Then 上次放置應成功
+    And 第 1 列第 1 格應是黏土屋
+    And 玩家 1 的牧場數應為 0
+

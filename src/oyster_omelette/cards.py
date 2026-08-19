@@ -87,8 +87,13 @@ def card_name(card_id: str) -> str:
 
 
 def occupation_cost(already_played: int) -> int:
-    """2 人版：第一張免費，之後 1 食。"""
+    """主格上課：遊戲第一張免費，之後 1 食。2–4 人都一樣。"""
     return 0 if already_played <= 0 else 1
+
+
+def lessons_4p_cost(already_played: int) -> int:
+    """4 人加格上課：遊戲中第 1、2 張職業 1 食，之後 2 食。"""
+    return 1 if already_played < 2 else 2
 
 
 def bonus_wood(player) -> int:

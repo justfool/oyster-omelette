@@ -39,12 +39,12 @@ def test_wood_cutter_gives_extra_wood_from_forest():
     assert player.wood == 4
 
 
-def test_wood_cutter_also_applies_to_copse():
+def test_wood_cutter_also_applies_to_grove_3p():
     game = Game.setup(3)
     game.prepare_round()
     player = game.players[0]
     player.occupations_played = ["A116"]
-    assert game.place_worker(0, "copse").ok
+    assert game.place_worker(0, "grove_3p").ok
     assert player.wood == 3
 
 
