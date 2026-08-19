@@ -218,6 +218,7 @@ class Game:
         player_index: int,
         space_id: str,
         target: tuple[int, int] | None = None,
+        cells: set[tuple[int, int]] | None = None,
     ) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
             return PlaceResult(ok=False, error="unknown_player")
@@ -239,7 +240,7 @@ class Game:
             blocked = cannot_use(player, space, self)
             if blocked:
                 return PlaceResult(ok=False, error=blocked)
-            blocked = target_error(player, space, target)
+            blocked = target_error(player, space, target, cells)
             if blocked:
                 return PlaceResult(ok=False, error=blocked)
 
@@ -247,7 +248,7 @@ class Game:
             take_one_person(player.farm)
             player.unplaced_workers -= 1
         space.occupant = player_index
-        resolve_space(self, player, space, target)
+        resolve_space(self, player, space, target, cells)
 
         self._turn_from = (player_index + 1) % len(self.players)
         self.current_player_index = self.whose_turn()

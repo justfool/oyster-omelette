@@ -33,6 +33,24 @@ def test_second_adjacent_pasture_shares_a_fence():
     assert animal_capacity(farm) == 5
 
 
+def test_two_cells_as_one_pasture_cost_six():
+    from oyster_omelette.pastures import animal_capacity, enclose_shape, pasture_count
+
+    farm = starting_farmyard()
+    cells = {(0, 1), (0, 2)}
+    assert enclose_shape(farm, cells) == 6
+    assert pasture_count(farm) == 1
+    assert animal_capacity(farm) == 5
+
+
+def test_disconnected_cells_cannot_form_one_pasture():
+    from oyster_omelette.pastures import enclose_shape, pasture_count
+
+    farm = starting_farmyard()
+    assert enclose_shape(farm, {(0, 1), (0, 4)}) == 0
+    assert pasture_count(farm) == 0
+
+
 def test_cannot_enclose_when_no_empty_legal_cell():
     farm = starting_farmyard()
     from oyster_omelette.farmyard import CellKind

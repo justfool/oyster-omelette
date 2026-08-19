@@ -271,3 +271,92 @@ def enclose_one_pasture(farm: Farmyard) -> int:
     if farm.fences.used() + cost > MAX_FENCES:
         return 0
     return _enclose_cell(farm, spot[0], spot[1])
+
+
+def _connected(cells: set[tuple[int, int]]) -> bool:
+    if not cells:
+        return False
+    start = next(iter(cells))
+    seen = {start}
+    queue = [start]
+    while queue:
+        row, col = queue.pop(0)
+        for n_row, n_col in _neighbors(row, col):
+            if (n_row, n_col) not in cells or (n_row, n_col) in seen:
+                continue
+            seen.add((n_row, n_col))
+            queue.append((n_row, n_col))
+    return seen == cells
+
+
+def _shape_missing_edges(farm: Farmyard, cells: set[tuple[int, int]]) -> list[tuple[str, int, int]]:
+    missing: list[tuple[str, int, int]] = []
+    seen: set[tuple[str, int, int]] = set()
+    for row, col in cells:
+        sides = (
+            ("N", row - 1, col, row, col),
+            ("S", row + 1, col, row + 1, col),
+            ("W", row, col - 1, row, col),
+            ("E", row, col + 1, row, col + 1),
+        )
+        for direction, n_row, n_col, fence_row, fence_col in sides:
+            if (n_row, n_col) in cells:
+                continue
+            kind = "h" if direction in {"N", "S"} else "v"
+            key = (kind, fence_row, fence_col)
+            if key in seen:
+                continue
+            seen.add(key)
+            has = {
+                "N": has_fence_north,
+                "S": has_fence_south,
+                "W": has_fence_west,
+                "E": has_fence_east,
+            }[direction]
+            if not has(farm.fences, row, col):
+                missing.append((direction, row, col))
+    return missing
+
+
+def shape_cost(farm: Farmyard, cells: set[tuple[int, int]]) -> int | None:
+    if shape_block_reason(farm, cells):
+        return None
+    return len(_shape_missing_edges(farm, cells))
+
+
+def shape_block_reason(farm: Farmyard, cells: set[tuple[int, int]]) -> str:
+    if not cells or not _connected(cells):
+        return "illegal_cell"
+    already = pasture_cells(farm)
+    for row, col in cells:
+        if (row, col) in already or not _eligible(farm, row, col):
+            return "illegal_cell"
+    if already and not any(
+        (n_row, n_col) in already
+        for row, col in cells
+        for n_row, n_col in _neighbors(row, col)
+    ):
+        return "illegal_cell"
+    cost = len(_shape_missing_edges(farm, cells))
+    if farm.fences.used() + cost > MAX_FENCES:
+        return "cannot_fence"
+    return ""
+
+
+def enclose_shape(farm: Farmyard, cells: set[tuple[int, int]]) -> int:
+    if shape_block_reason(farm, cells):
+        return 0
+    missing = _shape_missing_edges(farm, cells)
+    if farm.fences.used() + len(missing) > MAX_FENCES:
+        return 0
+    added = 0
+    setters = {
+        "N": set_fence_north,
+        "S": set_fence_south,
+        "W": set_fence_west,
+        "E": set_fence_east,
+    }
+    for direction, row, col in missing:
+        if setters[direction](farm.fences, row, col):
+            added += 1
+    return added
