@@ -170,7 +170,7 @@ class OysterOmeletteApp(App):
 
     def __init__(self, theme: Theme | None = None) -> None:
         super().__init__()
-        self.game = Game.setup(player_count=2)
+        self.game = Game.setup(player_count=2, deal="base")
         self.look = theme or load_theme()
         self.pending_space: str | None = None
         self.pending_row: int | None = None

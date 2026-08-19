@@ -84,6 +84,7 @@ class Game:
         round_cards: list[str] | None = None,
         solo: bool = False,
         god_mode: bool = False,
+        deal: str = "toy",
     ) -> "Game":
         if player_count < 1:
             raise ValueError("至少要有 1 位玩家")
@@ -123,8 +124,8 @@ class Game:
             god_mode=god_mode,
             player_count=player_count,
         )
-        job_hands = deal_occupations(player_count)
-        minor_hands = deal_minors(player_count)
+        job_hands = deal_occupations(player_count, source=deal)
+        minor_hands = deal_minors(player_count, source=deal)
         for player, jobs, minors in zip(players, job_hands, minor_hands, strict=True):
             player.occupations_hand = jobs
             player.minors_hand = minors
