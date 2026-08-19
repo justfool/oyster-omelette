@@ -1,0 +1,305 @@
+# 規則審核紀錄
+
+- 日期：2026-08-19
+- 審核者：Claude Code（`claude-opus[1m]`，Opus 5 1M context）
+- 範圍：修訂版（2016）基本規則。卡片效果（`decks/`、`card_effects.py`）不在此輪。
+- 對照檔案：`src/oyster_omelette/game.py`、`actions.py`、`board.py`、`farmyard.py`、`pastures.py`、`harvest.py`、`majors.py`、`scoring.py`、`animals.py`、`cards.py`
+- 對照 TODO：`TODO.txt`、`TODO-deck-x.txt`
+
+分級：
+- 🔴 規則錯（會影響結果）
+- 🟠 明顯漏（規則書有、程式沒做）
+- 🟡 簡化，玩家會少一點選擇（暫時可接受）
+- 🔵 值得確認
+
+---
+
+## 🔴 規則錯
+
+### 1. 牧場畜舍加倍：多間畜舍應**每間都各乘 2**
+- 位置：`src/oyster_omelette/pastures.py:158-173` `animal_capacity`
+- 現況：`doubled = any(...)`，`any` + 三元只做 ×2。
+- 規則：**每間**在牧場內的畜舍讓該牧場容量再乘 2；2 間畜舍就是 ×4。
+- 範例：2 格牧場 + 2 間畜舍。應該 2×2×2×2 = **16**，現在只算 2×2×2 = 8。
+- TODO 對照：`TODO.txt:106` 標 `[x]`，語意含糊遮住了「多間累乘」。
+
+### 2. 3–4 人版「上課」費用不對
+- 位置：`src/oyster_omelette/cards.py:89-91` `occupation_cost`、`actions.py:212`
+- 現況：`lessons_3p` 固定 2 食；`occupation_cost` 只覆蓋 2 人版（0／1）。
+- 規則：
+  - 2 人 Lessons：第 1 張免費、之後每張 1 食 ✅ 符合。
+  - 3–4 人 Lessons：第 1 張要 1 食、之後每張 2 食 ❌
+  - 3–4 人 3+ Lessons：第 1 張 1 食、之後每張 2 食 ❌（現在固定 2）
+- TODO 對照：`TODO.txt:65` 標 `[x]` 但只寫 2 人版。
+
+### 3. `target_error` 對圍籬沒套「樹籬看守」折扣
+- 位置：`actions.py:167-169`
+- 現況：`if player.wood < cost: return "cannot_fence"`，沒有扣 `fence_discount(player)`。
+- 症狀：有 A088 折扣、但木頭不夠原價時被誤擋；與 `_do_fence`、`_fence_block_reason` 的邏輯不一致。
+- TODO 對照：未列。
+
+---
+
+## 🟠 明顯漏
+
+### 4. 圍籬只能一次圍 1 格
+- 位置：`pastures.py: enclose_one_pasture` / `enclose_pasture_at`
+- 規則：修訂版一次可用任意木頭圍任意合法形狀（相鄰、共用邊只算一次、房間／田不能當邊）。
+- 症狀：一次 4 木只能圍 1 格；永遠無法一次圍出 6 木 3 格。
+- TODO 對照：`TODO.txt:97` `[~]`，已知未做。
+
+### 5. 播種：玩家不能選種哪塊、種什麼、種幾塊
+- 位置：`farmyard.py: sow_fields`
+- 現況：把所有空田一路先穀後菜播滿。
+- 規則：玩家自選「哪些田要播、每塊播穀或菜」，可以只播一塊、可以先菜後穀。
+- 症狀：拿一堆穀不想全播、只想留當食物做不到；菜田難以維持（會被自動穀壓）。
+- TODO 對照：未列（`TODO.txt:71` 只寫「播種且／或烤麵包」）。
+
+### 6. 收成餵食沒有自動先烤麵包
+- 位置：`harvest.py: feed_player`
+- 現況：只把手上的穀、菜當 1 食用。
+- 規則：有壁爐／灶時，玩家應能把穀先烤成 2／3 食再拿去餵食。
+- 症狀：擁有 hearth 的玩家在缺食時常被程式強行吃討飯卡。
+- TODO 對照：未列（`TODO.txt:120` 是反方向，講「烤只發生在烤麵包行動」）。
+
+### 7. `renovation_and_fences`：規則允許只圍不翻修（**已定案採嚴解**）
+- 位置：`actions.py: cannot_use` / `_apply_space`
+- 規則卡文有 and/or 的模糊；`TODO.txt:81` 明採「先翻修，木頭夠再圍 1 格」的嚴解。
+- 建議：把「不能翻修時整格廢掉」這點寫進 `AGENTS.md`，避免未來改回。
+
+---
+
+## 🟡 簡化
+
+### 8. 主要／次要改良自動買第一張付得起的
+- `majors.py: choose_major`、`actions.py: _try_play_major_or_minor`
+- TODO 對照：`TODO.txt:175` `[ ]`，已知未做。
+
+### 9. 繁殖順序固定為 sheep → boar → cattle
+- `harvest.py: breed_player`
+- 症狀：只剩 1 個容量時，實際上可以選繁殖哪一種。目前永遠先羊。
+- TODO 對照：未列。
+
+### 10. `farm_expansion` 若沒指定目標，自動連蓋房＋畜舍到極限
+- `actions.py:280-288`
+- 規則允許蓋多間，也允許只蓋一半留資源。UI 有選格時可以精準放，但沒指定目標時就會被榨到底。
+- TODO 對照：`TODO.txt:64` 標 `[x]`，等於「現況即設計」。
+
+### 11. 動物不記位置，只記總數
+- `Player.sheep/wild_boar/cattle` 是純整數。
+- 影響：房子寵物是哪一格、混群、看每格動物數的卡片。
+- TODO 對照：`TODO.txt:109` `[~]`，已知未做。
+
+### 12. 「拿動物住不下」自動決定煮或跑
+- `animals.py: house_animals`：能煮就全煮、不能煮就全跑。
+- 規則：玩家選（煮多少、跑多少）。
+- TODO 對照：`TODO.txt:110` 標 `[x]`，等於「現況即設計」。
+
+---
+
+## 🔵 值得確認
+
+### 13. 菜生食 = 1、有壁爐 = 2
+- `harvest.py:39` 用 `cook_table["vegetable"]`（Fireplace=2、Hearth=3）。
+- 若以卡文為準是對的。建議在 `majors.py` 加註是哪張卡文的數字。
+
+### 14. 單一 `farm_expansion` 行動的房間數上限
+- `actions.py: _apply_space` 的 `while _can_build_room` 沒設上限；規則沒明訂，材料就是門檻。判定正確，順帶提醒。
+
+### 15. `_reset_workers` 允許 family_size > room_count
+- `farmyard.py: return_people_home` 把多的塞第一間；規則允許（生育不受房間上限限制，特別是 stage 5「沒房間也能生」）。
+- 建議加一行註解說明。
+
+### 16. `well_food_rounds` 邊界
+- `majors.py:207` `min(5, 14 - current_round)`，正確。
+
+### 17. `is_harvest_round` 硬編碼 `(4, 7, 9, 11, 13, 14)`
+- 修訂版正確；未來若接 Deck 變體卡再處理。
+
+---
+
+## 沒發現問題（順便留檔）
+
+- 起始配置：左上兩間木屋各 1 人、起始玩家 2 食、其他人 3 食、單人 0 食 3 食吃
+- 14 回合、6 階段（4/3/2/2/2/1）、階段內洗牌
+- 房間與田的相鄰規則、第一塊隨意
+- 建材成本：木屋 5 木 2 蘆、黏土 5 黏 2 蘆、石屋 5 石 2 蘆
+- 翻修成本：1 蘆 + 每間 1 建材
+- 家人上限 5、新生兒同回合不工作
+- 新生兒 1 食、成人 2 食（單人 3 食）
+- 討飯 -3
+- 平手比 leftover（`scoring.py:142`）
+- 分數表（田／牧場／穀／菜／羊／豬／牛／未用地／畜舍／房間／家人／改良）
+- 累積格：森林 3 木、黏土坑 1、蘆葦岸 1、漁場 1、羊／野豬／牛 1、東西採石 1、Copse 2、Hollow 1、Grove 2、旅行藝人 1
+- 3／4 人加格、單人森林 2 木
+- 工人擺放合法性檢查、回合狀態機（`work_phase` / `harvested`）
+
+---
+
+## TODO 對照總表
+
+12 項裡 **8 項不在 TODO**（#1、#2、#3、#5、#6、#9、#10、#12）。
+
+三個標 `[x]` 但實作與規則書不符或簡化未註明的：
+- `TODO.txt:65` 上課費用（缺 3–4 人版）
+- `TODO.txt:106` 畜舍加倍（多間各乘 2 沒做）
+- `TODO.txt:110` 動物住不下（玩家不能選煮／跑）
+
+---
+
+## 建議修的先後順序
+
+依「規則影響嚴重度 × 實作代價」：
+
+1. **【錯】3–4 人上課費用**：改一個函式、加 feature／單元測試。
+2. **【錯】圍籬折扣 `target_error` 對齊 `_do_fence`**：一行邏輯。
+3. **【錯】畜舍加倍改成 per-stable 累乘**：一行邏輯。
+4. **【漏】任意形狀圍籬**：工程較大，實戰最痛；先寫紅燈場景後排時程。
+5. **【漏】玩家選要不要／要用哪些田播**：TUI 層改動大，領域先支援 partial sow。
+6. **【漏】餵食前的烤麵包選擇**：與主要改良互動，建議跟「玩家選改良」一起做。
+
+## 建議加進的流程
+
+- 補上面 8 條 TODO 到 `TODO.txt` 正確段落下，改回 `[~]` 並註明簡化內容。
+- 在 `AGENTS.md` 補一行：「若簡化實作與規則書不同，TODO 對應行應標 `[~]` 並註明簡化內容，不能標 `[x]`。」
+
+---
+
+# BDD Feature Coverage 審核
+
+只看規格面（`features/*.feature`），不看實作。29 個 feature 檔全數審過。
+
+分級：
+- 🔴 重要規則沒 feature（連紅燈規格都沒寫）
+- 🟠 有規格但只覆蓋一角（缺邊界／變體）
+- 🟡 有 unit test 沒 feature（規格層缺）
+- 🔵 設計選擇要明文寫進 feature
+
+## 🔴 完全沒 feature 的規則
+
+### 開局／人數
+1. **3 人／4 人開局**：只有 1p、2p、solo。3p 加 `copse/hollow/lessons_3p`、4p 再加 `grove/traveling_players` 完全沒有 feature 描述。
+2. **手牌 7 職業 + 7 次要**：規則明訂張數，只在其他 feature 打出時間接測到。發牌數量本身沒規格。
+
+### 行動板
+3. **3–4 人加格效果**：`copse` 2 木、`hollow` 1 黏、`grove` 2 木、`traveling_players` 1 食物。無任何 feature。
+4. **上課 3–4 人費用**（對應規則審核 🔴#2）：`lessons_3p` 完全沒 feature。第 1 張 1 食、之後 2 食都沒寫。
+5. **回合卡各階段內洗牌**：`board.py: deal_round_cards` 有做，但沒 feature 描述「同階段順序不定」。
+6. **6 階段完整分佈（4/3/2/2/2/1）**：`action_board.feature` 只驗證「前 4 回合都是階段 1」，沒驗證後面 3、2、2、2、1。
+
+### 蓋房
+7. **黏土屋 5 黏 2 蘆蓋新房間**：只有翻修測到黏土成本，「蓋新房間變黏土成本」的規則沒直接 feature。
+8. **石屋 5 石 2 蘆蓋新房間**：同上。
+9. **家人上限 5**：`actions.py` 有 `family_full` 錯誤碼，沒 feature 場景。
+10. **蓋房不相鄰時拒絕**：`can_place_room` 有處理，沒 feature 場景。
+
+### 圍籬／牧場
+11. **多格牧場（非 1 格）**：`fences.feature` 只有 1 格。共用邊、多格容量、跨牧場相鄰都沒規格描述。
+12. **房間／田的邊不能當籬笆**：規則書明訂，沒 feature。
+13. **籬笆不能拆**：沒 feature。
+14. **最多 15 段籬笆**：沒 feature。
+15. **畜舍上限 4**：沒 feature。
+16. **牧場內多間畜舍累乘容量**（對應規則審核 🔴#1）：沒 feature，也難怪實作漏。
+
+### 動物
+17. **繁殖：豬、牛**：`breeding.feature` 只有羊。
+18. **繁殖時不能煮**：feature 只說「住滿不生」，沒直接測「即便有壁爐也不能靠殺一隻讓另一種生」。
+19. **拿動物住不下：玩家可選煮／跑**（對應規則審核 🟡#12）：規則面沒 feature 描述「玩家選」。
+
+### 農田／播種
+20. **播菜（田上 2 菜）**：`sow.feature` 只有穀（田上 3）。
+21. **一次播多塊田**：沒 feature。
+22. **玩家選要不要播哪塊**（對應規則審核 🟠#5）：規則書允許「不播」或「部分播」，沒 feature。
+23. **`plow_and_or_sow` 回合卡**：程式支援，沒獨立 feature 場景。
+24. **多塊田同時收成**：`harvest.feature` 只有一塊。
+
+### 收成餵食
+25. **食物不夠先吃穀**：`harvest.py` 有做，沒 feature 直接描述「吃 1 穀當 1 食」的替代順序。
+26. **食物不夠吃菜**：沒 feature。
+27. **餵食順序（食物→穀→菜→動物）**：沒明文規格。
+28. **能煮就吃動物餵食**：`animals.feature` 有煮但那是拿動物住不下的情境，收成餵食時吃動物沒 feature。
+29. **餵食前烤麵包**（對應規則審核 🟠#6）：沒 feature，實作也沒做。
+30. **6 個收成回合都會觸發**：只測一次收成，沒驗證第 4/7/9/11/13/14 都對。
+
+### 主要改良（10 張中 6 張沒 feature）
+31. **fireplace_3**、**hearth_4**、**hearth_5**、**stone_oven**、**pottery**、**basketmaker**：都沒 feature。
+32. **烤麵包挑最佳選項**：規則「有多張烤具時選最好」沒 feature。
+33. **免費升級規則**（用 fireplace 換 hearth 免費，能對應 4 或 5 都可）：只測一次換，未測「哪一張都行」。
+
+### 次要改良／職業
+34. **次要卡的費用**（如 A063 荷蘭風車 2 木 2 石）：沒 feature 驗證付費失敗。
+35. **旅行卡打出後交左手**：TODO 標 `[x]` 但**沒 feature**。單人版「移出遊戲」也沒 feature。
+36. **卡片前提**（1 Occupation、2 Vegetable Fields 等）：沒 feature。程式 `_meets_prereq` 有做。
+
+### 計分（幾乎沒 feature）
+37. **各項計分表**（田／牧場／穀／菜／羊／豬／牛）：只有 `test_scoring_table.py`（unit），**沒 feature file**。
+38. **未使用空地 -1**：沒 feature。
+39. **家人 +3**：沒 feature。
+40. **討飯 -3**：只有 unit，沒 feature。
+41. **平手比 leftover**：沒 feature。
+
+### 遊戲結束
+42. **第 14 回合結束、自動計分**：只有 `test_end_game.py`（unit），沒 feature 描述「玩家看到的結束時機」。
+
+### 上帝模式
+43. **上帝模式繞過檢查**：`tui_board.feature` 只測「看到未翻卡名」，實際跳過 `not_work_phase / space_occupied / cannot_use` 等的行為沒 feature。
+
+## 🟠 有 feature 但只覆蓋一角
+
+44. **`renovate_and_fence.feature` 缺「翻修但圍不了」的另一半分歧**：有材料都夠、只夠翻修、翻修付不起；缺翻修 OK 但**已滿 15 段籬笆**的邊界。
+45. **`worker_placement` 缺「回家 → 收成 → 準備下一回合」順序明文**：只有不能在回家後再放。
+46. **`action_board.feature:139` 「前 4 回合都是階段 1」**：只測到前 4 張，後面 10 張的分佈沒斷言。
+47. **`newborn.feature` 缺「連續兩次生育」的邊界**：沒測「同一玩家連續兩回合各生 1」導致家人數 4。
+48. **`fireplace.feature` 缺 hearth 差異**：只測壁爐 = 2 食/穀。沒測 hearth = 3 食/穀。
+49. **`majors.feature` 井**：只驗證第一次「準備下回合拿 1 食」。沒驗證「5 個回合就此結束」。
+
+## 🟡 有 unit test 但沒 feature
+
+這些是規格層缺（unit test 不算 BDD 給玩家的規格）：
+
+- `test_scoring_table.py` → 全部計分表
+- `test_end_game.py` → 遊戲結束
+- `test_solo_rules.py` → 單人 3 食吃法（feature 只測開局）
+- `test_field.py`、`test_expansion_rules.py` → 部分行為僅 unit
+- `test_farmyard.py` → 起始配置驗證
+- `test_harvest_rules.py` → 收成細節
+
+**AGENTS.md 明文「BDD 先於 TDD」**，這些是規格層真正缺的位置。
+
+## 🔵 設計選擇要明文寫
+
+規則書留白／已定案的簡化，`AGENTS.md` 只在文字裡提，沒 feature 鎖定：
+
+50. **`renovation_and_fences` 定案採嚴解**：TODO 已定「先翻修，木頭夠再圍 1 格」，但**沒 feature 明文**「規則允許只圍，但本專案不允許」。將來子代理人可能改回，因為沒有紅燈規格擋著。
+51. **`farm_expansion` 沒指定目標時榨到底**：沒 feature 說「這是設計，不是自動選錯」。
+52. **動物住不下自動煮**：沒 feature 說「這是簡化，不是玩家選」。
+53. **繁殖順序固定 sheep→boar→cattle**：沒 feature 說明。
+54. **自動買第一張付得起的主要改良**：`TODO.txt:175` 有標，`majors.feature` 也是靠這行為在測，但**沒 feature 明文標「這是暫時的權宜」**。
+
+## 結構性缺失
+
+- **沒有 `scoring.feature`**——玩家最有感的規格文件，缺得最痛。
+- **沒有 `end_game.feature`**——「第 14 回合玩家看到什麼」沒規格。
+- **沒有 `three_players.feature` / `four_players.feature`**——3–4 人特有規則整個沒規格。
+- **沒有 `traveling_minor.feature`**——TODO 標 `[x]` 但沒規格。
+- **`multi_fence.feature` 名稱誤導**：實際只測「7 木一次圍兩塊 1 格」，還不是真正的多格牧場。
+
+## 建議補 feature 的優先順序
+
+按「規則衝擊 × 目前實作是否可能已錯」排：
+
+**第一波（規格對照規則審核三個 🔴）**
+1. `three_players.feature`：Lessons 費用 1／2 食（規則審核 🔴#2）
+2. `pastures_stables.feature`：多格牧場、多間畜舍累乘（規則審核 🔴#1）
+3. `fences.feature` 補測 A088 折扣下木頭不足（規則審核 🔴#3）
+
+**第二波（沒規格就一直漏做的核心規則）**
+4. `scoring.feature`：把 `test_scoring_table.py` 提升成 BDD 規格
+5. `end_game.feature`：14 回合結束的玩家視角
+6. `harvest_feeding.feature`：食物→穀→菜→動物、能煮就吃、餵食前烤（規則審核 🟠#6）
+7. `sow.feature` 補菜、多塊田、選格
+
+**第三波（🔵 明文寫定案）**
+8. 在既有 feature 加註「本專案的簡化決定」（或新增 `simplifications.feature` 集中放）
+9. `traveling_minor.feature`：交左手、單人移出遊戲
+10. `multi_fence.feature` 改名／擴充成真正的多格牧場
