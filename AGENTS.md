@@ -99,6 +99,8 @@ Gherkin 關鍵字留英文（`Feature` / `Given` / `When` / `Then`），句子�
 - **已綠的 feature 句子不准改。** 若再派測試者，只准新增 feature／測試。
 - 既有開局、工人擺放等回歸必須維持綠色。
 - 回合卡正式遊戲應在階段內洗牌；測試用 `Game.setup(..., round_cards=...)` 注入，預設清單可固定。
+- 若簡化實作與規則書不同，TODO 對應行應標 `[~]` 並註明簡化內容，不能標 `[x]`。
+- `renovation_and_fences` 採官方 *and afterward*：不能翻修則整格不能用；翻修後圍籬可選。
 
 ## Git
 
