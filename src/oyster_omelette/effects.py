@@ -27,6 +27,13 @@ def after_space(game, player, space_id: str) -> None:
         fn = AFTER_SPACE.get(card_id)
         if fn is not None:
             fn(game, player, space_id)
+    if game is None:
+        return
+    for holder in game.players:
+        for card_id in played_card_ids(holder):
+            fn = AFTER_ANY_SPACE.get(card_id)
+            if fn is not None:
+                fn(game, holder, player, space_id)
 
 
 def after_play(game, player, card_id: str) -> None:
@@ -117,6 +124,38 @@ def extra_pasture_capacity(player) -> int:
     return extra
 
 
+def after_return_home(game) -> None:
+    for player in game.players:
+        for card_id in played_card_ids(player):
+            fn = AFTER_RETURN_HOME.get(card_id)
+            if fn is not None:
+                fn(game, player)
+
+
+def fence_currency(player) -> int:
+    extra = 0
+    for card_id in played_card_ids(player):
+        fn = FENCE_BUDGET.get(card_id)
+        if fn is not None:
+            extra += fn(player)
+    return player.wood + extra
+
+
+def pay_fence_cost(player, amount: int) -> None:
+    for card_id in played_card_ids(player):
+        fn = PAY_FENCE.get(card_id)
+        if fn is not None and fn(player, amount):
+            return
+    player.wood -= amount
+
+
+def minor_extra_cost(player, card) -> dict[str, int] | None:
+    fn = MINOR_COST.get(card.id)
+    if fn is None:
+        return None
+    return fn(player, card)
+
+
 def fence_discount(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
@@ -201,6 +240,15 @@ AFTER_SPACE = {
     "B142": fx.B142_after_space,
     "B156": fx.B156_after_space,
     "B166": fx.B166_after_space,
+    "A024": fx.A024_after_space,
+    "A056": fx.A056_after_space,
+    "A092": fx.A092_after_space,
+    "A108": fx.A108_after_space,
+    "A147": fx.A147_after_space,
+}
+AFTER_ANY_SPACE = {
+    "A050": fx.A050_after_any,
+    "A160": fx.A160_after_any,
 }
 AFTER_PLAY = {
     "A002": fx.A002_after_play,
@@ -222,6 +270,9 @@ AFTER_PLAY = {
     "B089": fx.B089_after_play,
     "B102": fx.B102_after_play,
     "B123": fx.B123_after_play,
+    "A016": fx.A016_after_play,
+    "A165": fx.A165_after_play,
+    "B084": fx.B084_after_play,
 }
 AFTER_OCCUPATION = {
     "B025": fx.B025_after_occupation,
@@ -237,6 +288,7 @@ AFTER_ROUND_START = {
     "B114": fx.B114_after_round_start,
     "B118": fx.B118_after_round_start,
     "B089": fx.B089_after_round_start,
+    "A090": fx.A090_after_round_start,
 }
 AFTER_HARVEST = {
     "A112": fx.A112_after_harvest,
@@ -265,10 +317,23 @@ BONUS_ON_SCORE = {
     "B033": fx.B033_on_score,
     "B039": fx.B039_on_score,
     "B099": fx.B099_on_score,
+    "A032": fx.A032_on_score,
 }
 EXTRA_PASTURE = {
     "A012": fx.A012_pasture_capacity,
 }
 FENCE_DISCOUNT = {
     "A088": fx.A088_fence_discount,
+}
+FENCE_BUDGET = {
+    "A016": fx.A016_fence_budget,
+}
+PAY_FENCE = {
+    "A016": fx.A016_pay_fence,
+}
+MINOR_COST = {
+    "B036": fx.B036_cost,
+}
+AFTER_RETURN_HOME = {
+    "A165": fx.A165_after_return_home,
 }

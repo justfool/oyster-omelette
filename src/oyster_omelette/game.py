@@ -183,6 +183,9 @@ class Game:
     def return_home(self) -> None:
         self._reset_workers()
         self.work_phase = False
+        from oyster_omelette.effects import after_return_home
+
+        after_return_home(self)
 
     def upcoming_round_cards(self) -> list[str]:
         """尚未翻開的回合卡，依即將出現的順序。"""

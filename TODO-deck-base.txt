@@ -33,7 +33,7 @@
     中文：飲水槽
     費用：1 Clay    前提：—    分數：—    難度：4
     卡文：Each of your pastures (with or without a stable) can hold up to 2 more animals.
-[ ] A016
+[x] A016
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：農場規劃
     英文：Rammed Clay
     中文：夯土
@@ -45,7 +45,7 @@
     中文：手推犁
     費用：1 Wood    前提：—    分數：—    難度：6
     卡文：Add 5 to the current round and place 1 field tile on the corresponding round space. At the start of that round, you can plow the field.
-[ ] A024
+[x] A024
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：行動加強
     英文：Threshing Board
     中文：脫穀板
@@ -57,7 +57,7 @@
     中文：睡角
     費用：1 Wood    前提：2 Grain Fields    分數：1    難度：7
     卡文：You can use any "Wish for Children" action space even if it is occupied by one other player's person.
-[ ] A032
+[x] A032
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：分數
     英文：Manger
     中文：飼料槽
@@ -81,7 +81,7 @@
     中文：池邊小屋
     費用：1 Wood    前提：Exactly 2 Occupations    分數：1    難度：4
     卡文：Place 1 food on each of the next 3 round spaces. At the start of these rounds, you get the food.
-[ ] A050
+[x] A050
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：食物
     英文：Milk Jug
     中文：牛奶罐
@@ -99,7 +99,7 @@
     中文：雜物間
     費用：1 Wood,1 Clay    前提：—    分數：—    難度：3
     卡文：Each time after you build an improvement, including this one, you get 1 food.
-[ ] A056
+[x] A056
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：食物
     英文：Basket
     中文：籃子
@@ -171,13 +171,13 @@
     中文：樹籬看守
     費用：—    前提：—    分數：—    難度：4
     卡文：Each time you take a "Build Fences" action, you do not have to pay wood for 3 of the fences you build.
-[ ] A090
+[x] A090
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
     英文：Plow Driver
     中文：扶犁人
     費用：—    前提：—    分數：—    難度：5
     卡文：Once you live in a stone house, at the start of each round, you can pay 1 food to plow 1 field.
-[ ] A092
+[x] A092
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：行動加強
     英文：Adoptive Parents
     中文：養父母
@@ -195,7 +195,7 @@
     中文：雜貨商
     費用：—    前提：—    分數：—    難度：6
     卡文：Pile the following goods on this card (wood, grain, reed, stone, vegetable, clay, reed, vegetable). At any time, you can buy the top good for 1 food.
-[ ] A108
+[x] A108
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：食物
     英文：Mushroom Collector
     中文：採菇人
@@ -273,7 +273,7 @@
     中文：石匠
     費用：—    前提：—    分數：—    難度：4
     卡文：Every improvement, room, and renovation costs you 1 stone less.
-[ ] A147
+[x] A147
     來源：基本盒    種類：職業    旅行卡：否    人數：3+    分類：動物
     英文：Animal Dealer
     中文：牲口販
@@ -285,13 +285,13 @@
     中文：魔術師
     費用：—    前提：—    分數：—    難度：3
     卡文：Each time you use the "traveling Players" accumulation space, you get an additional 1 wood and 1 grain.
-[ ] A160
+[x] A160
     來源：基本盒    種類：職業    旅行卡：否    人數：4+    分類：作物
     英文：Lutenist
     中文：魯特琴師
     費用：—    前提：—    分數：—    難度：5
     卡文：Each time another player uses the "Traveling Players" accumulation space, you get 1 food and 1 wood. Immediately after, you can buy exactly 1 vegetable for 2 food.
-[ ] A165
+[x] A165
     來源：基本盒    種類：職業    旅行卡：否    人數：4+    分類：動物
     英文：Pig Breeder
     中文：養豬人
@@ -356,7 +356,7 @@
     中文：壁爐架
     費用：1 Stone    前提：Clay or Stone House    分數：-3    難度：3
     卡文：When you play this card, you immediately get 1 bonus point for each complete round left to play. You may no longer renovate your house.
-[ ] B036
+[x] B036
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：分數
     英文：Bottles
     中文：玻璃瓶
@@ -440,7 +440,7 @@
     中文：硬瓷
     費用：1 Clay    前提：—    分數：—    難度：2
     卡文：At any time, you can exchange 2/3/4 clay for 1/2/3 stone.
-[ ] B084
+[x] B084
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：動物
     英文：Acorns Basket
     中文：橡實籃

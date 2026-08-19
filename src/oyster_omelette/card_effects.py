@@ -471,6 +471,141 @@ def use_B080(player, clay_paid: int) -> bool:
     return True
 
 
+WOOD_SPACES = frozenset({"forest", "grove_3p", "grove_4p", "copse_4p"})
+ANIMAL_MARKETS = {
+    "sheep": "sheep",
+    "wild_boar": "wild_boar",
+    "cattle": "cattle",
+}
+
+
+def A016_after_play(_game, player) -> None:
+    grant(player, "clay", 1)
+
+
+def A016_fence_budget(player) -> int:
+    return player.clay
+
+
+def A016_pay_fence(player, amount: int) -> bool:
+    if player.wood >= amount:
+        player.wood -= amount
+        return True
+    need = amount - player.wood
+    if player.clay >= need:
+        player.clay -= need
+        player.wood = 0
+        return True
+    return False
+
+
+def A024_after_space(_game, _player, space_id: str) -> None:
+    if space_id in {"farmland", "plow_and_or_sow"}:
+        bake_best(_player)
+
+
+def A032_on_score(player) -> int:
+    covered = len(pasture_cells(player.farm))
+    if covered >= 10:
+        return 4
+    if covered >= 8:
+        return 3
+    if covered >= 7:
+        return 2
+    if covered >= 6:
+        return 1
+    return 0
+
+
+def A050_after_any(game, holder, actor, space_id: str) -> None:
+    if space_id != "cattle" or game is None:
+        return
+    grant(holder, "food", 3)
+    for other in game.players:
+        if other is not holder:
+            grant(other, "food", 1)
+
+
+def A056_after_space(game, player, space_id: str) -> None:
+    if space_id not in WOOD_SPACES or player.wood < 2 or game is None:
+        return
+    player.wood -= 2
+    grant(player, "food", 3)
+    space = game.space(space_id)
+    if space is not None:
+        space.accumulated += 2
+
+
+def A090_after_round_start(_game, player) -> None:
+    if player.farm.house_material() != CellKind.STONE_ROOM or player.food < 1:
+        return
+    player.food -= 1
+    plow_first_legal(player.farm)
+
+
+def A092_after_space(_game, player, space_id: str) -> None:
+    if space_id not in {"family_growth", "family_growth_without_room"}:
+        return
+    if player.food < 1 or player.newborns_this_round < 1:
+        return
+    player.food -= 1
+    player.newborns_this_round -= 1
+    player.unplaced_workers += 1
+
+
+def A108_after_space(game, player, space_id: str) -> None:
+    if space_id not in WOOD_SPACES or player.wood < 1 or game is None:
+        return
+    player.wood -= 1
+    grant(player, "food", 2)
+    space = game.space(space_id)
+    if space is not None:
+        space.accumulated += 1
+
+
+def A147_after_space(_game, player, space_id: str) -> None:
+    kind = ANIMAL_MARKETS.get(space_id)
+    if kind is None or player.food < 1:
+        return
+    player.food -= 1
+    from oyster_omelette.animals import house_animals
+
+    house_animals(player, kind, 1)
+
+
+def A165_after_play(_game, player) -> None:
+    grant(player, "wild_boar", 1)
+
+
+def A165_after_return_home(game, player) -> None:
+    from oyster_omelette.animals import animal_total
+    from oyster_omelette.pastures import capacity_for
+
+    if game is None or game.round != 12:
+        return
+    if player.wild_boar >= 2 and animal_total(player) < capacity_for(player):
+        player.wild_boar += 1
+
+
+def A160_after_any(_game, holder, actor, space_id: str) -> None:
+    if space_id != "traveling_players" or holder is actor:
+        return
+    grant(holder, "food", 1)
+    grant(holder, "wood", 1)
+    if holder.food >= 2:
+        holder.food -= 2
+        grant(holder, "vegetable", 1)
+
+
+def B036_cost(player, _card) -> dict[str, int]:
+    n = player.family_size()
+    return {"clay": n, "food": n}
+
+
+def B084_after_play(game, player) -> None:
+    schedule_next(game, player, 2, "wild_boar", 1)
+
+
 def use_B104(player, want: str) -> bool:
     if want not in {"wild_boar", "vegetable", "stone"} or player.sheep < 1:
         return False

@@ -13,7 +13,9 @@ from oyster_omelette.effects import (
     after_space,
     bonus_on_take,
     can_skip_to_stone,
+    fence_currency,
     fence_discount,
+    pay_fence_cost,
     room_cost,
     stone_discount,
 )
@@ -125,7 +127,7 @@ def _fence_block_reason(player) -> str:
     cost = next_pasture_cost(player.farm)
     if cost is None:
         return "cannot_fence"
-    if player.wood < max(0, cost - fence_discount(player)):
+    if fence_currency(player) < max(0, cost - fence_discount(player)):
         return "cannot_fence"
     return ""
 
@@ -162,22 +164,22 @@ def _do_fence(
         if cost is None:
             return
         pay = max(0, cost - free)
-        player.wood -= pay
+        pay_fence_cost(player, pay)
         enclose_shape(player.farm, cells)
         return
     if target is not None:
         cost = enclose_pasture_at(player.farm, target[0], target[1])
         pay = max(0, cost - free)
-        player.wood -= pay
+        pay_fence_cost(player, pay)
         free = max(0, free - cost)
     while True:
         cost = next_pasture_cost(player.farm)
         if cost is None:
             break
         pay = max(0, cost - free)
-        if player.wood < pay:
+        if fence_currency(player) < pay:
             break
-        player.wood -= pay
+        pay_fence_cost(player, pay)
         free = max(0, free - cost)
         enclose_one_pasture(player.farm)
 
@@ -195,7 +197,7 @@ def target_error(
         if blocked:
             return blocked
         cost = shape_cost(player.farm, cells) or 0
-        if player.wood < max(0, cost - fence_discount(player)):
+        if fence_currency(player) < max(0, cost - fence_discount(player)):
             return "cannot_fence"
         return ""
     if target is None:
@@ -208,7 +210,7 @@ def target_error(
         cost = fence_cost_at(player.farm, row, col)
         if cost is None:
             return "illegal_cell"
-        if player.wood < max(0, cost - fence_discount(player)):
+        if fence_currency(player) < max(0, cost - fence_discount(player)):
             return "cannot_fence"
     if space.id == "farm_expansion":
         can_room = _can_build_room(player) and can_place_room(player.farm, row, col)

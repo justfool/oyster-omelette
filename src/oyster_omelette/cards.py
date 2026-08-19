@@ -172,9 +172,14 @@ def _meets_prereq(player, card: Card, game=None) -> bool:
 
 
 def _effective_minor_cost(player, card: Card) -> dict[str, int]:
-    from oyster_omelette.effects import stone_discount, wood_discount_on_improvement
+    from oyster_omelette.effects import (
+        minor_extra_cost,
+        stone_discount,
+        wood_discount_on_improvement,
+    )
 
-    costs = dict(card.cost)
+    extra = minor_extra_cost(player, card)
+    costs = dict(extra) if extra is not None else dict(card.cost)
     if "wood" in costs:
         costs["wood"] = max(0, costs["wood"] - wood_discount_on_improvement(player))
     if "stone" in costs:
