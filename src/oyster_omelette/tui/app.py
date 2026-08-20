@@ -223,7 +223,7 @@ class OysterOmeletteApp(App):
         self.god_actor: int = 0
         self.farm_open: bool = False
         self.messages: list[str] = [
-            "2 人熱座。方向鍵選格，Enter 放工人，I 看說明。按 P 準備第 1 回合。"
+            "2 人熱座。方向鍵選格，Enter 放工人，I 看說明。滑鼠停在上方資源格看細節。按 P 準備第 1 回合。"
         ]
 
     def compose(self) -> ComposeResult:
