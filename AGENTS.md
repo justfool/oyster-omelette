@@ -35,6 +35,7 @@
 ### 卡片對照表命名
 
 靜態表，不是訂閱。打出只記卡號；時機到了才查表。
+查函式表用 `if card_id in TABLE:` 再 `TABLE[card_id](...)`，不要 `.get` 再判 `None`。`CARDS.get` 這種取資料物件的維持 `.get`。
 
 - **問數量**（回傳 `int`、只加總）：入口 `bonus_*`，表 `BONUS_*`
   - `bonus_on_take`／`BONUS_ON_TAKE`

@@ -16,24 +16,21 @@ def played_card_ids(player) -> tuple[str, ...]:
 def bonus_on_take(player, resource: str, space_id: str = "") -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = BONUS_ON_TAKE.get(card_id)
-        if fn is not None:
-            extra += fn(player, resource, space_id)
+        if card_id in BONUS_ON_TAKE:
+            extra += BONUS_ON_TAKE[card_id](player, resource, space_id)
     return extra
 
 
 def after_space(game, player, space_id: str) -> None:
     for card_id in played_card_ids(player):
-        fn = AFTER_SPACE.get(card_id)
-        if fn is not None:
-            fn(game, player, space_id)
+        if card_id in AFTER_SPACE:
+            AFTER_SPACE[card_id](game, player, space_id)
     if game is None:
         return
     for holder in game.players:
         for card_id in played_card_ids(holder):
-            fn = AFTER_ANY_SPACE.get(card_id)
-            if fn is not None:
-                fn(game, holder, player, space_id)
+            if card_id in AFTER_ANY_SPACE:
+                AFTER_ANY_SPACE[card_id](game, holder, player, space_id)
 
 
 def after_play(game, player, card_id: str) -> None:
@@ -41,111 +38,97 @@ def after_play(game, player, card_id: str) -> None:
 
     if game is not None:
         player._game = game
-    fn = AFTER_PLAY.get(card_id)
-    if fn is not None:
-        fn(game, player)
+    if card_id in AFTER_PLAY:
+        AFTER_PLAY[card_id](game, player)
     card = CARDS.get(card_id)
     if card is not None and card.kind == "occupation":
         for other in list(player.occupations_played) + list(player.minors_played):
-            notify = AFTER_OCCUPATION.get(other)
-            if notify is not None:
-                notify(game, player, card_id)
+            if other in AFTER_OCCUPATION:
+                AFTER_OCCUPATION[other](game, player, card_id)
 
 
 def before_occupation(game, player) -> None:
     for card_id in played_card_ids(player):
-        fn = BEFORE_OCCUPATION.get(card_id)
-        if fn is not None:
-            fn(game, player)
+        if card_id in BEFORE_OCCUPATION:
+            BEFORE_OCCUPATION[card_id](game, player)
 
 
 def after_improvement(game, player) -> None:
     for card_id in played_card_ids(player):
-        fn = AFTER_IMPROVEMENT.get(card_id)
-        if fn is not None:
-            fn(game, player)
+        if card_id in AFTER_IMPROVEMENT:
+            AFTER_IMPROVEMENT[card_id](game, player)
 
 
 def after_round_start(game, player) -> None:
     fx.collect_round_goods(player, game.round)
     for card_id in played_card_ids(player):
-        fn = AFTER_ROUND_START.get(card_id)
-        if fn is not None:
-            fn(game, player)
+        if card_id in AFTER_ROUND_START:
+            AFTER_ROUND_START[card_id](game, player)
 
 
 def after_harvest_fields(game, player) -> None:
     for card_id in played_card_ids(player):
-        fn = AFTER_HARVEST.get(card_id)
-        if fn is not None:
-            fn(game, player)
+        if card_id in AFTER_HARVEST:
+            AFTER_HARVEST[card_id](game, player)
 
 
 def after_rooms_built(game, player, count: int) -> None:
     if count <= 0:
         return
     for card_id in played_card_ids(player):
-        fn = AFTER_ROOMS.get(card_id)
-        if fn is not None:
-            fn(game, player, count)
+        if card_id in AFTER_ROOMS:
+            AFTER_ROOMS[card_id](game, player, count)
     if game is None:
         return
     for holder in game.players:
         for card_id in played_card_ids(holder):
-            fn = AFTER_ANY_ROOMS.get(card_id)
-            if fn is not None:
-                fn(game, holder, player, count)
+            if card_id in AFTER_ANY_ROOMS:
+                AFTER_ANY_ROOMS[card_id](game, holder, player, count)
 
 
 def after_renovate(game, player, before) -> None:
     for card_id in played_card_ids(player):
-        fn = AFTER_RENOVATE.get(card_id)
-        if fn is not None:
-            fn(game, player, before)
+        if card_id in AFTER_RENOVATE:
+            AFTER_RENOVATE[card_id](game, player, before)
 
 
 def bonus_on_bake(player, grain_used: int) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = BONUS_ON_BAKE.get(card_id)
-        if fn is not None:
-            extra += fn(player, grain_used)
+        if card_id in BONUS_ON_BAKE:
+            extra += BONUS_ON_BAKE[card_id](player, grain_used)
     return extra
 
 
 def bonus_on_score(player) -> int:
     total = getattr(player, "bonus_points", 0)
     for card_id in played_card_ids(player):
-        fn = BONUS_ON_SCORE.get(card_id)
-        if fn is not None:
-            total += fn(player)
+        if card_id in BONUS_ON_SCORE:
+            total += BONUS_ON_SCORE[card_id](player)
     return total
 
 
 def extra_pasture_capacity(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = EXTRA_PASTURE.get(card_id)
-        if fn is not None:
-            extra += fn(player)
+        if card_id in EXTRA_PASTURE:
+            extra += EXTRA_PASTURE[card_id](player)
     return extra
 
 
 def extra_house_capacity(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = EXTRA_HOUSE.get(card_id)
-        if fn is not None:
-            extra += fn(player)
+        if card_id in EXTRA_HOUSE:
+            extra += EXTRA_HOUSE[card_id](player)
     return extra
 
 
 def extra_family_rooms(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = EXTRA_FAMILY.get(card_id)
-        if fn is not None:
-            extra += fn(player)
+        if card_id in EXTRA_FAMILY:
+            extra += EXTRA_FAMILY[card_id](player)
     return extra
 
 
@@ -159,9 +142,8 @@ def family_room_capacity(player) -> int:
 
 def after_fence(game, player, cells) -> None:
     for card_id in played_card_ids(player):
-        fn = AFTER_FENCE.get(card_id)
-        if fn is not None:
-            fn(game, player, cells)
+        if card_id in AFTER_FENCE:
+            AFTER_FENCE[card_id](game, player, cells)
 
 
 def can_share_space(player, space, player_index: int) -> bool:
@@ -170,8 +152,7 @@ def can_share_space(player, space, player_index: int) -> bool:
     if space.occupant is None or space.occupant == player_index:
         return False
     for card_id in played_card_ids(player):
-        fn = SHARE_SPACE.get(card_id)
-        if fn is not None and fn(player, space):
+        if card_id in SHARE_SPACE and SHARE_SPACE[card_id](player, space):
             return True
     return False
 
@@ -180,8 +161,7 @@ def keep_turn(game, player, space_id: str) -> bool:
     if player.unplaced_workers <= 0:
         return False
     for card_id in played_card_ids(player):
-        fn = KEEP_TURN.get(card_id)
-        if fn is not None and fn(game, player, space_id):
+        if card_id in KEEP_TURN and KEEP_TURN[card_id](game, player, space_id):
             return True
     return False
 
@@ -193,54 +173,46 @@ def shared_bonus_on_score(player) -> int:
     total = 0
     for holder in holders:
         for card_id in played_card_ids(holder):
-            if card_id in seen:
-                continue
-            fn = SHARED_SCORE.get(card_id)
-            if fn is None:
+            if card_id in seen or card_id not in SHARED_SCORE:
                 continue
             seen.add(card_id)
-            total += fn(player)
+            total += SHARED_SCORE[card_id](player)
     return total
 
 
 def after_return_home(game) -> None:
     for player in game.players:
         for card_id in played_card_ids(player):
-            fn = AFTER_RETURN_HOME.get(card_id)
-            if fn is not None:
-                fn(game, player)
+            if card_id in AFTER_RETURN_HOME:
+                AFTER_RETURN_HOME[card_id](game, player)
 
 
 def fence_currency(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = FENCE_BUDGET.get(card_id)
-        if fn is not None:
-            extra += fn(player)
+        if card_id in FENCE_BUDGET:
+            extra += FENCE_BUDGET[card_id](player)
     return player.wood + extra
 
 
 def pay_fence_cost(player, amount: int) -> None:
     for card_id in played_card_ids(player):
-        fn = PAY_FENCE.get(card_id)
-        if fn is not None and fn(player, amount):
+        if card_id in PAY_FENCE and PAY_FENCE[card_id](player, amount):
             return
     player.wood -= amount
 
 
 def minor_extra_cost(player, card) -> dict[str, int] | None:
-    fn = MINOR_COST.get(card.id)
-    if fn is None:
+    if card.id not in MINOR_COST:
         return None
-    return fn(player, card)
+    return MINOR_COST[card.id](player, card)
 
 
 def fence_discount(player) -> int:
     extra = 0
     for card_id in played_card_ids(player):
-        fn = FENCE_DISCOUNT.get(card_id)
-        if fn is not None:
-            extra += fn(player)
+        if card_id in FENCE_DISCOUNT:
+            extra += FENCE_DISCOUNT[card_id](player)
     return extra
 
 
