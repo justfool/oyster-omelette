@@ -98,9 +98,13 @@ def _can_take(player, supply: list[str], major_id: str) -> bool:
     return _can_pay(player, major_id)
 
 
+def can_take_major(player, supply: list[str], major_id: str) -> bool:
+    return _can_take(player, supply, major_id)
+
+
 def choose_major(player, supply: list[str]) -> str | None:
     for major_id in PREFERENCE:
-        if _can_take(player, supply, major_id):
+        if can_take_major(player, supply, major_id):
             return major_id
     return None
 

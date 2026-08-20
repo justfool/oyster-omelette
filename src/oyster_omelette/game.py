@@ -231,6 +231,7 @@ class Game:
         space_id: str,
         target: tuple[int, int] | None = None,
         cells: set[tuple[int, int]] | None = None,
+        picks=None,
     ) -> PlaceResult:
         if player_index < 0 or player_index >= len(self.players):
             return PlaceResult(ok=False, error="unknown_player")
@@ -261,6 +262,12 @@ class Game:
             blocked = target_error(player, space, target, cells)
             if blocked:
                 return PlaceResult(ok=False, error=blocked)
+            from oyster_omelette.picks import picks_error, resolve_picks
+
+            plan = resolve_picks(player, space, self, target, cells, picks)
+            blocked = picks_error(player, space, plan, self)
+            if blocked:
+                return PlaceResult(ok=False, error=blocked)
 
         if player.unplaced_workers > 0:
             take_one_person(player.farm)
@@ -269,7 +276,7 @@ class Game:
             space.shared_occupant = player_index
         else:
             space.occupant = player_index
-        resolve_space(self, player, space, target, cells)
+        resolve_space(self, player, space, target, cells, picks)
 
         from oyster_omelette.effects import keep_turn
 

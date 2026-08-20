@@ -56,6 +56,7 @@ from oyster_omelette.pastures import (
     shape_block_reason,
     shape_cost,
 )
+from oyster_omelette.picks import Picks, resolve_picks
 
 
 def _lessons_food_cost(player, space_id: str) -> int:
@@ -119,25 +120,34 @@ def _fence_block_reason(player) -> str:
     return ""
 
 
-def _try_play_minor(player, game=None) -> None:
+def _play_chosen_minor(player, game, minor: str) -> None:
     from oyster_omelette.cards import can_play_minor
 
-    for card_id in list(player.minors_hand):
-        if can_play_minor(player, card_id, game):
-            play_minor(player, card_id, game)
-            return
-
-
-def _try_play_major_or_minor(game, player) -> None:
-    major_id = choose_major(player, game.major_supply)
-    if major_id is None:
-        _try_play_minor(player, game)
+    if not minor:
         return
-    take_major(player, game.major_supply, major_id, game)
-    if major_id in {"clay_oven", "stone_oven"}:
-        bake_best(player)
-    if major_id == "well":
-        player.well_food_left = well_food_rounds(game.round)
+    if minor in player.minors_hand and can_play_minor(player, minor, game):
+        play_minor(player, minor, game)
+
+
+def _play_minor_plan(player, game, picks: Picks) -> None:
+    from oyster_omelette.picks import first_playable_minor
+
+    minor = first_playable_minor(player, game) if picks.minor is None else picks.minor
+    _play_chosen_minor(player, game, minor)
+
+
+def _play_chosen_major_or_minor(game, player, picks: Picks) -> None:
+    major = picks.major
+    if major is None:
+        major = choose_major(player, game.major_supply) or ""
+    if major:
+        take_major(player, game.major_supply, major, game)
+        if major in {"clay_oven", "stone_oven"}:
+            bake_best(player)
+        if major == "well":
+            player.well_food_left = well_food_rounds(game.round)
+        return
+    _play_minor_plan(player, game, picks)
 
 
 def _do_fence(
@@ -145,6 +155,7 @@ def _do_fence(
     target: tuple[int, int] | None = None,
     cells: set[tuple[int, int]] | None = None,
     game=None,
+    continue_fence: bool = True,
 ) -> None:
     free = fence_discount(player)
     if cells:
@@ -162,7 +173,9 @@ def _do_fence(
         pay_fence_cost(player, pay)
         free = max(0, free - cost)
         after_fence(game, player, {target})
-    while True:
+        if not continue_fence:
+            return
+    while continue_fence:
         spot = first_legal_pasture_cell(player.farm)
         cost = next_pasture_cost(player.farm)
         if cost is None:
@@ -277,8 +290,10 @@ def resolve_space(
     space,
     target: tuple[int, int] | None = None,
     cells: set[tuple[int, int]] | None = None,
+    picks: Picks | None = None,
 ) -> None:
-    _apply_space(game, player, space, target, cells)
+    plan = resolve_picks(player, space, game, target, cells, picks)
+    _apply_space(game, player, space, target, cells, plan)
     after_space(game, player, space.id)
 
 
@@ -288,7 +303,9 @@ def _apply_space(
     space,
     target: tuple[int, int] | None,
     cells: set[tuple[int, int]] | None = None,
+    picks: Picks | None = None,
 ) -> None:
+    plan = picks if picks is not None else resolve_picks(player, space, game, target, cells)
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
             house_animals(player, space.resource, space.accumulated)
@@ -312,7 +329,7 @@ def _apply_space(
         for other in game.players:
             other.is_start_player = False
         player.is_start_player = True
-        _try_play_minor(player, game)
+        _play_minor_plan(player, game, plan)
         return
 
     if space.id == "farm_expansion":
@@ -325,29 +342,30 @@ def _apply_space(
             elif player.wood >= 2:
                 player.wood -= 2
                 player.farm.cell(row, col).stable = True
-        while _can_build_room(player):
-            pay_for_room(player)
-            build_one_room(player.farm)
-        if player.wood >= 2 and first_legal_stable(player.farm) is not None:
-            player.wood -= 2
-            build_one_stable(player.farm)
+        if plan.continue_expand:
+            while _can_build_room(player):
+                pay_for_room(player)
+                build_one_room(player.farm)
+            if player.wood >= 2 and first_legal_stable(player.farm) is not None:
+                player.wood -= 2
+                build_one_stable(player.farm)
         after_rooms_built(game, player, player.farm.room_count() - rooms_before)
         return
 
     if space.id == "renovation":
         _do_renovate(player, game)
-        _try_play_major_or_minor(game, player)
+        _play_chosen_major_or_minor(game, player, plan)
         return
 
     if space.id == "renovation_and_fences":
         _do_renovate(player, game)
-        if not _fence_block_reason(player):
-            _do_fence(player, game=game)
+        if plan.fence_after_renovate and not _fence_block_reason(player):
+            _do_fence(player, game=game, continue_fence=bool(plan.continue_fence))
         return
 
     if space.id in {"family_growth", "family_growth_without_room"}:
         _grow_family(player)
-        _try_play_minor(player, game)
+        _play_minor_plan(player, game, plan)
         return
 
     if space.id == "vegetable_seeds":
@@ -362,34 +380,38 @@ def _apply_space(
         return
 
     if space.id == "sow_and_or_bake":
-        sow_fields(player)
-        bake_best(player)
+        if plan.sow:
+            sow_fields(player)
+        if plan.bake:
+            bake_best(player)
         return
 
     if space.id == "major_or_minor":
-        _try_play_major_or_minor(game, player)
+        _play_chosen_major_or_minor(game, player, plan)
         return
 
     if space.id == "plow_and_or_sow":
-        if target is not None:
-            place_field(player.farm, target[0], target[1])
-        else:
-            plow_first_legal(player.farm)
-        sow_fields(player)
+        if plan.plow:
+            if target is not None:
+                place_field(player.farm, target[0], target[1])
+            else:
+                plow_first_legal(player.farm)
+        if plan.sow:
+            sow_fields(player)
         return
 
     if space.id == "fences":
-        _do_fence(player, target, cells, game)
+        _do_fence(player, target, cells, game, continue_fence=bool(plan.continue_fence))
         return
 
     if space.id in {"lessons", "lessons_3p", "lessons_4p"}:
         player.food -= _lessons_food_cost(player, space.id)
-        play_occupation(player, player.occupations_hand[0], game)
+        play_occupation(player, plan.occupation or player.occupations_hand[0], game)
         return
 
     if space.id == "resource_market_3p":
-        # 沒指定時暫定拿蘆葦；TUI 之後再讓玩家選蘆或石。
-        add_resource(player, "reed", 1)
+        chosen = plan.market or "reed"
+        add_resource(player, chosen, 1)
         player.food += 1
         return
 
