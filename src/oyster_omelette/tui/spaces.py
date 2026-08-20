@@ -192,7 +192,7 @@ def is_pile_slot(slot: SpaceSlot) -> bool:
 
 
 def slot_title(slot: SpaceSlot, theme: Theme) -> str:
-    if slot.face_down:
+    if slot.face_down or slot.zone == ZONE_ROUND:
         return ""
     icon = theme.icon(slot.space_id or "")
     name = SPACE_NAMES.get(slot.space_id or "", slot.space_id or "")
@@ -208,6 +208,12 @@ def slot_body(slot: SpaceSlot, theme: Theme) -> str:
     worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
     if worker:
         return worker
+    if slot.zone == ZONE_ROUND:
+        icon = theme.icon(slot.space_id or "")
+        if is_pile_slot(slot):
+            count = str(slot.accumulated)
+            return f"{icon}\n{count}" if icon else count
+        return icon
     if is_pile_slot(slot):
         return str(slot.accumulated)
     return ""
@@ -284,9 +290,9 @@ class ActionSpaceWidget(Static, can_focus=True):
     DEFAULT_CSS = """
     ActionSpaceWidget {
         border: round $primary;
-        width: 1fr;
-        min-width: 4;
-        height: 2;
+        width: 5;
+        min-width: 5;
+        height: 4;
         padding: 0;
         content-align: center middle;
     }
@@ -298,7 +304,8 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget.face-down {
         border: dashed $primary 40%;
         color: $text-muted;
-        height: 2;
+        height: 4;
+        width: 5;
     }
     ActionSpaceWidget.occupied {
         color: $text;
