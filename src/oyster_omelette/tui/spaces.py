@@ -187,9 +187,9 @@ def slot_title(slot: SpaceSlot, theme: Theme) -> str:
             return f"{back}{slot.round_number}"
         return back
     icon = theme.icon(slot.space_id or "")
-    name = theme.space_caption(slot.space_id or "")
-    if icon:
-        return f"{icon} {name}"
+    name = SPACE_NAMES.get(slot.space_id or "", slot.space_id or "")
+    if icon and icon != name:
+        return icon
     return name
 
 
@@ -282,12 +282,12 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget {
         border: round $primary;
         width: 1fr;
-        height: 3;
+        height: 2;
         padding: 0 1;
         content-align: center middle;
     }
     ActionSpaceWidget.pile {
-        height: 6;
+        height: 4;
     }
     ActionSpaceWidget:focus, ActionSpaceWidget.selected {
         border: heavy $accent;
@@ -297,7 +297,7 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget.face-down {
         border: dashed $primary 40%;
         color: $text-muted;
-        height: 3;
+        height: 2;
     }
     ActionSpaceWidget.occupied {
         color: $text;
