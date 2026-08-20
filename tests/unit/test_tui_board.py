@@ -5,15 +5,16 @@ import asyncio
 from oyster_omelette.board import DEFAULT_ROUND_CARDS, EXTRA_3P, FIXED_SPACE_IDS_2P
 from oyster_omelette.game import Game
 from oyster_omelette.theme import DEFAULT_THEME, load_theme
-from oyster_omelette.tui.app import OysterOmeletteApp
+from oyster_omelette.tui.app import InspectScreen, OysterOmeletteApp
 from oyster_omelette.tui.board_view import BoardView, move_selection
 from oyster_omelette.tui.farm_view import FarmGrid, move_farm_cursor
-from oyster_omelette.tui.goods_view import goods_groups
+from oyster_omelette.tui.goods_view import GoodsChip, goods_groups
 from oyster_omelette.tui.spaces import (
     ActionSpaceWidget,
     board_slots,
     inspect_text,
     slot_body,
+    slot_title,
     worker_icon,
 )
 
@@ -59,7 +60,7 @@ def test_slot_body_shows_pile_and_worker_icon():
     assert game.place_worker(0, "forest").ok
     forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
     body = slot_body(forest, DEFAULT_THEME)
-    assert "森林" in body
+    assert "森林" in slot_title(forest, DEFAULT_THEME)
     assert DEFAULT_THEME.icon("worker_1") in body
     assert "[1]" not in body
     assert "[P1]" not in body
@@ -124,7 +125,8 @@ def test_space_widget_is_focusable_and_shows_body():
     forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
     widget = ActionSpaceWidget(forest, DEFAULT_THEME)
     assert widget.can_focus
-    assert "森林" in widget.display_text()
+    assert "森林" in widget.border_title
+    assert "pile" in widget.classes
     assert widget.border_title != "整塊清單"
 
 
@@ -165,7 +167,13 @@ def test_app_compose_has_zones_and_uses_look():
             assert len(spaces) >= 10
             assert any(widget.can_focus for widget in spaces)
             goods = app.query_one("#goods")
-            assert "建材" in str(goods.render()) or goods.query("GoodsChip")
+            chips = list(app.query(GoodsChip))
+            assert chips
+            titles = [chip.border_title for chip in chips]
+            assert "建材" in titles
+            rendered = " ".join(str(chip.render()) for chip in chips)
+            assert any(char.isdigit() for char in rendered)
+            assert "建材" in str(goods.render()) or chips
 
     asyncio.run(go())
 
@@ -210,8 +218,11 @@ def test_app_arrows_and_inspect_and_place():
             await pilot.pause()
             await pilot.press("i")
             await pilot.pause()
-            inspect = str(app.query_one("#inspect").render())
-            assert "木" in inspect or "森林" in inspect
+            assert isinstance(app.screen, InspectScreen)
+            box = str(app.screen.query_one("#inspect-box").render())
+            assert "木" in box or "森林" in box or "累積" in box
+            await pilot.press("escape")
+            await pilot.pause()
             await pilot.press("enter")
             await pilot.pause()
             forest = next(slot for slot in view.slots if slot.space_id == "forest")

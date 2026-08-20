@@ -84,12 +84,14 @@ class BoardView(Vertical):
         grid-size: 5 2;
         grid-gutter: 1 1;
         height: auto;
+        align: left top;
     }
     #round-grid {
         layout: grid;
         grid-size: 7 2;
         grid-gutter: 1 1;
         height: auto;
+        align: left top;
     }
     """
 

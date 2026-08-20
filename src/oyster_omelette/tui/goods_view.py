@@ -79,17 +79,23 @@ def all_goods_text(game, theme: Theme | None = None) -> str:
 
 
 class GoodsChip(Static):
-    """一組資源，例如建材或家人。"""
+    """一組資源：標題在邊框，數量在格子裡。"""
 
     DEFAULT_CSS = """
     GoodsChip {
         border: round $primary;
         width: auto;
+        min-width: 18;
         height: 3;
         padding: 0 1;
         margin: 0 1 0 0;
+        content-align: left middle;
     }
     """
+
+    def __init__(self, label: str, text: str) -> None:
+        super().__init__(text)
+        self.border_title = label
 
 
 class PlayerGoods(Horizontal):
@@ -118,8 +124,6 @@ class GoodsBar(Vertical):
         for index, player in enumerate(game.players):
             mark = "*" if turn == index else " "
             chips = [Static(f"{mark}P{index + 1}", classes="player-tag")]
-            chips.extend(
-                GoodsChip(f"{label}\n{text}") for label, text in goods_groups(player, theme)
-            )
+            chips.extend(GoodsChip(label, text) for label, text in goods_groups(player, theme))
             self.mount(PlayerGoods(*chips))
             self.mount(Static(f"  {cards_text(player, theme)}", classes="card-line"))
