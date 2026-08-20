@@ -22,7 +22,7 @@ NEEDS_CELL = frozenset({"farmland", "fences", "farm_expansion", "plow_and_or_sow
 ZONE_FIXED = "fixed"
 ZONE_ROUND = "round"
 
-FIXED_COLUMNS = 5
+FIXED_COLUMNS = 10
 ROUND_COLUMNS = 7
 
 SPACE_BLURBS = {
@@ -201,12 +201,11 @@ def slot_body(slot: SpaceSlot, theme: Theme) -> str:
         return back
 
     worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
+    if worker:
+        return worker
     if is_pile_slot(slot):
-        pile = f"{theme.icon(slot.resource)}×{slot.accumulated}"
-        if worker:
-            return f"{pile}\n{worker}"
-        return pile
-    return worker
+        return str(slot.accumulated)
+    return ""
 
 
 def inspect_text(slot: SpaceSlot, theme: Theme) -> str:
@@ -282,12 +281,10 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget {
         border: round $primary;
         width: 1fr;
+        min-width: 4;
         height: 2;
-        padding: 0 1;
+        padding: 0;
         content-align: center middle;
-    }
-    ActionSpaceWidget.pile {
-        height: 4;
     }
     ActionSpaceWidget:focus, ActionSpaceWidget.selected {
         border: heavy $accent;
