@@ -13,6 +13,19 @@ GOODS_GROUPS = (
     ("動物", ("sheep", "wild_boar", "cattle")),
 )
 
+GOOD_ZH = {
+    "wood": "木頭",
+    "clay": "黏土",
+    "reed": "蘆葦",
+    "stone": "石頭",
+    "grain": "穀",
+    "vegetable": "蔬菜",
+    "food": "食物",
+    "sheep": "羊",
+    "wild_boar": "野豬",
+    "cattle": "牛",
+}
+
 
 def _look(theme: Theme | None) -> Theme:
     return theme if theme is not None else DEFAULT_THEME
@@ -57,14 +70,40 @@ def card_zh(card_id: str, theme: Theme | None = None) -> str:
 
 
 def cards_text(player, theme: Theme | None = None) -> str:
-    look = _look(theme)
-    if player.majors:
-        majors = ",".join(card_zh(card, look) for card in player.majors)
-    else:
-        majors = "無"
     jobs = str(len(player.occupations_played))
     minors = str(len(player.minors_played))
-    return f"改良 {majors}　職業{jobs}　次要{minors}"
+    majors = str(len(player.majors))
+    return f"主要{majors} 職業{jobs} 次要{minors}"
+
+
+def _join_cards(card_ids: list[str], theme: Theme) -> str:
+    return "、".join(card_zh(card_id, theme) for card_id in card_ids) or "無"
+
+
+def cards_tooltip(player, theme: Theme | None = None, *, show_hand: bool = False) -> str:
+    look = _look(theme)
+    lines = [
+        f"主要改良：{_join_cards(player.majors, look)}",
+        f"面前職業：{_join_cards(player.occupations_played, look)}",
+        f"面前次要：{_join_cards(player.minors_played, look)}",
+    ]
+    if show_hand:
+        lines.append(f"職業手牌：{_join_cards(player.occupations_hand, look)}")
+        lines.append(f"次要手牌：{_join_cards(player.minors_hand, look)}")
+    return "\n".join(lines)
+
+
+def family_tooltip(player) -> str:
+    return (
+        f"家人 {player.family_size()} 人（人口，含還沒回家的）。\n"
+        f"還能派工 {player.unplaced_workers} 人（本回合還沒放到行動板）。\n"
+        f"討飯卡 {player.begging} 張。"
+    )
+
+
+def group_tooltip(keys: tuple[str, ...], player) -> str:
+    bits = [f"{GOOD_ZH[key]} {getattr(player, key)}" for key in keys]
+    return "　".join(bits)
 
 
 def all_goods_text(game, theme: Theme | None = None) -> str:
@@ -93,9 +132,11 @@ class GoodsChip(Static):
     }
     """
 
-    def __init__(self, label: str, text: str) -> None:
+    def __init__(self, label: str, text: str, tooltip: str = "") -> None:
         super().__init__(text)
         self.border_title = label
+        if tooltip:
+            self.tooltip = tooltip
 
 
 class PlayerGoods(Horizontal):
@@ -123,7 +164,25 @@ class GoodsBar(Vertical):
         turn = game.whose_turn()
         for index, player in enumerate(game.players):
             mark = "*" if turn == index else " "
-            chips = [Static(f"{mark}P{index + 1}", classes="player-tag")]
-            chips.extend(GoodsChip(label, text) for label, text in goods_groups(player, theme))
+            tag = Static(f"{mark}P{index + 1}", classes="player-tag")
+            tag.tooltip = f"玩家{index + 1}" + ("　輪到這位" if turn == index else "")
+            chips = [tag]
+            for label, keys in GOODS_GROUPS:
+                text = " ".join(f"{theme.icon(key)}{getattr(player, key)}" for key in keys)
+                chips.append(GoodsChip(label, text, group_tooltip(keys, player)))
+            family = " ".join(
+                [
+                    f"{theme.icon('family')}{player.family_size()}",
+                    f"{theme.icon('unplaced')}{player.unplaced_workers}",
+                    f"{theme.icon('begging')}{player.begging}",
+                ]
+            )
+            chips.append(GoodsChip("家人", family, family_tooltip(player)))
+            chips.append(
+                GoodsChip(
+                    "卡片",
+                    cards_text(player, theme),
+                    cards_tooltip(player, theme, show_hand=bool(game.god_mode)),
+                )
+            )
             self.mount(PlayerGoods(*chips))
-            self.mount(Static(f"  {cards_text(player, theme)}", classes="card-line"))

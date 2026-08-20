@@ -8,7 +8,12 @@ from oyster_omelette.theme import DEFAULT_THEME, load_theme
 from oyster_omelette.tui.app import InspectScreen, OysterOmeletteApp
 from oyster_omelette.tui.board_view import BoardView, move_selection
 from oyster_omelette.tui.farm_view import FarmGrid, move_farm_cursor
-from oyster_omelette.tui.goods_view import GoodsChip, goods_groups
+from oyster_omelette.tui.goods_view import (
+    GoodsChip,
+    cards_tooltip,
+    family_tooltip,
+    goods_groups,
+)
 from oyster_omelette.tui.spaces import (
     ActionSpaceWidget,
     board_slots,
@@ -139,6 +144,42 @@ def test_space_widget_is_focusable_and_shows_body():
     assert widget.border_title == DEFAULT_THEME.icon("forest")
     assert "pile" in widget.classes
     assert widget.border_title != "整塊清單"
+
+
+def test_family_tooltip_explains_unplaced_workers():
+    game = Game.setup(1)
+    text = family_tooltip(game.players[0])
+    assert "還能派工" in text
+    assert "討飯卡" in text
+    assert "2" in text
+
+
+def test_cards_tooltip_lists_played_minor():
+    game = Game.setup(1)
+    game.prepare_round()
+    assert game.place_worker(0, "meeting_place").ok
+    text = cards_tooltip(game.players[0])
+    assert "運木車" in text
+    assert "面前次要" in text
+
+
+def test_app_player_chips_have_hover_tooltips():
+    app = OysterOmeletteApp()
+    app.game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))
+    app.game.prepare_round()
+
+    async def go():
+        async with app.run_test(size=(140, 40)) as _pilot:
+            chips = list(app.query(GoodsChip))
+            titles = [chip.border_title for chip in chips]
+            assert "家人" in titles
+            assert "卡片" in titles
+            family = next(chip for chip in chips if chip.border_title == "家人")
+            assert "還能派工" in (family.tooltip or "")
+            cards = next(chip for chip in chips if chip.border_title == "卡片")
+            assert "面前職業" in (cards.tooltip or "")
+
+    asyncio.run(go())
 
 
 def test_goods_bar_is_grouped():
