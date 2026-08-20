@@ -84,6 +84,22 @@ def test_round_cards_wrap_by_harvest_stage():
     assert cols == [0, 1, 2, 3, 0, 1, 2, 0, 1, 0, 1, 0, 1, 0]
 
 
+def test_round_card_shows_number_then_icon():
+    game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))
+    hidden = next(
+        slot
+        for slot in board_slots(game)
+        if slot.zone == "round" and slot.face_down and slot.round_number == 1
+    )
+    assert slot_body(hidden, DEFAULT_THEME) == "1"
+    assert slot_title(hidden, DEFAULT_THEME) == ""
+    game.prepare_round()
+    shown = next(slot for slot in board_slots(game) if slot.space_id == "fences")
+    assert shown.zone == "round"
+    assert DEFAULT_THEME.icon("fences") in slot_body(shown, DEFAULT_THEME)
+    assert slot_title(shown, DEFAULT_THEME) == ""
+
+
 def test_slot_title_is_a_single_icon():
     game = Game.setup(2)
     game.prepare_round()
@@ -229,8 +245,8 @@ def test_app_compose_has_zones_and_uses_look():
     async def go():
         async with app.run_test(size=(140, 40)) as _pilot:
             view = app.query_one(BoardView)
-            assert view.query("#fixed-grid")
-            assert view.query("#round-grid")
+            assert view.query("#fixed-rows")
+            assert view.query("#round-rows")
             spaces = list(app.query(ActionSpaceWidget))
             assert len(spaces) >= 10
             assert any(widget.can_focus for widget in spaces)

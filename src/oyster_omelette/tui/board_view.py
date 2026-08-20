@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from textual.containers import Grid, Vertical
+from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.widgets import Static
 
@@ -79,19 +79,14 @@ class BoardView(Vertical):
         text-style: bold;
         color: $accent;
     }
-    #fixed-grid {
-        layout: grid;
-        grid-size: 10 1;
-        grid-gutter: 0 1;
+    #fixed-rows, #round-rows {
         height: auto;
-        align: left top;
+        width: auto;
     }
-    #round-grid {
-        layout: grid;
-        grid-size: 4 6;
-        grid-gutter: 0 1;
-        height: auto;
-        align: left top;
+    BoardView .space-row {
+        height: 4;
+        width: auto;
+        align: left middle;
     }
     """
 
@@ -108,9 +103,9 @@ class BoardView(Vertical):
 
     def compose(self):
         yield Static("固定區", classes="zone-title", id="fixed-title")
-        yield Grid(id="fixed-grid")
+        yield Vertical(id="fixed-rows")
         yield Static("回合卡", classes="zone-title", id="round-title")
-        yield Grid(id="round-grid")
+        yield Vertical(id="round-rows")
 
     def load(self, game, theme: Theme, *, god_mode: bool | None = None) -> None:
         previous = self.selected_identity()
@@ -176,17 +171,15 @@ class BoardView(Vertical):
     def _sync_widgets(self) -> None:
         fixed_slots = [slot for slot in self._slots if slot.zone == ZONE_FIXED]
         round_slots = [slot for slot in self._slots if slot.zone == ZONE_ROUND]
-        fixed_grid = self.query_one("#fixed-grid", Grid)
-        round_grid = self.query_one("#round-grid", Grid)
-        fixed_cols = 10
-        fixed_rows = max(1, (len(fixed_slots) + fixed_cols - 1) // fixed_cols)
-        round_cols = max((slot.col + 1 for slot in round_slots), default=4)
-        round_rows = max((slot.row + 1 for slot in round_slots), default=1)
-        fixed_grid.styles.grid_size = (fixed_cols, fixed_rows)
-        round_grid.styles.grid_size = (round_cols, round_rows)
-        _fill_grid(fixed_grid, fixed_slots, self.look, self.selected_index, 0)
-        _fill_grid(
-            round_grid,
+        _fill_rows(
+            self.query_one("#fixed-rows", Vertical),
+            fixed_slots,
+            self.look,
+            self.selected_index,
+            0,
+        )
+        _fill_rows(
+            self.query_one("#round-rows", Vertical),
             round_slots,
             self.look,
             self.selected_index,
@@ -195,31 +188,41 @@ class BoardView(Vertical):
         self.sync_selection()
 
 
-def _fill_grid(
-    grid: Grid,
+def _fill_rows(
+    container: Vertical,
     slots: list[SpaceSlot],
     theme: Theme,
     selected_index: int,
     start_index: int,
 ) -> None:
-    children = [child for child in grid.children if isinstance(child, ActionSpaceWidget)]
-    if len(children) != len(slots):
-        grid.remove_children()
-        for offset, slot in enumerate(slots):
-            grid.mount(
+    children = list(container.query(ActionSpaceWidget))
+    if len(children) == len(slots) and slots:
+        for offset, (widget, slot) in enumerate(zip(children, slots, strict=True)):
+            widget.apply_slot(
+                slot,
+                theme,
+                selected=start_index + offset == selected_index,
+            )
+        return
+    container.remove_children()
+    if not slots:
+        return
+    by_row: dict[int, list[SpaceSlot]] = {}
+    for slot in slots:
+        by_row.setdefault(slot.row, []).append(slot)
+    offset = 0
+    for row in sorted(by_row):
+        line = Horizontal(classes="space-row")
+        container.mount(line)
+        for slot in by_row[row]:
+            line.mount(
                 ActionSpaceWidget(
                     slot,
                     theme,
                     selected=start_index + offset == selected_index,
                 )
             )
-        return
-    for offset, (widget, slot) in enumerate(zip(children, slots, strict=True)):
-        widget.apply_slot(
-            slot,
-            theme,
-            selected=start_index + offset == selected_index,
-        )
+            offset += 1
 
 
 __all__ = [
