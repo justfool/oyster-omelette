@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from textual.containers import Grid, Vertical
+from textual.message import Message
 from textual.widgets import Static
 
 from oyster_omelette.theme import DEFAULT_THEME, Theme
@@ -59,6 +60,11 @@ def move_selection(slots: list[SpaceSlot], index: int, direction: str) -> int:
 
 class BoardView(Vertical):
     """畫面正中的桌遊板：上面固定區，下面回合卡。"""
+
+    class SelectionChanged(Message):
+        """滑鼠點了另一格，App 要重畫下方選取說明。"""
+
+        pass
 
     DEFAULT_CSS = """
     BoardView {
@@ -134,6 +140,19 @@ class BoardView(Vertical):
                 self.selected_index = index
                 return True
         return False
+
+    def select_identity(self, identity: str) -> bool:
+        for index, slot in enumerate(self._slots):
+            if slot.identity == identity:
+                self.selected_index = index
+                self.sync_selection()
+                self.post_message(self.SelectionChanged())
+                return True
+        return False
+
+    def on_action_space_widget_clicked(self, event: ActionSpaceWidget.Clicked) -> None:
+        event.stop()
+        self.select_identity(event.widget.slot.identity)
 
     def move(self, direction: str) -> SpaceSlot:
         if not self._slots:

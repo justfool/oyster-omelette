@@ -217,6 +217,14 @@ class OysterOmeletteApp(App):
     def _board(self) -> BoardView:
         return self.query_one(BoardView)
 
+    def on_board_view_selection_changed(self) -> None:
+        if self._picking_farm() or self._picking_choice():
+            slot = self._board().selected_slot()
+            pending = self.pending_space or self.pending_choice_space
+            if slot.space_id != pending:
+                self._clear_pending()
+        self._refresh_inspect()
+
     def _farm(self) -> FarmGrid:
         return self.query_one(FarmGrid)
 

@@ -170,6 +170,33 @@ def test_app_compose_has_zones_and_uses_look():
     asyncio.run(go())
 
 
+def test_clicking_space_updates_selection_and_inspect():
+    app = OysterOmeletteApp()
+    app.game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))
+    app.game.prepare_round()
+
+    async def go():
+        async with app.run_test(size=(140, 40)) as pilot:
+            view = app.query_one(BoardView)
+            view.select_space("farm_expansion")
+            view.sync_selection()
+            await pilot.pause()
+            farmland = next(
+                widget
+                for widget in app.query(ActionSpaceWidget)
+                if widget.slot.space_id == "farmland"
+            )
+            await pilot.click(farmland)
+            await pilot.pause()
+            assert view.selected_slot().space_id == "farmland"
+            selected = [w for w in app.query(ActionSpaceWidget) if "selected" in w.classes]
+            assert [w.slot.space_id for w in selected] == ["farmland"]
+            inspect = str(app.query_one("#inspect").render())
+            assert "耕地" in inspect
+
+    asyncio.run(go())
+
+
 def test_app_arrows_and_inspect_and_place():
     app = OysterOmeletteApp()
     app.game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))

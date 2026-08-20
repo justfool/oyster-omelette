@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from textual.containers import Grid, Vertical
+from textual.message import Message
 from textual.widgets import Static
 
 from oyster_omelette.farmyard import CellKind
@@ -168,6 +169,11 @@ def first_legal_cell(legal: set[tuple[int, int]] | None) -> tuple[int, int]:
 class FarmCellWidget(Static, can_focus=True):
     """農場上一格，大圖時可方向鍵選。"""
 
+    class Clicked(Message):
+        def __init__(self, widget: FarmCellWidget) -> None:
+            super().__init__()
+            self.widget = widget
+
     DEFAULT_CSS = """
     FarmCellWidget {
         border: solid $primary;
@@ -188,6 +194,9 @@ class FarmCellWidget(Static, can_focus=True):
         self.row = row
         self.col = col
         super().__init__(mark, classes="legal" if legal else "")
+
+    def on_click(self) -> None:
+        self.post_message(self.Clicked(self))
 
 
 class FarmGrid(Vertical):
@@ -231,6 +240,11 @@ class FarmGrid(Vertical):
 
     def set_cursor(self, row: int, col: int) -> None:
         self.cursor = (row, col)
+
+    def on_farm_cell_widget_clicked(self, event: FarmCellWidget.Clicked) -> None:
+        event.stop()
+        self.cursor = (event.widget.row, event.widget.col)
+        self.sync_selection()
 
     def selected_cell(self) -> tuple[int, int]:
         return self.cursor
