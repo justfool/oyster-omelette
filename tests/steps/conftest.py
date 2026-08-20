@@ -91,6 +91,15 @@ def do_harvest(game: Game) -> None:
     game.harvest()
 
 
+@when(parsers.parse("玩家 {number:d} 餵食時不把穀菜動物換成食物"))
+def skip_convert_on_feed(game: Game, number: int) -> None:
+    from oyster_omelette.harvest import FeedPlan
+
+    game.feed_plans[number - 1] = FeedPlan(
+        grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0
+    )
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {wood:d} 木與 {reed:d} 蘆葦"))
 def give_build_goods(game: Game, number: int, wood: int, reed: int) -> None:
     player = game.players[number - 1]
