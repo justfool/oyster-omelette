@@ -92,6 +92,20 @@ TUI：Enter 不開選單 = 整包預設。開選單 = 先算出預設方案給�
 
 不要：每個選擇一個 class、每回合強制彈一堆選單、在畫面層複製「穀當 1 食」。
 
+### 對照表迴圈要不要抽共用層（2026-08-20 先記，未做）
+
+`effects.py` 很多入口長一樣：掃 `played_card_ids`、`表.get`、有就呼叫。這是查表，不是事件匯流排。
+
+現在**先維持各入口自己寫迴圈**，方便對照時機、單張卡除錯少跳一層。
+
+以後若重複真的礙事，最多抽三個普通函式，入口名仍用 `after_*`／`bonus_*`：
+
+- `each_played(table, player, *args)`：全跑、改狀態
+- `sum_played(table, player, *args)`：全跑、加總 `int`
+- `first_played(table, player, *args)`：第一個回 `True` 就停（`pay_fence_cost`、`can_share_space`）
+
+不要做成 `dispatch("after_space", ...)`／`emit`／統一 `**kwargs`。回傳語意本來就不一樣（加總／短路／只查剛打出那張／掃所有玩家），硬併會變成訂閱。`after_play`、`AFTER_ANY_*`、`SHARED_SCORE` 也不走「掃自己面前全部」。
+
 ## 領域與畫面分開
 
 ```

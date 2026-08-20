@@ -27,6 +27,7 @@
 [x] 餵食 picks tracer：default_feed_plan + apply_feed，不傳 plan 維持自動  (2026-08-20)
 [x] 基本盒 96 張職業／次要卡效  (2026-08-20)
 [~] 牌庫：基本盒已接；Artifex 120 ＋ Bubulcus 120 還沒做 → TODO-deck-a.txt／b.txt  (2026-08-20)
+[ ] 以後再看：effects.py 對照表迴圈要不要抽 each_played／sum_played／first_played（不要做成 dispatch）。說明在 AGENTS.md  (2026-08-20)
 
 ================================================================
 修訂版規則對照
