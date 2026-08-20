@@ -155,9 +155,9 @@ def pasture_count(farm: Farmyard) -> int:
     return len(find_pastures(farm))
 
 
-def animal_capacity(farm: Farmyard, extra_per_pasture: int = 0) -> int:
+def animal_capacity(farm: Farmyard, extra_per_pasture: int = 0, extra_house: int = 0) -> int:
     """每格牧場 2 隻；牧場內每間畜舍再讓該牧場乘 2。沒圍的畜舍 +1。房子寵物 1 隻。"""
-    capacity = 1
+    capacity = 1 + extra_house
     fenced: set[tuple[int, int]] = set()
     for group in find_pastures(farm):
         fenced |= group
@@ -177,9 +177,11 @@ def animal_capacity(farm: Farmyard, extra_per_pasture: int = 0) -> int:
 
 
 def capacity_for(player) -> int:
-    from oyster_omelette.effects import extra_pasture_capacity
+    from oyster_omelette.effects import extra_house_capacity, extra_pasture_capacity
 
-    return animal_capacity(player.farm, extra_pasture_capacity(player))
+    return animal_capacity(
+        player.farm, extra_pasture_capacity(player), extra_house_capacity(player)
+    )
 
 
 def _missing_edges(farm: Farmyard, row: int, col: int) -> int:
@@ -338,9 +340,7 @@ def shape_block_reason(farm: Farmyard, cells: set[tuple[int, int]]) -> str:
         if (row, col) in already or not _eligible(farm, row, col):
             return "illegal_cell"
     if already and not any(
-        (n_row, n_col) in already
-        for row, col in cells
-        for n_row, n_col in _neighbors(row, col)
+        (n_row, n_col) in already for row, col in cells for n_row, n_col in _neighbors(row, col)
     ):
         return "illegal_cell"
     cost = len(_shape_missing_edges(farm, cells))

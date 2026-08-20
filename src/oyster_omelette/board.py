@@ -81,6 +81,7 @@ class ActionSpace:
     replenish_amount: int = 0
     accumulated: int = 0
     occupant: int | None = None
+    shared_occupant: int | None = None
 
     def is_occupied(self) -> bool:
         return self.occupant is not None
@@ -134,6 +135,7 @@ class Board:
     def clear_occupants(self) -> None:
         for space in self.spaces.values():
             space.occupant = None
+            space.shared_occupant = None
 
 
 def deal_round_cards(rng: random.Random | None = None) -> list[str]:

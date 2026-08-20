@@ -25,7 +25,8 @@
 [x] TUI：方向鍵選格、I 說明、Enter 放工人、工人圖示  (2026-08-17)
 [x] TUI：資源列分組、農場大圖 3×5 可選格  (2026-08-17)
 [x] 餵食 picks tracer：default_feed_plan + apply_feed，不傳 plan 維持自動  (2026-08-20)
-[ ] 牌庫：基本盒 96（A48+B48）＋ Artifex 120 ＋ Bubulcus 120 → TODO-deck-base.txt／a.txt／b.txt  (2026-08-18)
+[x] 基本盒 96 張職業／次要卡效  (2026-08-20)
+[~] 牌庫：基本盒已接；Artifex 120 ＋ Bubulcus 120 還沒做 → TODO-deck-a.txt／b.txt  (2026-08-20)
 
 ================================================================
 修訂版規則對照

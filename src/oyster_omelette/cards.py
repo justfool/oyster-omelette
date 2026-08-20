@@ -161,6 +161,10 @@ def _meets_prereq(player, card: Card, game=None) -> bool:
         from oyster_omelette.card_effects import veg_fields
 
         return veg_fields(player) >= 2
+    if prereq == "2 Grain Fields":
+        from oyster_omelette.card_effects import grain_fields
+
+        return grain_fields(player) >= 2
     if prereq == "5 Clay in Supply":
         return player.clay >= 5
     if prereq == "Person on Fishing":
@@ -281,10 +285,14 @@ def deal_minors(player_count: int, source: str = "toy", rng=None) -> list[list[s
 
 def use_card(player, card_id: str, choice=None) -> bool:
     """隨時效果。choice：硬瓷付的黏土數，或夢羊人要換的東西。"""
-    from oyster_omelette.card_effects import use_B080, use_B104
+    from oyster_omelette.card_effects import use_A071, use_A102, use_B080, use_B104
 
     if card_id == "B080":
         return use_B080(player, int(choice))
     if card_id == "B104":
         return use_B104(player, str(choice))
+    if card_id == "A071":
+        return use_A071(player)
+    if card_id == "A102":
+        return use_A102(player)
     return False

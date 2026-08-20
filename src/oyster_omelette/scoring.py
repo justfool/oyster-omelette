@@ -92,6 +92,9 @@ def vegetable_total(player) -> int:
         for cell in row:
             if cell.crop == "vegetable":
                 total += cell.crop_count
+    for field in getattr(player, "card_fields", []):
+        if field.get("crop") == "vegetable":
+            total += field.get("crop_count", 0)
     return total
 
 
@@ -110,6 +113,7 @@ def unused_spaces(player) -> int:
 
 def score_player(player) -> dict[str, int]:
     from oyster_omelette.cards import occupation_points
+    from oyster_omelette.effects import extra_fields, shared_bonus_on_score
     from oyster_omelette.farmyard import CellKind
     from oyster_omelette.majors import major_points
     from oyster_omelette.pastures import pasture_cells, pasture_count
@@ -122,7 +126,7 @@ def score_player(player) -> dict[str, int]:
             elif cell.kind == CellKind.STONE_ROOM:
                 room_points += 2
     detail = {
-        "fields": points_fields(player.farm.field_count()),
+        "fields": points_fields(player.farm.field_count() + extra_fields(player)),
         "pastures": points_pastures(pasture_count(player.farm)),
         "grain": points_grain(grain_total(player)),
         "vegetables": points_vegetables(vegetable_total(player)),
@@ -137,7 +141,7 @@ def score_player(player) -> dict[str, int]:
         "family": player.family_size() * 3,
         "begging": player.begging * -3,
         "majors": major_points(player),
-        "cards": occupation_points(player),
+        "cards": occupation_points(player) + shared_bonus_on_score(player),
     }
     leftover = player.wood + player.clay + player.reed + player.stone
     detail["leftover"] = leftover

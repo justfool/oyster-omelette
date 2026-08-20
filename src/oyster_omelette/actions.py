@@ -1,6 +1,7 @@
 """行動格立刻結算。還沒做完的格子只佔格、不改農場。"""
 
 from oyster_omelette.animals import house_animals
+from oyster_omelette.card_effects import note_gained_building
 from oyster_omelette.cards import (
     lessons_4p_cost,
     occupation_cost,
@@ -8,16 +9,20 @@ from oyster_omelette.cards import (
     play_occupation,
 )
 from oyster_omelette.effects import (
+    after_fence,
     after_renovate,
     after_rooms_built,
     after_space,
     bonus_on_take,
+    can_afford_renovate,
+    can_afford_room,
     can_skip_to_stone,
+    family_room_capacity,
     fence_currency,
     fence_discount,
     pay_fence_cost,
-    room_cost,
-    stone_discount,
+    pay_for_renovate,
+    pay_for_room,
 )
 from oyster_omelette.farmyard import (
     CellKind,
@@ -46,6 +51,7 @@ from oyster_omelette.pastures import (
     enclose_pasture_at,
     enclose_shape,
     fence_cost_at,
+    first_legal_pasture_cell,
     next_pasture_cost,
     shape_block_reason,
     shape_cost,
@@ -62,19 +68,22 @@ def _lessons_food_cost(player, space_id: str) -> int:
 
 def add_resource(player, resource: str, amount: int) -> None:
     setattr(player, resource, getattr(player, resource) + amount)
-
-
-def _room_cost(player) -> tuple[str, int, int]:
-    return room_cost(player)
+    note_gained_building(player, resource, amount)
 
 
 def _can_build_room(player) -> bool:
-    resource, amount, reed = _room_cost(player)
-    return (
-        getattr(player, resource) >= amount
-        and player.reed >= reed
-        and first_legal_room(player.farm) is not None
-    )
+    return can_afford_room(player) and first_legal_room(player.farm) is not None
+
+
+def _can_sow(player) -> bool:
+    if player.grain <= 0 and player.vegetable <= 0:
+        return False
+    if empty_fields(player.farm):
+        return True
+    for field in getattr(player, "card_fields", []):
+        if field.get("crop_count", 0) == 0:
+            return True
+    return False
 
 
 def _grow_family(player) -> None:
@@ -83,42 +92,20 @@ def _grow_family(player) -> None:
 
 
 def _renovate_block_reason(player) -> str:
-    if getattr(player, "cannot_renovate", False):
+    if not can_afford_renovate(player):
         return "cannot_renovate"
-    material = player.farm.house_material()
-    rooms = player.farm.room_count()
-    if material == CellKind.STONE_ROOM:
-        return "cannot_renovate"
-    if player.reed < 1:
-        return "cannot_renovate"
-    skip = can_skip_to_stone(player)
-    if material == CellKind.WOOD_ROOM and not skip and player.clay < rooms:
-        return "cannot_renovate"
-    if material == CellKind.WOOD_ROOM and skip:
-        need = max(0, rooms - stone_discount(player, "renovate"))
-        if player.stone < need:
-            return "cannot_renovate"
-    if material == CellKind.CLAY_ROOM:
-        need = max(0, rooms - stone_discount(player, "renovate"))
-        if player.stone < need:
-            return "cannot_renovate"
     return ""
 
 
 def _do_renovate(player, game=None) -> None:
-    rooms = player.farm.room_count()
     before = player.farm.house_material()
-    player.reed -= 1
+    if not pay_for_renovate(player):
+        return
     skip = can_skip_to_stone(player)
     if before == CellKind.WOOD_ROOM and skip:
-        player.stone -= max(0, rooms - stone_discount(player, "renovate"))
         renovate_house(player.farm)
-        renovate_house(player.farm)
-    elif before == CellKind.WOOD_ROOM:
-        player.clay -= rooms
         renovate_house(player.farm)
     else:
-        player.stone -= max(0, rooms - stone_discount(player, "renovate"))
         renovate_house(player.farm)
     after_renovate(game, player, before)
 
@@ -157,6 +144,7 @@ def _do_fence(
     player,
     target: tuple[int, int] | None = None,
     cells: set[tuple[int, int]] | None = None,
+    game=None,
 ) -> None:
     free = fence_discount(player)
     if cells:
@@ -166,13 +154,16 @@ def _do_fence(
         pay = max(0, cost - free)
         pay_fence_cost(player, pay)
         enclose_shape(player.farm, cells)
+        after_fence(game, player, cells)
         return
     if target is not None:
         cost = enclose_pasture_at(player.farm, target[0], target[1])
         pay = max(0, cost - free)
         pay_fence_cost(player, pay)
         free = max(0, free - cost)
+        after_fence(game, player, {target})
     while True:
+        spot = first_legal_pasture_cell(player.farm)
         cost = next_pasture_cost(player.farm)
         if cost is None:
             break
@@ -182,6 +173,8 @@ def _do_fence(
         pay_fence_cost(player, pay)
         free = max(0, free - cost)
         enclose_one_pasture(player.farm)
+        if spot is not None:
+            after_fence(game, player, {spot})
 
 
 def target_error(
@@ -240,7 +233,7 @@ def cannot_use(player, space, game=None) -> str:
     if space.id == "family_growth":
         if player.family_size() >= 5:
             return "family_full"
-        if player.farm.room_count() <= player.family_size():
+        if family_room_capacity(player) <= player.family_size():
             return "need_spare_room"
     if space.id == "family_growth_without_room":
         if player.family_size() >= 5:
@@ -258,7 +251,7 @@ def cannot_use(player, space, game=None) -> str:
         if player.food < cost:
             return "cannot_play_occupation"
     if space.id in {"sow_and_or_bake", "plow_and_or_sow"}:
-        can_sow = bool(empty_fields(player.farm)) and (player.grain > 0 or player.vegetable > 0)
+        can_sow = _can_sow(player)
         can_plow = space.id == "plow_and_or_sow" and first_legal_field(player.farm) is not None
         can_bake = (
             space.id == "sow_and_or_bake"
@@ -327,17 +320,13 @@ def _apply_space(
         if target is not None:
             row, col = target
             if _can_build_room(player) and can_place_room(player.farm, row, col):
-                resource, amount, reed = _room_cost(player)
-                setattr(player, resource, getattr(player, resource) - amount)
-                player.reed -= reed
+                pay_for_room(player)
                 place_room(player.farm, row, col)
             elif player.wood >= 2:
                 player.wood -= 2
                 player.farm.cell(row, col).stable = True
         while _can_build_room(player):
-            resource, amount, reed = _room_cost(player)
-            setattr(player, resource, getattr(player, resource) - amount)
-            player.reed -= reed
+            pay_for_room(player)
             build_one_room(player.farm)
         if player.wood >= 2 and first_legal_stable(player.farm) is not None:
             player.wood -= 2
@@ -353,7 +342,7 @@ def _apply_space(
     if space.id == "renovation_and_fences":
         _do_renovate(player, game)
         if not _fence_block_reason(player):
-            _do_fence(player)
+            _do_fence(player, game=game)
         return
 
     if space.id in {"family_growth", "family_growth_without_room"}:
@@ -390,7 +379,7 @@ def _apply_space(
         return
 
     if space.id == "fences":
-        _do_fence(player, target, cells)
+        _do_fence(player, target, cells, game)
         return
 
     if space.id in {"lessons", "lessons_3p", "lessons_4p"}:
@@ -400,13 +389,12 @@ def _apply_space(
 
     if space.id == "resource_market_3p":
         # 沒指定時暫定拿蘆葦；TUI 之後再讓玩家選蘆或石。
-        chosen = "reed"
-        setattr(player, chosen, getattr(player, chosen) + 1)
+        add_resource(player, "reed", 1)
         player.food += 1
         return
 
     if space.id == "resource_market_4p":
-        player.reed += 1
-        player.stone += 1
+        add_resource(player, "reed", 1)
+        add_resource(player, "stone", 1)
         player.food += 1
         return

@@ -51,6 +51,10 @@ class Player:
     cannot_renovate: bool = False
     prefer_vegetable: bool = False
     flags: set = field(default_factory=set)
+    gained_building: int = 0
+    goods_piles: dict = field(default_factory=dict)
+    card_fields: list = field(default_factory=list)
+    tokens: dict = field(default_factory=dict)
     _game: object | None = None
 
     def family_size(self) -> int:
@@ -180,6 +184,8 @@ class Game:
         for player in self.players:
             player._game = self
             after_round_start(self, player)
+            player.gained_building = 0
+            player.flags.discard("B024_combo")
 
     def return_home(self) -> None:
         self._reset_workers()
@@ -234,6 +240,7 @@ class Game:
         if space is None:
             return PlaceResult(ok=False, error="unknown_space")
 
+        sharing = False
         if not self.god_mode:
             if not self.work_phase:
                 return PlaceResult(ok=False, error="not_work_phase")
@@ -242,7 +249,12 @@ class Game:
             if self.whose_turn() != player_index:
                 return PlaceResult(ok=False, error="not_your_turn")
             if space.is_occupied():
-                return PlaceResult(ok=False, error="space_occupied")
+                from oyster_omelette.effects import can_share_space
+
+                if can_share_space(player, space, player_index):
+                    sharing = True
+                else:
+                    return PlaceResult(ok=False, error="space_occupied")
             blocked = cannot_use(player, space, self)
             if blocked:
                 return PlaceResult(ok=False, error=blocked)
@@ -253,11 +265,20 @@ class Game:
         if player.unplaced_workers > 0:
             take_one_person(player.farm)
             player.unplaced_workers -= 1
-        space.occupant = player_index
+        if sharing:
+            space.shared_occupant = player_index
+        else:
+            space.occupant = player_index
         resolve_space(self, player, space, target, cells)
 
-        self._turn_from = (player_index + 1) % len(self.players)
-        self.current_player_index = self.whose_turn()
+        from oyster_omelette.effects import keep_turn
+
+        if keep_turn(self, player, space_id):
+            self._turn_from = player_index
+            self.current_player_index = player_index
+        else:
+            self._turn_from = (player_index + 1) % len(self.players)
+            self.current_player_index = self.whose_turn()
         return PlaceResult(ok=True, error="")
 
     def _flip_next_round_card(self) -> None:
