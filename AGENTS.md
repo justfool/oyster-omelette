@@ -48,8 +48,11 @@
   - `after_rooms_built`／`AFTER_ROOMS`
   - `after_renovate`／`AFTER_RENOVATE`
   - `after_improvement`／`AFTER_IMPROVEMENT`
-  - 以後回家：`after_return_home`
+  - `after_return_home`／`AFTER_RETURN_HOME`
+  - `after_fence`／`AFTER_FENCE`
+  - `AFTER_ANY_ROOMS`（任何人蓋房，持有者都會被叫到）
 - 單張卡函式：`{卡id}_{時機}`，例如 `forester_on_take`、`A002_after_play`
+- 其他入口：`can_share_space`／`SHARE_SPACE`、`keep_turn`／`KEEP_TURN`、`extra_house_capacity`／`EXTRA_HOUSE`、`extra_family_rooms`／`EXTRA_FAMILY`、`extra_fields`、`shared_bonus_on_score`／`SHARED_SCORE`
 - 牌庫資料放 `decks/`（不要叫 catalog）。一張卡不要獨立一個檔。
   ```
   cards.py           Card、打出、發牌、合併後的 CARDS

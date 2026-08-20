@@ -33,6 +33,17 @@ def take_crops(player) -> None:
             cell.crop_count -= 1
             if cell.crop_count == 0:
                 cell.crop = None
+    for field in getattr(player, "card_fields", []):
+        if field.get("crop_count", 0) <= 0 or not field.get("crop"):
+            continue
+        crop = field["crop"]
+        if crop == "grain":
+            player.grain += 1
+        elif crop == "vegetable":
+            player.vegetable += 1
+        field["crop_count"] -= 1
+        if field["crop_count"] == 0:
+            field["crop"] = None
 
 
 def food_need(player) -> int:

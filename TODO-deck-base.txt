@@ -39,7 +39,7 @@
     中文：夯土
     費用：—    前提：—    分數：—    難度：5
     卡文：When you play this card, you immediately get 1 clay. You can use clay instead of wood to build fences.
-[ ] A019
+[x] A019
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：農場規劃
     英文：Handplow
     中文：手推犁
@@ -51,7 +51,7 @@
     中文：脫穀板
     費用：1 Wood    前提：2 Occupations    分數：1    難度：5
     卡文：Each time you use the "Farmland" or "Cultivation" action space, you get an additional "Bake Bread" action.
-[ ] A026
+[x] A026
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：行動加強
     英文：Sleeping Corner
     中文：睡角
@@ -87,7 +87,7 @@
     中文：牛奶罐
     費用：1 Clay    前提：—    分數：—    難度：5
     卡文：Each time any player (including you) uses the "Cattle Market" accumulation space, you get 3 food, and each other player gets 1 food.
-[ ] A053
+[x] A053
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：食物
     英文：Claypipe
     中文：陶管
@@ -123,7 +123,7 @@
     中文：大溫室
     費用：2 Wood    前提：2 Occupations    分數：—    難度：4
     卡文：Add 4, 7, and 9 to the current round and place 1 vegetable on each corresponding round space. At the start of these rounds, you get the vegetable.
-[ ] A071
+[x] A071
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：作物
     英文：Clearing Spade
     中文：清田鏟
@@ -147,13 +147,13 @@
     中文：石鉗
     費用：1 Wood    前提：—    分數：—    難度：2
     卡文：Each time you use a stone accumulation space, you get 1 additional stone.
-[ ] A083
+[x] A083
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：動物
     英文：Shepherd's Crook
     中文：牧羊杖
     費用：1 Wood    前提：—    分數：—    難度：8
     卡文：Each time you fence a new pasture covering at least 4 farmyard spaces, you immediately get 2 sheep on this pasture.
-[ ] A086
+[x] A086
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
     英文：Animal Tamer
     中文：馴獸師
@@ -189,7 +189,7 @@
     中文：畜舍建築師
     費用：—    前提：—    分數：—    難度：3
     卡文：During scoring, you get 1 bonus point for each unfenced stable in your farmyard.
-[ ] A102
+[x] A102
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：貨物
     英文：Grocer
     中文：雜貨商
@@ -243,7 +243,7 @@
     中文：黏土屋匠
     費用：—    前提：—    分數：—    難度：4
     卡文：Once you no longer live in a wooden house, place 2 clay on each of the next 5 round spaces. At the start of these rounds, you get the clay.
-[ ] A123
+[x] A123
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：建材
     英文：Frame Builder
     中文：屋架工
@@ -314,7 +314,7 @@
     中文：攤位
     費用：1 Grain    前提：—    分數：—    難度：3
     卡文：You immediately get 1 vegetable. (Effectively, you are exchanging 1 grain for 1 vegetable).
-[ ] B010
+[x] B010
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：農場規劃
     英文：Caravan
     中文：篷車
@@ -332,13 +332,13 @@
     中文：開礦鎚
     費用：1 Wood    前提：—    分數：—    難度：4
     卡文：When you play this card, you immediately get 1 food. Each time you renovate, you can also build a stable without paying wood.
-[ ] B019
+[x] B019
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：農場規劃
     英文：Moldboard Plow
     中文：鏵式犁
     費用：2 Wood    前提：1 Occupation    分數：—    難度：6
     卡文：Place 2 field tiles on this card. Twice this game, when you use the "Farmland" action space, you can also plow 1 field from this card.
-[ ] B024
+[x] B024
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：行動加強
     英文：Lasso
     中文：套索
@@ -416,7 +416,7 @@
     中文：穀袋車
     費用：2 Wood    前提：2 Occupations    分數：—    難度：4
     卡文：Place 1 grain each on the remaining spaces for rounds 5, 8, 11, and 14. At the start of these rounds, you get the grain.
-[ ] B068
+[x] B068
     來源：基本盒    種類：次要    旅行卡：否    人數：—    分類：作物
     英文：Beanfield
     中文：豆田
@@ -446,7 +446,7 @@
     中文：橡實籃
     費用：1 Reed    前提：3 Occupations    分數：—    難度：5
     卡文：Place 1 wild boar on each of the 2 round spaces. At the start of these rounds, you get the wild boar.
-[ ] B087
+[x] B087
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：農場規劃
     英文：Cottager
     中文：僱農
@@ -470,13 +470,13 @@
     中文：砌磚師傅
     費用：—    前提：—    分數：—    難度：4
     卡文：Each time you build a major improvement, reduce the stone cost by the number of rooms you have built onto you initial house.
-[ ] B097
+[x] B097
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：行動加強
     英文：Scholar
     中文：學者
     費用：—    前提：—    分數：—    難度：6
     卡文：Once you live in a stone house, at the start of each round, you can play an occupation for an occupation cost of 1 food, or a minor improvement (by paying its cost).
-[ ] B098
+[x] B098
     來源：基本盒    種類：職業    旅行卡：否    人數：1+    分類：分數
     英文：Organic Farmer
     中文：有機農夫
@@ -548,7 +548,7 @@
     中文：木匠
     費用：—    前提：—    分數：—    難度：3
     卡文：Every new room only costs you 3 of the appropriate building resource and 2 reed (e.g. if you live in a wooden house, 3 wood and 2 reed).
-[ ] B136
+[x] B136
     來源：基本盒    種類：職業    旅行卡：否    人數：3+    分類：分數
     英文：House Steward
     中文：管家
@@ -560,7 +560,7 @@
     中文：菜販
     費用：—    前提：—    分數：—    難度：2
     卡文：Each time you use the "Grain Seeds" action space, you also get 1 vegetable.
-[ ] B145
+[x] B145
     來源：基本盒    種類：職業    旅行卡：否    人數：3+    分類：建材
     英文：Brushwood Collector
     中文：柴薪工
@@ -572,13 +572,13 @@
     中文：倉管
     費用：—    前提：—    分數：—    難度：3
     卡文：Each time you use the "resource Market" action space, you also get your choice of 1 clay or 1 grain.
-[ ] B163
+[x] B163
     來源：基本盒    種類：職業    旅行卡：否    人數：4+    分類：建材
     英文：Pastor
     中文：牧師
     費用：—    前提：—    分數：—    難度：6
     卡文：Once you are the only player to live in a house with only 2 rooms, you immediately get 3 wood, 2 clay, 1 reed, and 1 stone (only once).
-[ ] B164
+[x] B164
     來源：基本盒    種類：職業    旅行卡：否    人數：4+    分類：動物
     英文：Sheep Whisperer
     中文：羊語者

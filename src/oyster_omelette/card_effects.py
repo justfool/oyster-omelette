@@ -1,13 +1,25 @@
-"""基本盒難度 1～4 的具名效果函式。對照表在 effects.py。"""
+"""基本盒卡具名效果函式。對照表在 effects.py。"""
 
 from oyster_omelette.farmyard import CellKind, first_legal_stable, plow_first_legal
 from oyster_omelette.majors import bake_best
 from oyster_omelette.pastures import enclose_one_pasture, pasture_cells
 
+BUILDING_RESOURCES = frozenset({"wood", "clay", "reed", "stone"})
+
+
+def note_gained_building(player, resource: str, amount: int) -> None:
+    if amount <= 0 or resource not in BUILDING_RESOURCES:
+        return
+    game = getattr(player, "_game", None)
+    if game is None or not getattr(game, "work_phase", False):
+        return
+    player.gained_building = getattr(player, "gained_building", 0) + amount
+
 
 def grant(player, resource: str, amount: int) -> None:
     if amount:
         setattr(player, resource, getattr(player, resource) + amount)
+        note_gained_building(player, resource, amount)
 
 
 def remaining_rounds(game) -> int:
@@ -34,6 +46,10 @@ def collect_round_goods(player, round_no: int) -> None:
     for resource, amount in player.round_goods.pop(round_no, {}).items():
         if resource == "stable":
             continue
+        if resource == "field":
+            for _ in range(amount):
+                plow_first_legal(player.farm)
+            continue
         grant(player, resource, amount)
 
 
@@ -43,6 +59,9 @@ def veg_fields(player) -> int:
         for cell in row:
             if cell.kind == CellKind.FIELD and cell.crop == "vegetable":
                 total += 1
+    for field in getattr(player, "card_fields", []):
+        if field.get("only") == "vegetable" or field.get("crop") == "vegetable":
+            total += 1
     return total
 
 
@@ -612,3 +631,248 @@ def use_B104(player, want: str) -> bool:
     player.sheep -= 1
     grant(player, want, 1)
     return True
+
+
+# --- remaining base-box cards ---
+
+
+def A019_after_play(game, player) -> None:
+    if game is None:
+        return
+    schedule(player, game.round + 5, "field", 1)
+
+
+def A026_share(_player, space) -> bool:
+    return space.id in {"family_growth", "family_growth_without_room"}
+
+
+def A053_after_return_home(_game, player) -> None:
+    if getattr(player, "gained_building", 0) >= 7:
+        grant(player, "food", 2)
+
+
+def use_A071(player) -> bool:
+    source = None
+    empty = None
+    for row in player.farm.cells:
+        for cell in row:
+            if cell.kind != CellKind.FIELD:
+                continue
+            if source is None and cell.crop and cell.crop_count >= 2:
+                source = cell
+            elif empty is None and not cell.crop:
+                empty = cell
+    if source is None or empty is None:
+        return False
+    empty.crop = source.crop
+    empty.crop_count = 1
+    source.crop_count -= 1
+    if source.crop_count == 0:
+        source.crop = None
+    return True
+
+
+def A083_after_fence(_game, player, cells) -> None:
+    if cells is None or len(cells) < 4:
+        return
+    from oyster_omelette.animals import house_animals
+
+    house_animals(player, "sheep", 2)
+
+
+def A086_after_play(_game, player) -> None:
+    grant(player, "grain" if player.prefer_vegetable else "wood", 1)
+
+
+def A086_house(player) -> int:
+    return max(0, player.farm.room_count() - 1)
+
+
+def A102_after_play(_game, player) -> None:
+    player.goods_piles["A102"] = [
+        "wood",
+        "grain",
+        "reed",
+        "stone",
+        "vegetable",
+        "clay",
+        "reed",
+        "vegetable",
+    ]
+
+
+def use_A102(player) -> bool:
+    pile = player.goods_piles.get("A102")
+    if not pile or player.food < 1:
+        return False
+    player.food -= 1
+    grant(player, pile.pop(0), 1)
+    return True
+
+
+def B010_family(_player) -> int:
+    return 1
+
+
+def B019_after_play(_game, player) -> None:
+    player.tokens["B019"] = 2
+
+
+def B019_after_space(_game, player, space_id: str) -> None:
+    if space_id != "farmland":
+        return
+    left = player.tokens.get("B019", 0)
+    if left <= 0:
+        return
+    if plow_first_legal(player.farm):
+        player.tokens["B019"] = left - 1
+
+
+def B024_keep_turn(_game, player, space_id: str) -> bool:
+    if "B024_combo" in player.flags:
+        player.flags.discard("B024_combo")
+        return False
+    if space_id in {"sheep", "wild_boar", "cattle"}:
+        player.flags.add("B024_combo")
+        return True
+    return False
+
+
+def B068_after_play(_game, player) -> None:
+    player.card_fields.append({"only": "vegetable", "crop": None, "crop_count": 0})
+
+
+def B087_after_space(game, player, space_id: str) -> None:
+    if space_id != "day_laborer":
+        return
+    from oyster_omelette.effects import (
+        after_renovate,
+        after_rooms_built,
+        can_afford_renovate,
+        can_afford_room,
+        can_skip_to_stone,
+        pay_for_renovate,
+        pay_for_room,
+    )
+    from oyster_omelette.farmyard import build_one_room, first_legal_room, renovate_house
+
+    if can_afford_room(player) and first_legal_room(player.farm) is not None:
+        pay_for_room(player)
+        build_one_room(player.farm)
+        after_rooms_built(game, player, 1)
+        return
+    if can_afford_renovate(player):
+        before = player.farm.house_material()
+        pay_for_renovate(player)
+        if before == CellKind.WOOD_ROOM and can_skip_to_stone(player):
+            renovate_house(player.farm)
+            renovate_house(player.farm)
+        else:
+            renovate_house(player.farm)
+        after_renovate(game, player, before)
+
+
+def B097_after_round_start(game, player) -> None:
+    if player.farm.house_material() != CellKind.STONE_ROOM:
+        return
+    from oyster_omelette.cards import can_play_minor, play_minor, play_occupation
+
+    if player.occupations_hand and player.food >= 1:
+        player.food -= 1
+        play_occupation(player, player.occupations_hand[0], game)
+        return
+    for card_id in list(player.minors_hand):
+        if can_play_minor(player, card_id, game):
+            play_minor(player, card_id, game)
+            return
+
+
+def B098_on_score(player) -> int:
+    from oyster_omelette.effects import extra_house_capacity, extra_pasture_capacity
+    from oyster_omelette.pastures import find_pastures, pasture_cells
+
+    extra = extra_pasture_capacity(player)
+    caps = []
+    for group in find_pastures(player.farm):
+        cap = 2 * len(group)
+        for row, col in group:
+            if player.farm.cell(row, col).stable:
+                cap *= 2
+        cap += extra
+        caps.append(cap)
+    if not caps:
+        return 0
+    animals = player.sheep + player.wild_boar + player.cattle
+    fenced = pasture_cells(player.farm)
+    unfenced = 0
+    for row_index, row in enumerate(player.farm.cells):
+        for col_index, cell in enumerate(row):
+            if cell.stable and (row_index, col_index) not in fenced:
+                unfenced += 1
+    absorb = 1 + extra_house_capacity(player) + unfenced
+    spacious = [cap for cap in caps if cap >= 4]
+    placed = min(len(spacious), animals)
+    if placed == 0:
+        return 0
+    remaining = animals - placed
+    small = sum(cap for cap in caps if cap < 4)
+    overflow = max(0, remaining - absorb - small)
+    slack = sum(cap - 4 for cap in spacious[:placed])
+    leftover = max(0, overflow - slack)
+    ruined = 0
+    while leftover > 0 and ruined < placed:
+        ruined += 1
+        leftover = max(0, leftover - 3)
+    return placed - ruined
+
+
+def B136_after_play(game, player) -> None:
+    left = remaining_rounds(game)
+    if left >= 9:
+        grant(player, "wood", 4)
+    elif left >= 6:
+        grant(player, "wood", 3)
+    elif left >= 3:
+        grant(player, "wood", 2)
+    elif left >= 1:
+        grant(player, "wood", 1)
+
+
+def B136_shared_score(player) -> int:
+    game = getattr(player, "_game", None)
+    players = game.players if game is not None else [player]
+    most = max(holder.farm.room_count() for holder in players)
+    return 3 if player.farm.room_count() == most else 0
+
+
+def B163_try(game, player) -> None:
+    if "B163_fired" in player.flags or game is None:
+        return
+    if player.farm.room_count() != 2:
+        return
+    if any(other is not player and other.farm.room_count() == 2 for other in game.players):
+        return
+    player.flags.add("B163_fired")
+    grant(player, "wood", 3)
+    grant(player, "clay", 2)
+    grant(player, "reed", 1)
+    grant(player, "stone", 1)
+
+
+def B163_after_play(game, player) -> None:
+    B163_try(game, player)
+
+
+def B163_after_round_start(game, player) -> None:
+    B163_try(game, player)
+
+
+def B163_after_any_rooms(game, holder, _builder, _count: int) -> None:
+    B163_try(game, holder)
+
+
+def B164_after_play(game, player) -> None:
+    if game is None:
+        return
+    for offset in (2, 5, 8, 10):
+        schedule(player, game.round + offset, "sheep", 1)

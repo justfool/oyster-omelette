@@ -276,6 +276,31 @@ def sow_fields(player) -> bool:
             planted = True
         else:
             break
+    for card_field in getattr(player, "card_fields", []):
+        if card_field.get("crop_count", 0) > 0:
+            continue
+        only = card_field.get("only")
+        if only == "vegetable" and player.vegetable > 0:
+            player.vegetable -= 1
+            card_field["crop"] = "vegetable"
+            card_field["crop_count"] = 2
+            planted = True
+        elif only == "grain" and player.grain > 0:
+            player.grain -= 1
+            card_field["crop"] = "grain"
+            card_field["crop_count"] = 3
+            planted = True
+        elif not only:
+            if player.grain > 0:
+                player.grain -= 1
+                card_field["crop"] = "grain"
+                card_field["crop_count"] = 3
+                planted = True
+            elif player.vegetable > 0:
+                player.vegetable -= 1
+                card_field["crop"] = "vegetable"
+                card_field["crop_count"] = 2
+                planted = True
     return planted
 
 
