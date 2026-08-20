@@ -88,8 +88,8 @@ class BoardView(Vertical):
     }
     #round-grid {
         layout: grid;
-        grid-size: 7 2;
-        grid-gutter: 1 1;
+        grid-size: 4 6;
+        grid-gutter: 0 1;
         height: auto;
         align: left top;
     }
@@ -180,9 +180,10 @@ class BoardView(Vertical):
         round_grid = self.query_one("#round-grid", Grid)
         fixed_cols = 10
         fixed_rows = max(1, (len(fixed_slots) + fixed_cols - 1) // fixed_cols)
-        round_rows = max(1, (len(round_slots) + 6) // 7)
+        round_cols = max((slot.col + 1 for slot in round_slots), default=4)
+        round_rows = max((slot.row + 1 for slot in round_slots), default=1)
         fixed_grid.styles.grid_size = (fixed_cols, fixed_rows)
-        round_grid.styles.grid_size = (7, round_rows)
+        round_grid.styles.grid_size = (round_cols, round_rows)
         _fill_grid(fixed_grid, fixed_slots, self.look, self.selected_index, 0)
         _fill_grid(
             round_grid,
