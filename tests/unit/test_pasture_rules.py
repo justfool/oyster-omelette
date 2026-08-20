@@ -43,6 +43,23 @@ def test_two_cells_as_one_pasture_cost_six():
     assert animal_capacity(farm) == 5
 
 
+def test_next_pasture_cost_none_when_fifteen_cap_blocks():
+    from oyster_omelette.actions import _do_fence
+    from oyster_omelette.game import Player
+    from oyster_omelette.pastures import enclose_pasture_at, next_pasture_cost, pasture_count
+
+    farm = starting_farmyard()
+    for row, col in ((2, 0), (2, 1), (1, 1), (0, 1)):
+        assert enclose_pasture_at(farm, row, col) > 0
+    assert farm.fences.used() == 13
+    assert next_pasture_cost(farm) is None
+    player = Player(farm=farm, food=2, is_start_player=True, wood=6)
+    _do_fence(player)
+    assert player.wood == 6
+    assert farm.fences.used() == 13
+    assert pasture_count(farm) == 4
+
+
 def test_disconnected_cells_cannot_form_one_pasture():
     from oyster_omelette.pastures import enclose_shape, pasture_count
 
