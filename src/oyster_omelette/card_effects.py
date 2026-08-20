@@ -290,7 +290,7 @@ def B142_after_space(_game, player, space_id: str) -> None:
 
 
 def B156_after_space(_game, player, space_id: str) -> None:
-    if space_id not in {"resource_market", "resource_market_3p", "resource_market_4p"}:
+    if space_id not in {"resource_market_3p", "resource_market_4p"}:
         return
     if player.prefer_vegetable:
         grant(player, "grain", 1)

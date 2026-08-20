@@ -513,7 +513,7 @@ def test_b156_resource_market():
     game, player = _ready(played=["B156"])
     from oyster_omelette.effects import after_space
 
-    after_space(game, player, "resource_market")
+    after_space(game, player, "resource_market_4p")
     assert player.clay == 1
 
 

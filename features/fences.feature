@@ -75,6 +75,34 @@ Feature: 圍籬與牧場
     Then 玩家 1 的牧場數應為 0
     And 玩家 1 的籬笆段數應為 15
 
+  Scenario: 圍籬 15 段上限使下一塊圍不成時 fences 不能用
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 fences
+    When 完成開局設置
+    And 玩家 1 依序圍出第 3 列第 1 格、第 3 列第 2 格、第 2 列第 2 格與第 1 列第 2 格
+    Then 玩家 1 的籬笆段數應為 13
+    And 玩家 1 的牧場數應為 4
+    When 準備下一回合
+    And 玩家 1 身上有 6 木
+    And 玩家 1 放置工人到 fences
+    Then 上次放置應失敗且原因包含 cannot_fence
+    And 玩家 1 應有 6 木
+    And 玩家 1 的籬笆段數應為 13
+    And 玩家 1 的牧場數應為 4
+
+  Scenario: 再 3 段剛好滿 15 時仍可圍
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 fences
+    When 完成開局設置
+    And 玩家 1 依序圍出第 1 列第 2 格、第 1 列第 3 格、第 2 列第 2 格與第 2 列第 3 格
+    Then 玩家 1 的籬笆段數應為 12
+    When 準備下一回合
+    And 玩家 1 身上有 3 木
+    And 玩家 1 放置工人到 fences
+    Then 上次放置應成功
+    And 玩家 1 應有 0 木
+    And 玩家 1 的籬笆段數應為 15
+
   Scenario: 樹籬看守折扣後木頭不夠原價仍可指定格子圍
     Given 1 位玩家的農家樂修訂版
     And 回合卡先翻 fences

@@ -168,6 +168,32 @@ def give_pasture(game: Game, number: int) -> None:
     enclose_one_pasture(game.players[number - 1].farm)
 
 
+@when(
+    parsers.parse(
+        "玩家 {number:d} 依序圍出第 {r1:d} 列第 {c1:d} 格、第 {r2:d} 列第 {c2:d} 格、"
+        "第 {r3:d} 列第 {c3:d} 格與第 {r4:d} 列第 {c4:d} 格"
+    )
+)
+def enclose_four_cells_in_order(
+    game: Game,
+    number: int,
+    r1: int,
+    c1: int,
+    r2: int,
+    c2: int,
+    r3: int,
+    c3: int,
+    r4: int,
+    c4: int,
+) -> None:
+    from oyster_omelette.pastures import enclose_pasture_at
+
+    farm = game.players[number - 1].farm
+    for row, col in ((r1, c1), (r2, c2), (r3, c3), (r4, c4)):
+        added = enclose_pasture_at(farm, row - 1, col - 1)
+        assert added > 0
+
+
 @when(parsers.parse("玩家 {number:d} 身上有 {count:d} 羊"))
 def give_sheep(game: Game, number: int, count: int) -> None:
     game.players[number - 1].sheep = count

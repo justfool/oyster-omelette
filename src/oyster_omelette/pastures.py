@@ -222,7 +222,10 @@ def next_pasture_cost(farm: Farmyard) -> int | None:
     spot = first_legal_pasture_cell(farm)
     if spot is None:
         return None
-    return _missing_edges(farm, spot[0], spot[1])
+    cost = _missing_edges(farm, spot[0], spot[1])
+    if farm.fences.used() + cost > MAX_FENCES:
+        return None
+    return cost
 
 
 def first_legal_pasture_cell(farm: Farmyard) -> tuple[int, int] | None:
@@ -242,7 +245,10 @@ def first_legal_pasture_cell(farm: Farmyard) -> tuple[int, int] | None:
 def fence_cost_at(farm: Farmyard, row: int, col: int) -> int | None:
     if not can_enclose_cell(farm, row, col):
         return None
-    return _missing_edges(farm, row, col)
+    cost = _missing_edges(farm, row, col)
+    if farm.fences.used() + cost > MAX_FENCES:
+        return None
+    return cost
 
 
 def can_enclose_cell(farm: Farmyard, row: int, col: int) -> bool:
