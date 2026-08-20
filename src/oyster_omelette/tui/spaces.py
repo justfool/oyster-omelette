@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from textual.message import Message
 from textual.widgets import Static
 
 from oyster_omelette.board import (
@@ -257,6 +258,11 @@ def _key_at(index: int) -> str:
 class ActionSpaceWidget(Static, can_focus=True):
     """一塊行動格：有邊框，可 focus，被佔用時站著工人圖示。"""
 
+    class Clicked(Message):
+        def __init__(self, widget: ActionSpaceWidget) -> None:
+            super().__init__()
+            self.widget = widget
+
     DEFAULT_CSS = """
     ActionSpaceWidget {
         border: round $primary;
@@ -295,6 +301,9 @@ class ActionSpaceWidget(Static, can_focus=True):
             self.border_title = SPACE_NAMES.get(slot.space_id, slot.space_id)
         elif slot.round_number:
             self.border_title = f"第{slot.round_number}回合"
+
+    def on_click(self) -> None:
+        self.post_message(self.Clicked(self))
 
     def display_text(self) -> str:
         return slot_body(self.slot, self.look)
