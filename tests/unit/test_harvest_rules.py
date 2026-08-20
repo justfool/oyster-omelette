@@ -2,7 +2,7 @@
 
 from oyster_omelette.farmyard import place_field, sow_fields, starting_farmyard
 from oyster_omelette.game import Player
-from oyster_omelette.harvest import feed_player, take_crops
+from oyster_omelette.harvest import FeedPlan, feed_player, take_crops
 
 
 def test_take_one_grain_from_field():
@@ -48,6 +48,14 @@ def test_fireplace_cooks_sheep_during_feed():
     feed_player(player)
     assert player.begging == 0
     assert player.sheep == 0
+
+
+def test_feed_plan_can_keep_grain_and_beg():
+    farm = starting_farmyard()
+    player = Player(farm=farm, food=0, is_start_player=True, grain=4)
+    feed_player(player, FeedPlan(grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0))
+    assert player.grain == 4
+    assert player.begging == 4
 
 
 def test_enough_food_no_begging():
