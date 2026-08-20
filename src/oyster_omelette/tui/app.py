@@ -5,6 +5,7 @@ from dataclasses import replace
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
+from textual.screen import ModalScreen
 from textual.widgets import Footer, Header, Static
 
 from oyster_omelette.game import Game
@@ -58,6 +59,42 @@ __all__ = [
     "minimap_text",
     "should_show_farm_detail",
 ]
+
+
+class InspectScreen(ModalScreen):
+    """按 I 跳出的格子說明。Esc／I／點一下關閉。"""
+
+    BINDINGS = [
+        Binding("escape", "close", "關閉", show=True),
+        Binding("i", "close", "關閉", show=False),
+        Binding("enter", "close", "關閉", show=False),
+    ]
+    CSS = """
+    InspectScreen {
+        align: center middle;
+    }
+    #inspect-box {
+        width: 62;
+        max-width: 80%;
+        height: auto;
+        border: heavy $accent;
+        padding: 1 2;
+        background: $panel;
+    }
+    """
+
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self._text = text
+
+    def compose(self) -> ComposeResult:
+        yield Static(self._text + "\n\nEsc／I 關閉", id="inspect-box")
+
+    def on_click(self) -> None:
+        self.dismiss()
+
+    def action_close(self) -> None:
+        self.dismiss()
 
 
 def _theme(theme: Theme | None) -> Theme:
@@ -329,7 +366,7 @@ class OysterOmeletteApp(App):
 
     def action_inspect(self) -> None:
         slot = self._board().selected_slot()
-        self.note(inspect_text(slot, self.look))
+        self.push_screen(InspectScreen(inspect_text(slot, self.look)))
 
     def action_place_selected(self) -> None:
         if self._picking_choice():
@@ -435,7 +472,7 @@ class OysterOmeletteApp(App):
 
     def action_help(self) -> None:
         self.note(
-            "方向鍵選格。Enter／空白放工人。I 看格子說明。"
+            "方向鍵選格。Enter／空白放工人。I 跳出格子說明。"
             "P 準備  R 回家  S 計分  G 上帝  M 農場  T 主題  ? 按鍵  Q 離開。"
             "耕田圍籬蓋房先選行動再方向鍵選農場格。"
             "上課／改良／播種會先列出選項，Enter 用預設。"

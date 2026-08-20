@@ -176,22 +176,37 @@ def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
     return slots
 
 
+def is_pile_slot(slot: SpaceSlot) -> bool:
+    return bool(slot.resource) and not slot.face_down
+
+
+def slot_title(slot: SpaceSlot, theme: Theme) -> str:
+    if slot.face_down:
+        back = theme.icon("face_down") or "🂠"
+        if slot.round_number:
+            return f"{back}{slot.round_number}"
+        return back
+    icon = theme.icon(slot.space_id or "")
+    name = theme.space_caption(slot.space_id or "")
+    if icon:
+        return f"{icon} {name}"
+    return name
+
+
 def slot_body(slot: SpaceSlot, theme: Theme) -> str:
     if slot.face_down:
         back = theme.icon("face_down") or "🂠"
         if slot.god_name:
-            return f"{back} {slot.god_name}\n未翻開"
-        return f"{back}\n第{slot.round_number}回合"
+            return back
+        return back
 
-    title = theme.space_caption(slot.space_id or "")
-    pile = ""
-    if slot.resource and slot.accumulated:
-        pile = f"{theme.icon(slot.resource)}×{slot.accumulated}"
     worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
-    first = f"{title} {pile}".rstrip()
-    if worker:
-        return f"{first}\n{worker}"
-    return first
+    if is_pile_slot(slot):
+        pile = f"{theme.icon(slot.resource)}×{slot.accumulated}"
+        if worker:
+            return f"{pile}\n{worker}"
+        return pile
+    return worker
 
 
 def inspect_text(slot: SpaceSlot, theme: Theme) -> str:
@@ -267,9 +282,12 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget {
         border: round $primary;
         width: 1fr;
-        height: 4;
+        height: 3;
         padding: 0 1;
         content-align: center middle;
+    }
+    ActionSpaceWidget.pile {
+        height: 6;
     }
     ActionSpaceWidget:focus, ActionSpaceWidget.selected {
         border: heavy $accent;
@@ -279,6 +297,7 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget.face-down {
         border: dashed $primary 40%;
         color: $text-muted;
+        height: 3;
     }
     ActionSpaceWidget.occupied {
         color: $text;
@@ -297,10 +316,7 @@ class ActionSpaceWidget(Static, can_focus=True):
             slot_body(slot, self.look),
             classes=_slot_classes(slot, selected),
         )
-        if slot.space_id:
-            self.border_title = SPACE_NAMES.get(slot.space_id, slot.space_id)
-        elif slot.round_number:
-            self.border_title = f"第{slot.round_number}回合"
+        self.border_title = slot_title(slot, self.look)
 
     def on_click(self) -> None:
         self.post_message(self.Clicked(self))
@@ -318,10 +334,7 @@ class ActionSpaceWidget(Static, can_focus=True):
         self.look = theme
         self.update(slot_body(slot, theme))
         self.set_classes(_slot_classes(slot, selected))
-        if slot.space_id:
-            self.border_title = SPACE_NAMES.get(slot.space_id, slot.space_id)
-        elif slot.round_number:
-            self.border_title = f"第{slot.round_number}回合"
+        self.border_title = slot_title(slot, theme)
 
 
 def _slot_classes(slot: SpaceSlot, selected: bool) -> str:
@@ -330,6 +343,8 @@ def _slot_classes(slot: SpaceSlot, selected: bool) -> str:
         bits.append("selected")
     if slot.face_down:
         bits.append("face-down")
+    if is_pile_slot(slot):
+        bits.append("pile")
     if slot.occupant is not None:
         bits.append("occupied")
     return " ".join(bits)
