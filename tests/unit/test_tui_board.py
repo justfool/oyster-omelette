@@ -69,6 +69,7 @@ def test_slot_body_shows_pile_and_worker_icon():
     assert title == DEFAULT_THEME.icon("forest")
     assert title.count(DEFAULT_THEME.icon("forest")) == 1
     assert DEFAULT_THEME.icon("worker_1") in body
+    assert DEFAULT_THEME.icon("wood") not in body
     assert "[1]" not in body
     assert "[P1]" not in body
 
@@ -87,7 +88,8 @@ def test_accumulation_shown_as_icon_times_count():
     game.prepare_round()
     forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
     body = slot_body(forest, DEFAULT_THEME)
-    assert f"{DEFAULT_THEME.icon('wood')}×3" in body
+    assert body == "3"
+    assert DEFAULT_THEME.icon("wood") not in body
 
 
 def test_inspect_text_covers_effect_pile_occupant_and_cell():
@@ -120,7 +122,11 @@ def test_board_view_arrow_selection_without_app():
     assert view.selected_slot().space_id == "farm_expansion"
     view.move("right")
     assert view.selected_slot().space_id == "meeting_place"
-    view.move("down")
+    view.move("right")
+    view.move("right")
+    view.move("right")
+    view.move("right")
+    view.move("right")
     assert view.selected_slot().space_id == "forest"
     view.select_space("forest")
     assert view.selected_slot().space_id == "forest"
