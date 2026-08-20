@@ -12,6 +12,7 @@ from oyster_omelette.board import (
     EXTRA_3P,
     EXTRA_4P,
     FIXED_SPACE_IDS_2P,
+    STAGE_SIZES,
 )
 from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme
 
@@ -23,7 +24,6 @@ ZONE_FIXED = "fixed"
 ZONE_ROUND = "round"
 
 FIXED_COLUMNS = 10
-ROUND_COLUMNS = 7
 
 SPACE_BLURBS = {
     "farm_expansion": "蓋房間（貼著既有房間；木屋 5 木+2 蘆）或蓋畜舍（2 木）。",
@@ -100,6 +100,16 @@ def fixed_space_ids(game) -> tuple[str, ...]:
     return tuple(FIXED_SPACE_IDS_2P) + extra_fixed_ids(game)
 
 
+def round_cell(offset: int) -> tuple[int, int]:
+    """回合卡依收成階段換行：4、3、2、2、2、1。"""
+    start = 0
+    for row, size in enumerate(STAGE_SIZES):
+        if offset < start + size:
+            return row, offset - start
+        start += size
+    return len(STAGE_SIZES) - 1, offset - start
+
+
 def worker_icon(player_index: int, theme: Theme) -> str:
     mark = theme.icon(f"worker_{player_index + 1}")
     return mark or f"P{player_index + 1}"
@@ -132,6 +142,7 @@ def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
     upcoming = list(game.upcoming_round_cards())
     total_round = max(len(DEFAULT_ROUND_CARDS), len(revealed) + len(upcoming))
     for offset in range(total_round):
+        row, col = round_cell(offset)
         if offset < len(revealed):
             space_id = revealed[offset]
             space = game.space(space_id)
@@ -146,8 +157,8 @@ def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
                     resource=None if space is None else space.resource,
                     key=_key_at(key_index),
                     round_number=offset + 1,
-                    row=offset // ROUND_COLUMNS,
-                    col=offset % ROUND_COLUMNS,
+                    row=row,
+                    col=col,
                 )
             )
         else:
@@ -168,8 +179,8 @@ def board_slots(game, *, god_mode: bool | None = None) -> list[SpaceSlot]:
                     key=_key_at(key_index),
                     round_number=offset + 1,
                     god_name=god_name,
-                    row=offset // ROUND_COLUMNS,
-                    col=offset % ROUND_COLUMNS,
+                    row=row,
+                    col=col,
                 )
             )
         key_index += 1
@@ -182,10 +193,7 @@ def is_pile_slot(slot: SpaceSlot) -> bool:
 
 def slot_title(slot: SpaceSlot, theme: Theme) -> str:
     if slot.face_down:
-        back = theme.icon("face_down") or "🂠"
-        if slot.round_number:
-            return f"{back}{slot.round_number}"
-        return back
+        return ""
     icon = theme.icon(slot.space_id or "")
     name = SPACE_NAMES.get(slot.space_id or "", slot.space_id or "")
     if icon and icon != name:
@@ -195,10 +203,7 @@ def slot_title(slot: SpaceSlot, theme: Theme) -> str:
 
 def slot_body(slot: SpaceSlot, theme: Theme) -> str:
     if slot.face_down:
-        back = theme.icon("face_down") or "🂠"
-        if slot.god_name:
-            return back
-        return back
+        return str(slot.round_number or "")
 
     worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
     if worker:
@@ -247,10 +252,9 @@ def inspect_text(slot: SpaceSlot, theme: Theme) -> str:
 
 def selection_summary(slot: SpaceSlot, theme: Theme) -> str:
     if slot.face_down:
-        back = theme.icon("face_down") or "🂠"
         if slot.god_name:
-            return f"選取：{back} {slot.god_name}（未翻開）　I 說明"
-        return f"選取：{back} 第{slot.round_number}回合（蓋著）　I 說明"
+            return f"選取：第{slot.round_number}回合 {slot.god_name}（未翻開）　I 說明"
+        return f"選取：第{slot.round_number}回合（蓋著）　I 說明"
 
     name = theme.space_caption(slot.space_id or "")
     pile = ""

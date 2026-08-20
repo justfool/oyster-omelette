@@ -53,7 +53,8 @@ def test_face_down_hides_name_unless_god():
         body = slot_body(slot, theme)
         assert "圍籬" not in body
         assert "fences" not in body
-        assert theme.icon("face_down") in body
+        assert theme.icon("face_down") not in body
+        assert body == str(slot.round_number)
 
     god_hidden = [slot for slot in board_slots(game, god_mode=True) if slot.face_down]
     assert any(slot.god_name == "圍籬" for slot in god_hidden)
@@ -72,6 +73,15 @@ def test_slot_body_shows_pile_and_worker_icon():
     assert DEFAULT_THEME.icon("wood") not in body
     assert "[1]" not in body
     assert "[P1]" not in body
+
+
+def test_round_cards_wrap_by_harvest_stage():
+    game = Game.setup(2)
+    rounds = [slot for slot in board_slots(game) if slot.zone == "round"]
+    rows = [slot.row for slot in rounds]
+    cols = [slot.col for slot in rounds]
+    assert rows == [0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5]
+    assert cols == [0, 1, 2, 3, 0, 1, 2, 0, 1, 0, 1, 0, 1, 0]
 
 
 def test_slot_title_is_a_single_icon():
