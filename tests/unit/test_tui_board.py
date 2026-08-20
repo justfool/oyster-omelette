@@ -60,10 +60,21 @@ def test_slot_body_shows_pile_and_worker_icon():
     assert game.place_worker(0, "forest").ok
     forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
     body = slot_body(forest, DEFAULT_THEME)
-    assert "森林" in slot_title(forest, DEFAULT_THEME)
+    title = slot_title(forest, DEFAULT_THEME)
+    assert title == DEFAULT_THEME.icon("forest")
+    assert title.count(DEFAULT_THEME.icon("forest")) == 1
     assert DEFAULT_THEME.icon("worker_1") in body
     assert "[1]" not in body
     assert "[P1]" not in body
+
+
+def test_slot_title_is_a_single_icon():
+    game = Game.setup(2)
+    game.prepare_round()
+    forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
+    title = slot_title(forest, DEFAULT_THEME)
+    assert title == "🌲"
+    assert "森林" not in title
 
 
 def test_accumulation_shown_as_icon_times_count():
@@ -125,7 +136,7 @@ def test_space_widget_is_focusable_and_shows_body():
     forest = next(slot for slot in board_slots(game) if slot.space_id == "forest")
     widget = ActionSpaceWidget(forest, DEFAULT_THEME)
     assert widget.can_focus
-    assert "森林" in widget.border_title
+    assert widget.border_title == DEFAULT_THEME.icon("forest")
     assert "pile" in widget.classes
     assert widget.border_title != "整塊清單"
 
