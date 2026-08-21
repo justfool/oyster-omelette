@@ -91,6 +91,18 @@ def do_harvest(game: Game) -> None:
     game.harvest()
 
 
+@when(parsers.parse("玩家 {number:d} 收成時不把木工坊的木頭換成食物"))
+def skip_joinery_on_harvest(game: Game, number: int) -> None:
+    from oyster_omelette.majors import CraftPlan
+
+    game.craft_plans[number - 1] = CraftPlan(joinery=False)
+
+
+@when(parsers.parse("玩家 {number:d} 收成時繁殖先讓野豬生"))
+def prefer_boar_on_breed(game: Game, number: int) -> None:
+    game.breed_prefers[number - 1] = "wild_boar"
+
+
 @when(parsers.parse("玩家 {number:d} 餵食時不把穀菜動物換成食物"))
 def skip_convert_on_feed(game: Game, number: int) -> None:
     from oyster_omelette.harvest import FeedPlan

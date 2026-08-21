@@ -44,6 +44,22 @@ Feature: 主要改良
     Then 玩家 1 應有 2 木
     And 玩家 1 應有 0 食物
 
+  Scenario: 木工坊收成時可以不把木頭換成食物
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 major_or_minor
+    When 完成開局設置
+    And 準備下一回合
+    And 公共供應只剩下 joinery
+    And 玩家 1 身上有 2 木與 2 石頭
+    And 玩家 1 放置工人到 major_or_minor
+    And 所有家人回家
+    And 玩家 1 身上有 3 木
+    And 玩家 1 收成時不把木工坊的木頭換成食物
+    And 進行收成
+    Then 玩家 1 應有 3 木
+    And 玩家 1 應有 0 食物
+    And 玩家 1 應有 2 張討飯卡
+
   Scenario: 井會在之後的準備回合給食物
     Given 1 位玩家的農家樂修訂版
     And 回合卡先翻 major_or_minor

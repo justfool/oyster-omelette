@@ -1,5 +1,7 @@
 """修訂版 10 張主要改良。效果用普通函式，自動選付得起的下一張。"""
 
+from dataclasses import dataclass
+
 ALL_MAJORS: tuple[str, ...] = (
     "fireplace_2",
     "fireplace_3",
@@ -172,15 +174,27 @@ def bake_best(player, grain: int | None = None) -> int:
     return food
 
 
-def convert_crafts(player) -> None:
-    """收成時各工坊最多換 1 份。"""
-    if "joinery" in player.majors and player.wood >= 1:
+@dataclass
+class CraftPlan:
+    """收成工坊要不要換。None 表示這項跟自動預設。False 表示跳過。"""
+
+    joinery: bool | None = None
+    pottery: bool | None = None
+    basketmaker: bool | None = None
+
+
+def convert_crafts(player, plan: CraftPlan | None = None) -> None:
+    """收成時各工坊最多換 1 份。不傳 plan 時有材料就換。"""
+    use_joinery = True if plan is None or plan.joinery is None else plan.joinery
+    use_pottery = True if plan is None or plan.pottery is None else plan.pottery
+    use_basket = True if plan is None or plan.basketmaker is None else plan.basketmaker
+    if use_joinery and "joinery" in player.majors and player.wood >= 1:
         player.wood -= 1
         player.food += 2
-    if "pottery" in player.majors and player.clay >= 1:
+    if use_pottery and "pottery" in player.majors and player.clay >= 1:
         player.clay -= 1
         player.food += 2
-    if "basketmaker" in player.majors and player.reed >= 1:
+    if use_basket and "basketmaker" in player.majors and player.reed >= 1:
         player.reed -= 1
         player.food += 3
 

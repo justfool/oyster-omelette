@@ -4,6 +4,7 @@ from oyster_omelette.farmyard import starting_farmyard
 from oyster_omelette.game import Game, Player
 from oyster_omelette.majors import (
     ALL_MAJORS,
+    CraftPlan,
     bake_best,
     choose_major,
     convert_crafts,
@@ -93,6 +94,19 @@ def test_joinery_converts_one_wood_at_harvest():
     convert_crafts(player)
     assert player.wood == 2
     assert player.food == 4
+
+
+def test_joinery_can_skip_convert():
+    player = Player(
+        farm=starting_farmyard(),
+        food=2,
+        is_start_player=True,
+        majors=["joinery"],
+        wood=3,
+    )
+    convert_crafts(player, CraftPlan(joinery=False))
+    assert player.wood == 3
+    assert player.food == 2
 
 
 def test_well_pays_food_on_following_prepares():

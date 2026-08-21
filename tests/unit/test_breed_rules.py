@@ -18,3 +18,23 @@ def test_no_room_means_no_lamb():
     player = Player(farm=starting_farmyard(), food=4, is_start_player=True, sheep=1)
     breed_player(player)
     assert player.sheep == 1
+
+
+def test_one_slot_left_prefers_sheep_by_default():
+    farm = starting_farmyard()
+    enclose_one_pasture(farm)
+    enclose_one_pasture(farm)
+    player = Player(farm=farm, food=4, is_start_player=True, sheep=2, wild_boar=2)
+    breed_player(player)
+    assert player.sheep == 3
+    assert player.wild_boar == 2
+
+
+def test_one_slot_left_can_prefer_boar():
+    farm = starting_farmyard()
+    enclose_one_pasture(farm)
+    enclose_one_pasture(farm)
+    player = Player(farm=farm, food=4, is_start_player=True, sheep=2, wild_boar=2)
+    breed_player(player, prefer="wild_boar")
+    assert player.sheep == 2
+    assert player.wild_boar == 3

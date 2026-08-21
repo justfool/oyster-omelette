@@ -126,11 +126,15 @@ def feed_player(player, plan: FeedPlan | None = None) -> None:
     apply_feed(player, resolved)
 
 
-def breed_player(player) -> None:
+def breed_player(player, prefer: str | None = None) -> None:
     from oyster_omelette.animals import animal_total
     from oyster_omelette.pastures import capacity_for
 
-    for kind in ("sheep", "wild_boar", "cattle"):
+    kinds = ["sheep", "wild_boar", "cattle"]
+    if prefer in kinds:
+        kinds.remove(prefer)
+        kinds.insert(0, prefer)
+    for kind in kinds:
         if getattr(player, kind) < 2:
             continue
         if animal_total(player) >= capacity_for(player):
@@ -138,15 +142,22 @@ def breed_player(player) -> None:
         setattr(player, kind, getattr(player, kind) + 1)
 
 
-def harvest(game, feed_plans: dict[int, FeedPlan] | None = None) -> None:
+def harvest(
+    game,
+    feed_plans: dict[int, FeedPlan] | None = None,
+    craft_plans: dict | None = None,
+    breed_prefers: dict | None = None,
+) -> None:
     from oyster_omelette.effects import after_harvest_fields
     from oyster_omelette.majors import convert_crafts
 
     plans = feed_plans or {}
+    crafts = craft_plans or {}
+    prefers = breed_prefers or {}
     for index, player in enumerate(game.players):
         player._game = game
         after_harvest_fields(game, player)
         take_crops(player)
-        convert_crafts(player)
+        convert_crafts(player, crafts.get(index))
         feed_player(player, plans.get(index))
-        breed_player(player)
+        breed_player(player, prefers.get(index))

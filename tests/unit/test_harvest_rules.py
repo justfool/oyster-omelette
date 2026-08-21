@@ -67,6 +67,8 @@ def test_harvest_clears_feed_plans():
     game.feed_plans[0] = FeedPlan(grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0)
     game.harvest()
     assert game.feed_plans == {}
+    assert game.craft_plans == {}
+    assert game.breed_prefers == {}
 
 
 def test_enough_food_no_begging():

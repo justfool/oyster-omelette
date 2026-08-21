@@ -80,6 +80,8 @@ class Game:
     major_supply: list[str] = field(default_factory=starting_supply)
     last_harvest_round: int = 0
     feed_plans: dict = field(default_factory=dict)
+    craft_plans: dict = field(default_factory=dict)
+    breed_prefers: dict = field(default_factory=dict)
     _turn_from: int = 0
 
     @classmethod
@@ -220,8 +222,12 @@ class Game:
 
         if self.harvested and not self.god_mode:
             return
-        run_harvest(self, self.feed_plans or None)
+        run_harvest(
+            self, self.feed_plans or None, self.craft_plans or None, self.breed_prefers or None
+        )
         self.feed_plans = {}
+        self.craft_plans = {}
+        self.breed_prefers = {}
         self.harvested = True
         self.last_harvest_round = self.round
 
