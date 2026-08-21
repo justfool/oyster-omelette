@@ -31,6 +31,7 @@ from oyster_omelette.tui.goods_view import (
     cards_text,
     goods_text,
 )
+from oyster_omelette.tui.choice_view import ChoiceScreen
 from oyster_omelette.tui.hand_view import HandScreen
 from oyster_omelette.tui.spaces import (
     NEEDS_CELL,
@@ -221,10 +222,6 @@ class OysterOmeletteApp(App):
         self.look = theme or load_theme()
         self.pending_space: str | None = None
         self.pending_row: int | None = None
-        self.pending_options: list[tuple[str, Picks]] | None = None
-        self.pending_choice_index: int = 0
-        self.pending_choice_space: str | None = None
-        self.pending_choice_target: tuple[int, int] | None = None
         self.god_actor: int = 0
         self.farm_open: bool = False
         self.messages: list[str] = [
@@ -253,17 +250,13 @@ class OysterOmeletteApp(App):
     def _picking_farm(self) -> bool:
         return self.pending_space is not None
 
-    def _picking_choice(self) -> bool:
-        return self.pending_options is not None
-
     def _board(self) -> BoardView:
         return self.query_one(BoardView)
 
     def on_board_view_selection_changed(self) -> None:
-        if self._picking_farm() or self._picking_choice():
+        if self._picking_farm():
             slot = self._board().selected_slot()
-            pending = self.pending_space or self.pending_choice_space
-            if slot.space_id != pending:
+            if slot.space_id != self.pending_space:
                 self._clear_pending()
         self._refresh_inspect()
 
@@ -333,8 +326,6 @@ class OysterOmeletteApp(App):
         slot = board.selected_slot()
         last = self.messages[-1] if self.messages else ""
         lines = [selection_summary(slot, self.look), f"剛才：{last}"]
-        if self._picking_choice() and self.pending_options:
-            lines.append(self._choice_text())
         if self.game.god_mode:
             upcoming = self.game.upcoming_round_cards()
             future = " → ".join(card_zh(card, self.look) for card in upcoming[:4])
@@ -363,13 +354,6 @@ class OysterOmeletteApp(App):
         self._move("left")
 
     def _move(self, direction: str) -> None:
-        if self._picking_choice() and self.pending_options:
-            step = -1 if direction in {"up", "left"} else 1
-            self.pending_choice_index = (self.pending_choice_index + step) % len(
-                self.pending_options
-            )
-            self._refresh_inspect()
-            return
         if self._picking_farm():
             self._farm().move(direction)
         else:
@@ -418,9 +402,6 @@ class OysterOmeletteApp(App):
         )
 
     def action_place_selected(self) -> None:
-        if self._picking_choice():
-            self._confirm_choice(self.pending_choice_index)
-            return
         if self._picking_farm():
             target = self._farm().selected_cell()
             space_id = self.pending_space
@@ -437,7 +418,7 @@ class OysterOmeletteApp(App):
         self._begin_or_place(slot.space_id)
 
     def action_cancel_pending(self) -> None:
-        if self.pending_options or self.pending_space:
+        if self.pending_space:
             self._clear_pending()
             self.note("取消選項。")
 
@@ -536,12 +517,6 @@ class OysterOmeletteApp(App):
     def on_key(self, event) -> None:
         if not event.character:
             return
-        if self._picking_choice() and event.character in "123456789":
-            index = int(event.character) - 1
-            if self.pending_options and index < len(self.pending_options):
-                self._confirm_choice(index)
-            event.stop()
-            return
         if self.pending_space:
             if event.character in "012345":
                 self._pick_cell_digit(event.character)
@@ -554,10 +529,6 @@ class OysterOmeletteApp(App):
     def _clear_pending(self) -> None:
         self.pending_space = None
         self.pending_row = None
-        self.pending_options = None
-        self.pending_choice_index = 0
-        self.pending_choice_space = None
-        self.pending_choice_target = None
 
     def _pick_cell_digit(self, key: str) -> None:
         if key == "0":
@@ -602,16 +573,6 @@ class OysterOmeletteApp(App):
             return
         self._offer_or_place(space_id, None)
 
-    def _choice_text(self) -> str:
-        options = self.pending_options or []
-        if not options:
-            return ""
-        shown = []
-        for index, (label, _picks) in enumerate(options[:9]):
-            mark = "→" if index == self.pending_choice_index else " "
-            shown.append(f"{mark}{index + 1} {label}")
-        return "選項：" + "  ".join(shown) + "　Enter 確認　Esc 取消"
-
     def _offer_or_place(self, space_id: str | None, target: tuple[int, int] | None) -> None:
         if not space_id:
             return
@@ -622,23 +583,15 @@ class OysterOmeletteApp(App):
         player = self.game.players[turn]
         options = space_options(self.game, player, space_id)
         if len(options) > 1:
-            self.pending_options = options
-            self.pending_choice_index = 0
-            self.pending_choice_space = space_id
-            self.pending_choice_target = target
-            self.note(f"選{self.look.space_caption(space_id)}的做法。方向鍵或數字，Enter 確認。")
-            self.refresh_view()
+            title = f"{self.look.space_caption(space_id)}：選一個做法"
+
+            def on_confirm(index: int, space_id=space_id, target=target, options=options) -> None:
+                picks = options[index][1]
+                self._place_on(space_id, target, picks)
+
+            self.push_screen(ChoiceScreen(title, options, self.look, on_confirm))
             return
         picks = options[0][1] if options else None
-        self._place_on(space_id, target, picks)
-
-    def _confirm_choice(self, index: int) -> None:
-        if not self.pending_options or index < 0 or index >= len(self.pending_options):
-            return
-        space_id = self.pending_choice_space
-        target = self.pending_choice_target
-        picks = self.pending_options[index][1]
-        self._clear_pending()
         self._place_on(space_id, target, picks)
 
     def _place_on(
