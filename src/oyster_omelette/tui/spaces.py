@@ -25,6 +25,8 @@ ZONE_ROUND = "round"
 
 FIXED_COLUMNS = 10
 
+HARVEST_ROUND_NUMBERS = frozenset({4, 7, 9, 11, 13, 14})
+
 SPACE_BLURBS = {
     "farm_expansion": "蓋房間（貼著既有房間；木屋 5 木+2 蘆）或蓋畜舍（2 木）。",
     "meeting_place": "成為起始玩家，下回合先放。之後可打 1 張次要改良。",
@@ -101,13 +103,12 @@ def fixed_space_ids(game) -> tuple[str, ...]:
 
 
 def round_cell(offset: int) -> tuple[int, int]:
-    """回合卡依收成階段換行：4、3、2、2、2、1。"""
-    start = 0
-    for row, size in enumerate(STAGE_SIZES):
-        if offset < start + size:
-            return row, offset - start
-        start += size
-    return len(STAGE_SIZES) - 1, offset - start
+    """回合卡單排 14 格；收成回合由邊框顏色標示，不換行。"""
+    return 0, offset
+
+
+def is_harvest_round_number(round_number: int | None) -> bool:
+    return round_number in HARVEST_ROUND_NUMBERS
 
 
 def worker_icon(player_index: int, theme: Theme) -> str:
@@ -192,8 +193,8 @@ def is_pile_slot(slot: SpaceSlot) -> bool:
 
 
 def slot_title(slot: SpaceSlot, theme: Theme) -> str:
-    if slot.face_down or slot.zone == ZONE_ROUND:
-        return ""
+    if slot.face_down:
+        return str(slot.round_number or "")
     icon = theme.icon(slot.space_id or "")
     name = SPACE_NAMES.get(slot.space_id or "", slot.space_id or "")
     if icon and icon != name:
@@ -203,17 +204,11 @@ def slot_title(slot: SpaceSlot, theme: Theme) -> str:
 
 def slot_body(slot: SpaceSlot, theme: Theme) -> str:
     if slot.face_down:
-        return str(slot.round_number or "")
+        return ""
 
     worker = worker_icon(slot.occupant, theme) if slot.occupant is not None else ""
     if worker:
         return worker
-    if slot.zone == ZONE_ROUND:
-        icon = theme.icon(slot.space_id or "")
-        if is_pile_slot(slot):
-            count = str(slot.accumulated)
-            return f"{icon}\n{count}" if icon else count
-        return icon
     if is_pile_slot(slot):
         return str(slot.accumulated)
     return ""
@@ -290,9 +285,9 @@ class ActionSpaceWidget(Static, can_focus=True):
     DEFAULT_CSS = """
     ActionSpaceWidget {
         border: round $primary;
-        width: 5;
-        min-width: 5;
-        height: 4;
+        width: 9;
+        min-width: 9;
+        height: 5;
         padding: 0;
         content-align: center middle;
     }
@@ -304,8 +299,18 @@ class ActionSpaceWidget(Static, can_focus=True):
     ActionSpaceWidget.face-down {
         border: dashed $primary 40%;
         color: $text-muted;
-        height: 4;
-        width: 5;
+        height: 5;
+        width: 9;
+    }
+    ActionSpaceWidget.harvest-round {
+        border: round $warning;
+    }
+    ActionSpaceWidget.harvest-round.face-down {
+        border: dashed $warning 60%;
+    }
+    ActionSpaceWidget.harvest-round:focus,
+    ActionSpaceWidget.harvest-round.selected {
+        border: heavy $accent;
     }
     ActionSpaceWidget.occupied {
         color: $text;
@@ -355,4 +360,6 @@ def _slot_classes(slot: SpaceSlot, selected: bool) -> str:
         bits.append("pile")
     if slot.occupant is not None:
         bits.append("occupied")
+    if slot.zone == ZONE_ROUND and is_harvest_round_number(slot.round_number):
+        bits.append("harvest-round")
     return " ".join(bits)

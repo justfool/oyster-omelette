@@ -50,11 +50,13 @@ def test_face_down_hides_name_unless_god():
     hidden = [slot for slot in board_slots(game, god_mode=False) if slot.face_down]
     theme = DEFAULT_THEME
     for slot in hidden:
+        title = slot_title(slot, theme)
         body = slot_body(slot, theme)
-        assert "圍籬" not in body
-        assert "fences" not in body
-        assert theme.icon("face_down") not in body
-        assert body == str(slot.round_number)
+        assert "圍籬" not in title
+        assert "fences" not in title
+        assert theme.icon("face_down") not in title
+        assert title == str(slot.round_number)
+        assert body == ""
 
     god_hidden = [slot for slot in board_slots(game, god_mode=True) if slot.face_down]
     assert any(slot.god_name == "圍籬" for slot in god_hidden)
@@ -75,29 +77,51 @@ def test_slot_body_shows_pile_and_worker_icon():
     assert "[P1]" not in body
 
 
-def test_round_cards_wrap_by_harvest_stage():
+def test_round_cards_lay_out_in_single_row():
     game = Game.setup(2)
     rounds = [slot for slot in board_slots(game) if slot.zone == "round"]
     rows = [slot.row for slot in rounds]
     cols = [slot.col for slot in rounds]
-    assert rows == [0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5]
-    assert cols == [0, 1, 2, 3, 0, 1, 2, 0, 1, 0, 1, 0, 1, 0]
+    assert rows == [0] * 14
+    assert cols == list(range(14))
 
 
-def test_round_card_shows_number_then_icon():
+def test_round_card_face_down_shows_number_in_border_title():
     game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))
     hidden = next(
         slot
         for slot in board_slots(game)
         if slot.zone == "round" and slot.face_down and slot.round_number == 1
     )
-    assert slot_body(hidden, DEFAULT_THEME) == "1"
-    assert slot_title(hidden, DEFAULT_THEME) == ""
+    assert slot_title(hidden, DEFAULT_THEME) == "1"
+    assert slot_body(hidden, DEFAULT_THEME) == ""
+
+
+def test_harvest_round_number_is_marked_on_slot():
+    from oyster_omelette.tui.spaces import _slot_classes, is_harvest_round_number
+
+    assert is_harvest_round_number(4)
+    assert is_harvest_round_number(14)
+    assert not is_harvest_round_number(1)
+    assert not is_harvest_round_number(5)
+    game = Game.setup(2)
+    harvest_slot = next(
+        slot for slot in board_slots(game) if slot.zone == "round" and slot.round_number == 4
+    )
+    other_slot = next(
+        slot for slot in board_slots(game) if slot.zone == "round" and slot.round_number == 1
+    )
+    assert "harvest-round" in _slot_classes(harvest_slot, selected=False)
+    assert "harvest-round" not in _slot_classes(other_slot, selected=False)
+
+
+def test_revealed_round_card_puts_icon_in_border_title():
+    game = Game.setup(2, round_cards=list(DEFAULT_ROUND_CARDS))
     game.prepare_round()
     shown = next(slot for slot in board_slots(game) if slot.space_id == "fences")
     assert shown.zone == "round"
-    assert DEFAULT_THEME.icon("fences") in slot_body(shown, DEFAULT_THEME)
-    assert slot_title(shown, DEFAULT_THEME) == ""
+    assert slot_title(shown, DEFAULT_THEME) == DEFAULT_THEME.icon("fences")
+    assert slot_body(shown, DEFAULT_THEME) == ""
 
 
 def test_slot_title_is_a_single_icon():
