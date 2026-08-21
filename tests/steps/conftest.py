@@ -221,6 +221,14 @@ def play_minor_in_front(game: Game, number: int, card_id: str) -> None:
     game.players[number - 1].minors_played.append(card_id)
 
 
+@when(parsers.parse("玩家 {number:d} 下次住不下的動物煮 {count:d} 隻"))
+def queue_cook_animals(last_place: dict, number: int, count: int) -> None:
+    del number
+    from oyster_omelette.picks import Picks
+
+    last_place["picks"] = Picks(cook_animals=count)
+
+
 @when(parsers.parse("玩家 {number:d} 下次烤麵包只烤 {count:d} 穀"))
 def queue_bake_grain(last_place: dict, number: int, count: int) -> None:
     del number

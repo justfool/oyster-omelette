@@ -309,7 +309,7 @@ def _apply_space(
     plan = picks
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
-            house_animals(player, space.resource, space.accumulated)
+            house_animals(player, space.resource, space.accumulated, plan.cook_animals)
         else:
             add_resource(player, space.resource, space.accumulated)
             extra = bonus_on_take(player, space.resource, space.id)

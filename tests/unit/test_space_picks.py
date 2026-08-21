@@ -103,6 +103,18 @@ def test_sow_plants_rejects_not_enough_seed():
     assert player.farm.cell(0, 1).crop is None
 
 
+def test_sheep_market_can_let_extra_flee_with_fireplace():
+    game = Game.setup(1, round_cards=["sheep"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.has_fireplace = True
+    game.space("sheep").accumulated = 3
+    food = player.food
+    assert game.place_worker(0, "sheep", picks=Picks(cook_animals=0)).ok
+    assert player.sheep == 1
+    assert player.food == food
+
+
 def test_sow_and_or_bake_can_bake_one_grain():
     game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
     game.prepare_round()

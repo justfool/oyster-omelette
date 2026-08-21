@@ -31,3 +31,27 @@ Feature: 動物要有地方住
     And 玩家 1 放置工人到 sheep
     Then 玩家 1 應有 1 羊
     And 玩家 1 應有 6 食物
+
+  Scenario: 有壁爐也可以讓多的羊跑掉
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sheep
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 已有壁爐
+    And 羊市上有 3 羊
+    And 玩家 1 下次住不下的動物煮 0 隻
+    And 玩家 1 放置工人到 sheep
+    Then 玩家 1 應有 1 羊
+    And 玩家 1 應有 2 食物
+
+  Scenario: 有壁爐可以只煮 1 隻多的羊
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sheep
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 已有壁爐
+    And 羊市上有 3 羊
+    And 玩家 1 下次住不下的動物煮 1 隻
+    And 玩家 1 放置工人到 sheep
+    Then 玩家 1 應有 1 羊
+    And 玩家 1 應有 4 食物
