@@ -45,10 +45,10 @@ SPACE_NAMES = {
 }
 
 MAJOR_NAMES = {
-    "fireplace_2": "壁爐(2黏)",
-    "fireplace_3": "壁爐(3黏)",
-    "hearth_4": "灶(4黏)",
-    "hearth_5": "灶(5黏)",
+    "fireplace_2": "壁爐",
+    "fireplace_3": "壁爐",
+    "hearth_4": "灶",
+    "hearth_5": "灶",
     "clay_oven": "黏土爐",
     "stone_oven": "石爐",
     "joinery": "木工坊",
