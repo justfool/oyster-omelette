@@ -196,7 +196,9 @@ class OysterOmeletteApp(App):
         Binding("s", "show_score", "計分"),
         Binding("question_mark", "help", "按鍵"),
         Binding("g", "toggle_god", "上帝", show=False),
-        Binding("tab", "next_actor", "換操作者", show=False),
+        Binding("n", "next_actor", "換操作者", show=False),
+        Binding("tab", "cycle_next", "下一格", show=False, priority=True),
+        Binding("shift+tab", "cycle_prev", "上一格", show=False, priority=True),
         Binding("m", "toggle_farm", "農場"),
         Binding("t", "cycle_theme", "主題", show=False),
         Binding("enter", "place_selected", "放工人", priority=True),
@@ -350,6 +352,13 @@ class OysterOmeletteApp(App):
     def action_move_right(self) -> None:
         self._move("right")
 
+    def action_cycle_next(self) -> None:
+        # Tab 走下一格；接管掉 Textual 預設把焦點跳到下一個 focusable 的行為。
+        self._move("right")
+
+    def action_cycle_prev(self) -> None:
+        self._move("left")
+
     def _move(self, direction: str) -> None:
         if self._picking_choice() and self.pending_options:
             step = -1 if direction in {"up", "left"} else 1
@@ -415,7 +424,7 @@ class OysterOmeletteApp(App):
         if self.game.god_mode:
             self.SUB_TITLE = "農家樂（上帝模式）"
             self.god_actor = 0
-            self.note("上帝模式開啟：可略過大部分檢查，並顯示未翻開的回合卡與手牌。Tab 換操作者。")
+            self.note("上帝模式開啟：可略過大部分檢查，並顯示未翻開的回合卡與手牌。N 換操作者。")
         else:
             self.SUB_TITLE = "農家樂（修訂版）"
             self.note("上帝模式關閉。")
@@ -472,8 +481,8 @@ class OysterOmeletteApp(App):
 
     def action_help(self) -> None:
         self.note(
-            "方向鍵選格。Enter／空白放工人。I 跳出格子說明。"
-            "P 準備  R 回家  S 計分  G 上帝  M 農場  T 主題  ? 按鍵  Q 離開。"
+            "方向鍵／Tab 選格。Enter／空白放工人。I 跳出格子說明。"
+            "P 準備  R 回家  S 計分  G 上帝  N 換操作者  M 農場  T 主題  ? 按鍵  Q 離開。"
             "耕田圍籬蓋房先選行動再方向鍵選農場格。"
             "上課／改良／播種會先列出選項，Enter 用預設。"
         )
