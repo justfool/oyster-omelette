@@ -27,9 +27,11 @@ def first_playable_minor(player, game=None) -> str:
 
 
 def default_space_picks(player, space, game=None, target=None, cells=None) -> Picks:
-    """現在的代打：第一張付得起的牌、兩個都做、材料用完、市場拿蘆葦。"""
-    del target, cells
+    """現在的代打：第一張付得起的牌、兩個都做、市場拿蘆葦。
+    沒指定格子時擴建／圍籬把材料用完；有 target 就只做那一格。"""
+    del cells
     occupation = player.occupations_hand[0] if player.occupations_hand else ""
+    only_that_cell = target is not None
     return Picks(
         occupation=occupation,
         minor=None,
@@ -38,8 +40,8 @@ def default_space_picks(player, space, game=None, target=None, cells=None) -> Pi
         bake=True,
         plow=True,
         market="reed",
-        continue_expand=True,
-        continue_fence=True,
+        continue_expand=not only_that_cell,
+        continue_fence=not only_that_cell,
         fence_after_renovate=True,
     )
 

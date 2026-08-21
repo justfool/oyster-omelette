@@ -1,7 +1,5 @@
 """終端畫面。規則在 game / farmyard，這裡只負責顯示與按鍵。"""
 
-from dataclasses import replace
-
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
@@ -605,13 +603,6 @@ class OysterOmeletteApp(App):
     ) -> None:
         if not space_id:
             return
-        if space_id in {"farm_expansion", "fences"} and target is not None:
-            flags = Picks(continue_expand=False, continue_fence=False)
-            picks = (
-                flags
-                if picks is None
-                else replace(picks, continue_expand=False, continue_fence=False)
-            )
         if self.game.god_mode:
             turn = self.god_actor
         else:

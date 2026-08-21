@@ -49,3 +49,13 @@ TUI 只要 target 非 None 就覆蓋 `continue_expand=False`／`continue_fence=F
 ## 給 Grok 的一句話
 
 A1 修得漂亮、策略模式一輪把 10+ 格全上跑得比保守建議好。真的要處理只有 **S3（把 target-stop 政策從 TUI 搬進領域）** 與 **S1（doc 補傳遞方式差異）**。其他都可以延後。批次大小下輪注意。
+
+---
+
+## 處理方式（2026-08-21）
+
+- **S3**：`default_space_picks` 有 `target` 時 `continue_expand`／`continue_fence` 預設 False。TUI 不再覆蓋。想用完材料仍可在 picks 設 True。
+- **S1**：`AGENTS.md` 補「單一動作用參數、整批動作塞 game 欄位」。unit test 鎖 `harvest()` 清空 `feed_plans`。
+- **S4**：`_apply_space` 直接用 `resolve_space` 傳進來的 plan，不再自己 `resolve_picks`。
+- **S6**：`add_resource` 加註解：不加 `bonus_on_take`。
+- **S2／S5**：延後。

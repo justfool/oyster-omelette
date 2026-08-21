@@ -68,6 +68,7 @@ def _lessons_food_cost(player, space_id: str) -> int:
 
 
 def add_resource(player, resource: str, amount: int) -> None:
+    """只加資源、記本回合建材。bonus_on_take 只在累積格拿走時另呼，資源市場不加林務員那類加成。"""
     setattr(player, resource, getattr(player, resource) + amount)
     note_gained_building(player, resource, amount)
 
@@ -305,7 +306,7 @@ def _apply_space(
     cells: set[tuple[int, int]] | None = None,
     picks: Picks | None = None,
 ) -> None:
-    plan = picks if picks is not None else resolve_picks(player, space, game, target, cells)
+    plan = picks
     if space.resource is not None:
         if space.resource in {"sheep", "wild_boar", "cattle"}:
             house_animals(player, space.resource, space.accumulated)

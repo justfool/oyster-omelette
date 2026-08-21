@@ -58,6 +58,17 @@ def test_feed_plan_can_keep_grain_and_beg():
     assert player.begging == 4
 
 
+def test_harvest_clears_feed_plans():
+    from oyster_omelette.game import Game
+
+    game = Game.setup(1)
+    game.prepare_round()
+    game.return_home()
+    game.feed_plans[0] = FeedPlan(grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0)
+    game.harvest()
+    assert game.feed_plans == {}
+
+
 def test_enough_food_no_begging():
     farm = starting_farmyard()
     player = Player(farm=farm, food=4, is_start_player=True)

@@ -91,9 +91,7 @@ def test_farm_expansion_can_stop_after_chosen_cell():
     player = game.players[0]
     player.wood = 12
     player.reed = 4
-    assert game.place_worker(
-        0, "farm_expansion", target=(0, 1), picks=Picks(continue_expand=False)
-    ).ok
+    assert game.place_worker(0, "farm_expansion", target=(0, 1)).ok
     assert player.farm.room_count() == 3
     assert player.wood == 7
     assert player.reed == 2
@@ -105,7 +103,7 @@ def test_fences_can_stop_after_chosen_cell():
     game.prepare_round()
     player = game.players[0]
     player.wood = 8
-    assert game.place_worker(0, "fences", target=(2, 0), picks=Picks(continue_fence=False)).ok
+    assert game.place_worker(0, "fences", target=(2, 0)).ok
     assert (2, 0) in pasture_cells(player.farm)
     assert pasture_count(player.farm) == 1
     assert player.wood == 4

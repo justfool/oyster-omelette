@@ -85,7 +85,9 @@ place_worker(..., picks=None)
 harvest(..., picks=None)
 ```
 
-TUI：Enter 不開選單 = 整包預設。開選單 = 先算出預設方案給玩家改，確認後整份送進領域。驗證方案（資源夠不夠、格子合不合法）在領域，回 `PlaceResult`，不要在 Textual 裡重寫規則。
+傳遞方式：單一動作（放工人）方案當**參數**傳 `place_worker(..., picks=)`。整批動作（收成）先塞 `game.feed_plans`，`harvest()` 讀完清空。開局發牌這類也用 game 欄位，不當呼叫參數。
+
+TUI：Enter 不開選單 = 整包預設。開選單 = 先算出預設方案給玩家改，確認後整份送進領域。驗證方案（資源夠不夠、格子合不合法）在領域，回 `PlaceResult`，不要在 Textual 裡重寫規則。指定農場格時，領域預設只做那一格（`continue_expand`／`continue_fence` 為 False）；要繼續用材料可在 picks 設 True。
 
 卡文「可以」：預設維持「付得起就做」；方案裡可以標跳過。
 
