@@ -120,7 +120,9 @@ def test_revealed_round_card_puts_icon_in_border_title():
     game.prepare_round()
     shown = next(slot for slot in board_slots(game) if slot.space_id == "fences")
     assert shown.zone == "round"
-    assert slot_title(shown, DEFAULT_THEME) == DEFAULT_THEME.icon("fences")
+    assert DEFAULT_THEME.icon("fences") == "🚧"
+    assert DEFAULT_THEME.icon("fences") != DEFAULT_THEME.icon("wood")
+    assert slot_title(shown, DEFAULT_THEME) == "🚧"
     assert slot_body(shown, DEFAULT_THEME) == ""
 
 

@@ -136,7 +136,7 @@ DEFAULT_ICONS = {
     "resource_market_4p": "🛒",
     "traveling_players": "🎭",
     "lessons_4p": "📚",
-    "fences": "🪵",
+    "fences": "🚧",
     "major_or_minor": "⚒️",
     "sow_and_or_bake": "🍞",
     "family_growth": "👶",

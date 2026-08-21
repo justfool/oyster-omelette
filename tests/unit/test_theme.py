@@ -80,6 +80,8 @@ def test_default_theme_has_worker_and_face_down_icons():
     for player in range(1, 5):
         assert "\u200d" not in theme.icon(f"worker_{player}")
     assert theme.icon("face_down") == "🂠"
+    assert theme.icon("fences") == "🚧"
+    assert theme.icon("fences") != theme.icon("wood")
 
 
 def test_text_theme_has_worker_and_face_down_words():
