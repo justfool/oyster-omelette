@@ -31,5 +31,5 @@ def test_supply_text_flags_taken_major():
     game.players[0].majors.append("fireplace_2")
     game.major_supply.remove("fireplace_2")
     text = supply_text(game, DEFAULT_THEME)
-    lines = [line for line in text.split("\n") if line.startswith("🔥") or "壁爐(2黏)" in line]
+    lines = [line for line in text.split("\n") if line.startswith("🔥") or "壁爐" in line]
     assert any("玩家1" in line and "已蓋" in line for line in lines)
