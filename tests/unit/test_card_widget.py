@@ -29,10 +29,27 @@ def test_major_card_title_is_zh_name():
     assert "壁爐" in title
 
 
-def test_major_card_body_starts_with_kind_label():
+def test_major_card_body_shows_cost_effect_and_vp():
     body = card_body("fireplace_2", DEFAULT_THEME)
-    assert body.startswith("主要改良")
+    # 主要改良格內只放費用、效果、VP；不再放 kind/prereq/打出。
+    assert body.startswith("費")
+    assert "烤麵包" in body
     assert "VP" in body
+    assert "主要改良" not in body
+    assert "需" not in body
+    assert "打出" not in body
+
+
+def test_well_card_body_lists_five_round_effect():
+    body = card_body("well", DEFAULT_THEME)
+    assert "5 回合" in body
+    assert "VP" in body
+
+
+def test_workshop_card_body_lists_convert_and_endgame_bonus():
+    body = card_body("joinery", DEFAULT_THEME)
+    assert "1 木" in body
+    assert "終局" in body
 
 
 def test_size_constants_are_reasonable():

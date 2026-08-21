@@ -8,6 +8,8 @@
   第 4 行       打出時拿到的資源
   第 5 行       VP／旅行等屬性標籤
   底部空白讓卡有呼吸空間
+
+主要改良格內只放費用、效果、VP —— kind／需／打出對主要沒意義。
 """
 
 from __future__ import annotations
@@ -35,6 +37,56 @@ PREREQ_ZH: dict[str, str] = {
     "2 Grain Fields": "2 塊穀田",
     "5 Clay in Supply": "供應剩 5 黏土",
     "Person on Fishing": "漁場有人",
+}
+
+
+# 主要改良的效果短句，依卡文寫。烤具用兩行放清楚不同煮法。
+MAJOR_EFFECT_ZH: dict[str, tuple[str, ...]] = {
+    "fireplace_2": (
+        "隨時把菜／動物換食：",
+        "菜 2、羊豬 2、牛 3。",
+        "烤麵包：1 穀 → 2 食。",
+    ),
+    "fireplace_3": (
+        "隨時把菜／動物換食：",
+        "菜 2、羊豬 2、牛 3。",
+        "烤麵包：1 穀 → 2 食。",
+    ),
+    "hearth_4": (
+        "隨時把菜／動物換食：",
+        "菜 3、羊 2、豬 3、牛 4。",
+        "烤麵包：1 穀 → 3 食。",
+        "壁爐可免費升級。",
+    ),
+    "hearth_5": (
+        "隨時把菜／動物換食：",
+        "菜 3、羊 2、豬 3、牛 4。",
+        "烤麵包：1 穀 → 3 食。",
+        "壁爐可免費升級。",
+    ),
+    "clay_oven": (
+        "烤麵包行動：",
+        "1 穀 → 5 食（一次只用 1 穀）。",
+    ),
+    "stone_oven": (
+        "烤麵包行動：",
+        "1 穀 → 4 食，最多用 2 穀。",
+    ),
+    "joinery": (
+        "收成可換 1 木 → 2 食。",
+        "終局：3/5/7 木 +1/2/3。",
+    ),
+    "pottery": (
+        "收成可換 1 黏 → 2 食。",
+        "終局：3/5/7 黏 +1/2/3。",
+    ),
+    "basketmaker": (
+        "收成可換 1 蘆 → 3 食。",
+        "終局：2/4/5 蘆 +1/2/3。",
+    ),
+    "well": (
+        "接下來 5 回合回合初 +1 食。",
+    ),
 }
 
 
@@ -79,7 +131,7 @@ def _card_lines(card: Card, theme: Theme) -> list[str]:
 
 
 def _major_lines(major_id: str, theme: Theme) -> list[str]:
-    lines = ["主要改良"]
+    lines: list[str] = []
     costs = COSTS.get(major_id, {})
     if costs:
         bits = []
@@ -87,12 +139,12 @@ def _major_lines(major_id: str, theme: Theme) -> list[str]:
             icon = theme.icon(resource) or resource
             bits.append(f"{icon}{amount}")
         lines.append("費 " + " ".join(bits))
-    else:
-        lines.append("費 —")
-    lines.append("需 —")
-    lines.append("打出 —")
+    lines.append("")  # 費用與效果之間留一行
+    lines.extend(MAJOR_EFFECT_ZH.get(major_id, ()))
     vp = POINTS.get(major_id, 0)
-    lines.append(f"VP {vp:+d}" if vp else "")
+    if vp:
+        lines.append("")
+        lines.append(f"VP {vp:+d}")
     return lines
 
 
