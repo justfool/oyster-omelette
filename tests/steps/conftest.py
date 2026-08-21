@@ -95,9 +95,7 @@ def do_harvest(game: Game) -> None:
 def skip_convert_on_feed(game: Game, number: int) -> None:
     from oyster_omelette.harvest import FeedPlan
 
-    game.feed_plans[number - 1] = FeedPlan(
-        grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0
-    )
+    game.feed_plans[number - 1] = FeedPlan(grain=0, vegetable=0, sheep=0, wild_boar=0, cattle=0)
 
 
 @when(parsers.parse("玩家 {number:d} 身上有 {wood:d} 木與 {reed:d} 蘆葦"))
@@ -223,9 +221,26 @@ def play_minor_in_front(game: Game, number: int, card_id: str) -> None:
     game.players[number - 1].minors_played.append(card_id)
 
 
+@when(parsers.parse("玩家 {number:d} 下次播種只在第 {row:d} 列第 {col:d} 格播穀"))
+def queue_sow_one_grain(last_place: dict, number: int, row: int, col: int) -> None:
+    del number
+    from oyster_omelette.picks import Picks
+
+    last_place["picks"] = Picks(sow=True, bake=False, sow_plants=[(row - 1, col - 1, "grain")])
+
+
+@when(parsers.parse("玩家 {number:d} 下次播種只在第 {row:d} 列第 {col:d} 格播菜"))
+def queue_sow_one_vegetable(last_place: dict, number: int, row: int, col: int) -> None:
+    del number
+    from oyster_omelette.picks import Picks
+
+    last_place["picks"] = Picks(sow=True, bake=False, sow_plants=[(row - 1, col - 1, "vegetable")])
+
+
 @when(parsers.parse("玩家 {number:d} 放置工人到 {space_id}"))
 def place_worker(game: Game, last_place: dict, number: int, space_id: str) -> None:
-    last_place["result"] = game.place_worker(number - 1, space_id)
+    picks = last_place.pop("picks", None)
+    last_place["result"] = game.place_worker(number - 1, space_id, picks=picks)
 
 
 @when(parsers.parse("玩家 {number:d} 把工人放到 {space_id} 的第 {row:d} 列第 {col:d} 格"))
@@ -522,6 +537,14 @@ def then_empty_cell(game: Game, row: int, col: int) -> None:
 def then_field_cell(game: Game, row: int, col: int) -> None:
     cell = game.players[0].farm.cell(row - 1, col - 1)
     assert cell.kind == CellKind.FIELD
+
+
+@then(parsers.parse("第 {row:d} 列第 {col:d} 格應是空田"))
+def then_empty_field(game: Game, row: int, col: int) -> None:
+    cell = game.players[0].farm.cell(row - 1, col - 1)
+    assert cell.kind == CellKind.FIELD
+    assert cell.crop is None
+    assert cell.crop_count == 0
 
 
 @then(parsers.parse("第 {row:d} 列第 {col:d} 格田上應有 {count:d} 穀"))

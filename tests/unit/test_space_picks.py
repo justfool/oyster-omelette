@@ -47,6 +47,62 @@ def test_major_or_minor_can_pick_later_major():
     assert "fireplace_2" not in player.majors
 
 
+def test_sow_and_or_bake_can_plant_one_field():
+    game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.farm.cell(0, 1).kind = CellKind.FIELD
+    player.farm.cell(0, 2).kind = CellKind.FIELD
+    player.grain = 2
+    assert game.place_worker(
+        0,
+        "sow_and_or_bake",
+        picks=Picks(sow=True, bake=False, sow_plants=[(0, 1, "grain")]),
+    ).ok
+    assert player.farm.cell(0, 1).crop == "grain"
+    assert player.farm.cell(0, 2).crop is None
+    assert player.grain == 1
+
+
+def test_sow_plants_rejects_non_field():
+    game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.farm.cell(0, 1).kind = CellKind.FIELD
+    player.grain = 1
+    result = game.place_worker(
+        0,
+        "sow_and_or_bake",
+        picks=Picks(sow=True, bake=False, sow_plants=[(0, 0, "grain")]),
+    )
+    assert not result.ok
+    assert "illegal_cell" in result.error
+    assert player.grain == 1
+    assert player.unplaced_workers == 2
+
+
+def test_sow_plants_rejects_not_enough_seed():
+    game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.farm.cell(0, 1).kind = CellKind.FIELD
+    player.farm.cell(0, 2).kind = CellKind.FIELD
+    player.grain = 1
+    result = game.place_worker(
+        0,
+        "sow_and_or_bake",
+        picks=Picks(
+            sow=True,
+            bake=False,
+            sow_plants=[(0, 1, "grain"), (0, 2, "grain")],
+        ),
+    )
+    assert not result.ok
+    assert "cannot_sow" in result.error
+    assert player.grain == 1
+    assert player.farm.cell(0, 1).crop is None
+
+
 def test_sow_and_or_bake_can_sow_without_baking():
     game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
     game.prepare_round()

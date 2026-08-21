@@ -53,3 +53,38 @@ Feature: 播種
     Then 第 1 列第 2 格田上應有 3 穀
     And 第 1 列第 3 格田上應有 3 穀
     And 玩家 1 應有 0 穀
+
+  Scenario: 指定只播一塊田時另一塊保持空
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 身上有 2 穀
+    And 玩家 1 下次播種只在第 1 列第 2 格播穀
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 上次放置應成功
+    And 第 1 列第 2 格田上應有 3 穀
+    And 第 1 列第 3 格應是空田
+    And 玩家 1 應有 1 穀物
+
+  Scenario: 身上有穀也可以指定播菜
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 放置工人到 farmland
+    And 所有家人回家
+    And 準備下一回合
+    And 玩家 1 身上有 1 穀
+    And 玩家 1 身上有 1 菜
+    And 玩家 1 下次播種只在第 1 列第 2 格播菜
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 上次放置應成功
+    And 第 1 列第 2 格田上應有 2 菜
+    And 玩家 1 應有 1 穀物

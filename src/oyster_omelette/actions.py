@@ -382,7 +382,7 @@ def _apply_space(
 
     if space.id == "sow_and_or_bake":
         if plan.sow:
-            sow_fields(player)
+            sow_fields(player, plan.sow_plants)
         if plan.bake:
             bake_best(player)
         return
@@ -398,7 +398,7 @@ def _apply_space(
             else:
                 plow_first_legal(player.farm)
         if plan.sow:
-            sow_fields(player)
+            sow_fields(player, plan.sow_plants)
         return
 
     if space.id == "fences":

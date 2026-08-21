@@ -260,22 +260,53 @@ def empty_fields(farm: Farmyard) -> list[Cell]:
     return found
 
 
-def sow_fields(player) -> bool:
-    """把身上的種子播到所有空田。穀田 3、菜田 2。"""
+CROP_ON_FIELD = {"grain": 3, "vegetable": 2}
+
+
+def default_sow_plan(player) -> list[tuple[int, int, str]]:
+    """現在的代打：所有空田先穀後菜。卡片上的田不列在這份，仍由 sow_fields 自動播。"""
+    plants = []
+    grain = player.grain
+    vegetable = player.vegetable
+    for row in range(player.farm.rows):
+        for col in range(player.farm.cols):
+            cell = player.farm.cell(row, col)
+            if cell.kind != CellKind.FIELD or cell.crop_count != 0:
+                continue
+            if grain > 0:
+                plants.append((row, col, "grain"))
+                grain -= 1
+            elif vegetable > 0:
+                plants.append((row, col, "vegetable"))
+                vegetable -= 1
+            else:
+                return plants
+    return plants
+
+
+def apply_sow(player, plants: list[tuple[int, int, str]]) -> bool:
     planted = False
-    for cell in empty_fields(player.farm):
-        if player.grain > 0:
+    for row, col, crop in plants:
+        amount = CROP_ON_FIELD[crop]
+        if crop == "grain":
+            if player.grain <= 0:
+                continue
             player.grain -= 1
-            cell.crop = "grain"
-            cell.crop_count = 3
-            planted = True
-        elif player.vegetable > 0:
+        elif crop == "vegetable":
+            if player.vegetable <= 0:
+                continue
             player.vegetable -= 1
-            cell.crop = "vegetable"
-            cell.crop_count = 2
-            planted = True
         else:
-            break
+            continue
+        cell = player.farm.cell(row, col)
+        cell.crop = crop
+        cell.crop_count = amount
+        planted = True
+    return planted
+
+
+def _sow_card_fields(player) -> bool:
+    planted = False
     for card_field in getattr(player, "card_fields", []):
         if card_field.get("crop_count", 0) > 0:
             continue
@@ -302,6 +333,14 @@ def sow_fields(player) -> bool:
                 card_field["crop_count"] = 2
                 planted = True
     return planted
+
+
+def sow_fields(player, plants: list[tuple[int, int, str]] | None = None) -> bool:
+    """播種。plants 為 None 時所有空田先穀後菜，並播卡片上的田。有列出就只播那些農場格。"""
+    if plants is None:
+        planted = apply_sow(player, default_sow_plan(player))
+        return _sow_card_fields(player) or planted
+    return apply_sow(player, plants)
 
 
 def return_people_home(farm: Farmyard, count: int) -> None:

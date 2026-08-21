@@ -15,6 +15,7 @@ class Picks:
     continue_expand: bool | None = None
     continue_fence: bool | None = None
     fence_after_renovate: bool | None = None
+    sow_plants: list[tuple[int, int, str]] | None = None
 
 
 def first_playable_minor(player, game=None) -> str:
@@ -68,6 +69,7 @@ def merge_picks(auto: Picks, picks: Picks | None) -> Picks:
             if picks.fence_after_renovate is None
             else picks.fence_after_renovate
         ),
+        sow_plants=auto.sow_plants if picks.sow_plants is None else picks.sow_plants,
     )
 
 
@@ -95,6 +97,38 @@ def picks_error(player, space, picks: Picks, game=None) -> str:
             return "cannot_build_fireplace"
     if space.id == "resource_market_3p" and picks.market not in {"reed", "stone"}:
         return "illegal_cell"
+    if picks.sow and picks.sow_plants is not None:
+        return _sow_plants_error(player, picks.sow_plants)
+    return ""
+
+
+def _sow_plants_error(player, plants: list[tuple[int, int, str]]) -> str:
+    from oyster_omelette.farmyard import CellKind
+
+    seen: set[tuple[int, int]] = set()
+    grain_need = 0
+    vegetable_need = 0
+    for plant in plants:
+        if len(plant) != 3:
+            return "illegal_cell"
+        row, col, crop = plant
+        if crop not in {"grain", "vegetable"}:
+            return "illegal_cell"
+        try:
+            cell = player.farm.cell(row, col)
+        except IndexError:
+            return "illegal_cell"
+        if cell.kind != CellKind.FIELD or cell.crop_count != 0:
+            return "illegal_cell"
+        if (row, col) in seen:
+            return "illegal_cell"
+        seen.add((row, col))
+        if crop == "grain":
+            grain_need += 1
+        else:
+            vegetable_need += 1
+    if grain_need > player.grain or vegetable_need > player.vegetable:
+        return "cannot_sow"
     return ""
 
 
