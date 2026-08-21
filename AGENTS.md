@@ -152,6 +152,7 @@ Gherkin 關鍵字留英文（`Feature` / `Given` / `When` / `Then`），句子�
 - **每完成一小段就 commit**，不要累積整天再一次送。
 - 訊息用 conventional commits，主旨可中英混用，內文用台灣繁體說明做了什麼。
 - 不要 commit `__pycache__`、`.venv`。
+- **合進主線用 rebase，不要 merge commit。** 疊 PR 也是 rebase 再 fast-forward。已經 push 過、必須改寫歷史時才 force-push。
 
 ## 若派出子代理人
 
