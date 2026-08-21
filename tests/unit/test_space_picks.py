@@ -103,6 +103,23 @@ def test_sow_plants_rejects_not_enough_seed():
     assert player.farm.cell(0, 1).crop is None
 
 
+def test_sow_and_or_bake_can_bake_one_grain():
+    game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.has_fireplace = True
+    player.majors.append("fireplace_2")
+    player.grain = 3
+    food = player.food
+    assert game.place_worker(
+        0,
+        "sow_and_or_bake",
+        picks=Picks(sow=False, bake=True, bake_grain=1),
+    ).ok
+    assert player.grain == 2
+    assert player.food == food + 2
+
+
 def test_sow_and_or_bake_can_sow_without_baking():
     game = Game.setup(1, round_cards=["sow_and_or_bake"] + ["fences"] * 13)
     game.prepare_round()

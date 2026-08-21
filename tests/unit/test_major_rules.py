@@ -55,6 +55,19 @@ def test_clay_oven_bakes_one_grain_for_five():
     assert major_points(player) == 2
 
 
+def test_bake_best_can_use_fewer_grain():
+    player = Player(
+        farm=starting_farmyard(),
+        food=2,
+        is_start_player=True,
+        has_fireplace=True,
+        grain=3,
+    )
+    assert bake_best(player, grain=1) == 2
+    assert player.grain == 2
+    assert player.food == 4
+
+
 def test_baker_adds_one_food_per_baked_grain():
     player = Player(
         farm=starting_farmyard(),

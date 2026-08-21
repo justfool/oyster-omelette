@@ -145,21 +145,22 @@ def take_major(player, supply: list[str], major_id: str, game=None) -> None:
     after_improvement(game, player)
 
 
-def bake_best(player) -> int:
-    """選一種烤法，回傳得到的食物。"""
-    grain = player.grain
-    if grain <= 0:
+def bake_best(player, grain: int | None = None) -> int:
+    """選一種烤法，回傳得到的食物。grain 為 None 時把能烤的穀烤光。"""
+    available = player.grain if grain is None else min(max(0, grain), player.grain)
+    if available <= 0:
         return 0
     options: list[tuple[int, int]] = []
     if "clay_oven" in player.majors:
-        options.append((5, 1))
+        used = min(1, available)
+        options.append((5, used))
     if "stone_oven" in player.majors:
-        used = min(2, grain)
+        used = min(2, available)
         options.append((used * 4, used))
     if owns(player, "hearth"):
-        options.append((grain * 3, grain))
+        options.append((available * 3, available))
     if owns(player, "fireplace") or player.has_fireplace:
-        options.append((grain * 2, grain))
+        options.append((available * 2, available))
     if not options:
         return 0
     food, used = max(options, key=lambda item: item[0])

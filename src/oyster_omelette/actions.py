@@ -384,7 +384,7 @@ def _apply_space(
         if plan.sow:
             sow_fields(player, plan.sow_plants)
         if plan.bake:
-            bake_best(player)
+            bake_best(player, plan.bake_grain)
         return
 
     if space.id == "major_or_minor":

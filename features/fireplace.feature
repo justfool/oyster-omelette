@@ -19,6 +19,19 @@ Feature: 壁爐
     Then 玩家 1 應有 0 穀物
     And 玩家 1 應有 4 食物
 
+  Scenario: 有壁爐也可以只烤 1 顆穀
+    Given 1 位玩家的農家樂修訂版
+    And 回合卡先翻 sow_and_or_bake
+    When 完成開局設置
+    And 準備下一回合
+    And 玩家 1 已有壁爐
+    And 玩家 1 身上有 2 穀
+    And 玩家 1 下次烤麵包只烤 1 穀
+    And 玩家 1 放置工人到 sow_and_or_bake
+    Then 上次放置應成功
+    And 玩家 1 應有 1 穀物
+    And 玩家 1 應有 4 食物
+
   Scenario: 灶把 1 穀烤成 3 食
     Given 1 位玩家的農家樂修訂版
     And 回合卡依序為 major_or_minor 與 sow_and_or_bake

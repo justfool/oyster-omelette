@@ -16,6 +16,7 @@ class Picks:
     continue_fence: bool | None = None
     fence_after_renovate: bool | None = None
     sow_plants: list[tuple[int, int, str]] | None = None
+    bake_grain: int | None = None
 
 
 def first_playable_minor(player, game=None) -> str:
@@ -70,6 +71,7 @@ def merge_picks(auto: Picks, picks: Picks | None) -> Picks:
             else picks.fence_after_renovate
         ),
         sow_plants=auto.sow_plants if picks.sow_plants is None else picks.sow_plants,
+        bake_grain=auto.bake_grain if picks.bake_grain is None else picks.bake_grain,
     )
 
 
@@ -99,6 +101,8 @@ def picks_error(player, space, picks: Picks, game=None) -> str:
         return "illegal_cell"
     if picks.sow and picks.sow_plants is not None:
         return _sow_plants_error(player, picks.sow_plants)
+    if picks.bake and picks.bake_grain is not None and picks.bake_grain < 0:
+        return "illegal_cell"
     return ""
 
 
