@@ -11,7 +11,6 @@ from textual.widgets import Footer, Header, Static
 from oyster_omelette.game import Game
 from oyster_omelette.harvest import is_harvest_round
 from oyster_omelette.picks import Picks, space_options
-from oyster_omelette.scoring import score_player
 from oyster_omelette.theme import DEFAULT_THEME, Theme, load_theme
 from oyster_omelette.tui.board_view import BoardView
 from oyster_omelette.tui.farm_view import (
@@ -33,6 +32,8 @@ from oyster_omelette.tui.goods_view import (
 )
 from oyster_omelette.tui.choice_view import ChoiceScreen
 from oyster_omelette.tui.hand_view import HandScreen
+from oyster_omelette.tui.score_view import ScoreScreen
+from oyster_omelette.tui.supply_view import SupplyScreen
 from oyster_omelette.tui.spaces import (
     NEEDS_CELL,
     SPACE_KEYS,
@@ -209,6 +210,7 @@ class OysterOmeletteApp(App):
         Binding("d", "inspect", "格子", show=False),
         Binding("c", "show_occupations", "職業手牌"),
         Binding("v", "show_minors", "次要手牌"),
+        Binding("j", "show_supply", "改良供應"),
         Binding("up", "move_up", "上", show=False, priority=True),
         Binding("down", "move_down", "下", show=False, priority=True),
         Binding("left", "move_left", "左", show=False, priority=True),
@@ -503,16 +505,17 @@ class OysterOmeletteApp(App):
     def action_help(self) -> None:
         self.note(
             "方向鍵／Tab 選格。Enter／空白放工人。I 跳出格子說明。"
-            "C 看職業手牌  V 看次要手牌。"
+            "C 職業手牌  V 次要手牌  J 主要供應。"
             "P 準備  R 回家  S 計分  G 上帝  N 換操作者  M 農場  T 主題  ? 按鍵  Q 離開。"
             "耕田圍籬蓋房先選行動再方向鍵選農場格。"
             "上課／改良／播種會先列出選項，Enter 用預設。"
         )
 
     def action_show_score(self) -> None:
-        for index, player in enumerate(self.game.players):
-            detail = score_player(player)
-            self.note(f"玩家{index + 1} {detail['total']} 分")
+        self.push_screen(ScoreScreen(self.game))
+
+    def action_show_supply(self) -> None:
+        self.push_screen(SupplyScreen(self.game, self.look))
 
     def on_key(self, event) -> None:
         if not event.character:
@@ -522,7 +525,7 @@ class OysterOmeletteApp(App):
                 self._pick_cell_digit(event.character)
                 event.stop()
             return
-        if event.character in SPACE_KEYS and event.character not in "idcv":
+        if event.character in SPACE_KEYS and event.character not in "idcvj":
             self.place_by_key(event.character)
             event.stop()
 
