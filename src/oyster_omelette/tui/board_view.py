@@ -84,7 +84,7 @@ class BoardView(Vertical):
         width: auto;
     }
     BoardView .space-row {
-        height: 4;
+        height: 5;
         width: auto;
         align: left middle;
     }
