@@ -1,4 +1,4 @@
-"""行動格選項 modal：左邊選項清單、右邊那個選項會做什麼。"""
+"""行動格選項 modal：左邊選項清單、右邊即時預覽（有卡的秀卡、其他秀文字）。"""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from textual.widgets import Static
 from oyster_omelette.cards import CARDS
 from oyster_omelette.picks import Picks
 from oyster_omelette.theme import DEFAULT_THEME, MAJOR_NAMES, Theme
+from oyster_omelette.tui.card_widget import CardWidget
 from oyster_omelette.tui.hand_view import card_line
 
 
@@ -31,15 +32,22 @@ PLAIN_OPTION_HINTS: dict[str, str] = {
 }
 
 
-def preview_text(label: str, picks: Picks, theme: Theme) -> str:
-    """給選項生右邊的預覽。有卡的選項用單行卡摘要，其他用固定說明。"""
+def preview_card_id(picks: Picks) -> str:
+    """回傳這個選項要秀哪張卡；沒有卡就回空字串。"""
     card_id = picks.occupation or picks.minor or picks.major or ""
+    if card_id and (card_id in CARDS or card_id in MAJOR_NAMES):
+        return card_id
+    return ""
+
+
+def preview_text(label: str, picks: Picks, theme: Theme) -> str:
+    """給選項生右邊的預覽（純文字版，測試也用這個檢查有沒有指到卡）。"""
+    card_id = preview_card_id(picks)
     if card_id:
         if card_id in CARDS:
             return card_line(card_id, theme)
         if card_id in MAJOR_NAMES:
             return f"{MAJOR_NAMES[card_id]}（主要改良）"
-        return card_id
     return PLAIN_OPTION_HINTS.get(label, label)
 
 
@@ -59,10 +67,10 @@ class ChoiceScreen(ModalScreen):
         align: center middle;
     }
     #choice-box {
-        width: 76;
-        max-width: 90%;
+        width: 78;
+        max-width: 95%;
         height: auto;
-        max-height: 80%;
+        max-height: 90%;
         border: heavy $accent;
         padding: 1 2;
         background: $panel;
@@ -77,7 +85,7 @@ class ChoiceScreen(ModalScreen):
         height: auto;
     }
     #choice-list {
-        width: 30;
+        width: 28;
         height: auto;
     }
     #choice-preview {
@@ -111,11 +119,14 @@ class ChoiceScreen(ModalScreen):
             yield Static(self._title, id="choice-title")
             with Horizontal(id="choice-body"):
                 yield Static(self._list_text(), id="choice-list")
-                yield Static(self._preview_text(), id="choice-preview")
+                yield VerticalScroll(id="choice-preview")
             yield Static(
                 "方向鍵切選項　1-9 快選　Enter 確認　Esc 取消",
                 id="choice-hint",
             )
+
+    def on_mount(self) -> None:
+        self._render_preview()
 
     def _list_text(self) -> str:
         rows = []
@@ -124,15 +135,21 @@ class ChoiceScreen(ModalScreen):
             rows.append(f"{mark}{offset + 1} {label}")
         return "\n".join(rows)
 
-    def _preview_text(self) -> str:
+    def _render_preview(self) -> None:
+        preview = self.query_one("#choice-preview", VerticalScroll)
+        preview.remove_children()
         if not self._options:
-            return ""
+            return
         label, picks = self._options[self._index]
-        return preview_text(label, picks, self._theme)
+        card_id = preview_card_id(picks)
+        if card_id:
+            preview.mount(CardWidget(card_id, self._theme))
+        else:
+            preview.mount(Static(PLAIN_OPTION_HINTS.get(label, label)))
 
     def _refresh(self) -> None:
         self.query_one("#choice-list", Static).update(self._list_text())
-        self.query_one("#choice-preview", Static).update(self._preview_text())
+        self._render_preview()
 
     def action_prev(self) -> None:
         if not self._options:

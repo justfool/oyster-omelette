@@ -1,15 +1,16 @@
-"""主要改良供應區彈窗：10 張 + 費用 + VP，已被拿走的置灰並註明持有者。"""
+"""主要改良供應區彈窗：10 張卡片攤開，已被拿走的置灰並註明持有者。"""
 
 from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import VerticalScroll
+from textual.containers import Horizontal, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Static
 
 from oyster_omelette.majors import ALL_MAJORS, COSTS, POINTS
 from oyster_omelette.theme import DEFAULT_THEME, MAJOR_NAMES, Theme
+from oyster_omelette.tui.card_widget import CardWidget
 
 
 def _cost_line(major_id: str, theme: Theme) -> str:
@@ -28,6 +29,7 @@ def _owner_of(major_id: str, players) -> int | None:
 
 
 def major_summary_line(major_id: str, theme: Theme, owner: int | None) -> str:
+    """給 test / fallback 用的單行摘要。"""
     name = MAJOR_NAMES.get(major_id, major_id)
     icon = theme.icon(major_id)
     head = f"{icon} {name}" if icon else name
@@ -51,7 +53,7 @@ def supply_text(game, theme: Theme) -> str:
 
 
 class SupplyScreen(ModalScreen):
-    """按 J 彈：看目前主要改良供應區。"""
+    """按 J 彈：看目前主要改良供應區，卡片以長方形攤開。"""
 
     BINDINGS = [
         Binding("escape", "close", "關閉", show=True),
@@ -63,10 +65,10 @@ class SupplyScreen(ModalScreen):
         align: center middle;
     }
     #supply-box {
-        width: 76;
-        max-width: 90%;
+        width: 100;
+        max-width: 95%;
         height: auto;
-        max-height: 80%;
+        max-height: 95%;
         border: heavy $accent;
         padding: 1 2;
         background: $panel;
@@ -81,6 +83,9 @@ class SupplyScreen(ModalScreen):
         color: $text-muted;
         margin-top: 1;
     }
+    CardWidget.taken {
+        opacity: 40%;
+    }
     """
 
     def __init__(self, game, theme: Theme | None = None) -> None:
@@ -91,8 +96,23 @@ class SupplyScreen(ModalScreen):
     def compose(self) -> ComposeResult:
         with VerticalScroll(id="supply-box"):
             yield Static("主要改良供應區", id="supply-title")
-            yield Static(supply_text(self._game, self._theme), id="supply-list")
-            yield Static("Esc／J 關閉", id="supply-hint")
+            majors = list(ALL_MAJORS)
+            # 3 張一列
+            for start in range(0, len(majors), 3):
+                chunk = majors[start : start + 3]
+                yield Horizontal(
+                    *[self._card_for(major_id) for major_id in chunk],
+                    classes="supply-row",
+                )
+            yield Static("Esc／J 關閉。拿走的卡會置灰，被誰拿了寫在標題。", id="supply-hint")
+
+    def _card_for(self, major_id: str):
+        owner = _owner_of(major_id, self._game.players)
+        widget = CardWidget(major_id, self._theme)
+        if owner is not None:
+            widget.add_class("taken")
+            widget.border_title = f"{widget.border_title}　P{owner + 1}"
+        return widget
 
     def on_click(self) -> None:
         self.dismiss()

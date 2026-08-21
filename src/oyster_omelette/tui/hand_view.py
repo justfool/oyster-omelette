@@ -1,15 +1,16 @@
-"""手牌彈窗：C 看職業、V 看次要。目前用單行文字，Card widget 之後再接。"""
+"""手牌彈窗：C 看職業、V 看次要，卡片以長方形攤開。"""
 
 from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import VerticalScroll
+from textual.containers import Horizontal, VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Static
 
 from oyster_omelette.cards import CARDS
 from oyster_omelette.theme import DEFAULT_THEME, Theme
+from oyster_omelette.tui.card_widget import CardWidget
 
 
 def _cost_bits(card, theme: Theme) -> str:
@@ -23,7 +24,7 @@ def _cost_bits(card, theme: Theme) -> str:
 
 
 def card_line(card_id: str, theme: Theme) -> str:
-    """手牌一張的單行摘要。之後 Card widget 出來會替換掉。"""
+    """單行摘要。ChoiceScreen preview 等地方仍用。"""
     card = CARDS.get(card_id)
     if card is None:
         return card_id
@@ -44,13 +45,14 @@ def card_line(card_id: str, theme: Theme) -> str:
 
 
 def hand_text(card_ids: list[str], theme: Theme) -> str:
+    """給測試與 fallback 用的純文字版。"""
     if not card_ids:
         return "（沒有卡）"
     return "\n".join(card_line(card_id, theme) for card_id in card_ids)
 
 
 class HandScreen(ModalScreen):
-    """手牌 modal。目前只看不能選；之後接選牌 UI 時另擴充。"""
+    """手牌 modal：每張卡是一個 CardWidget，橫排、超過自動換行。"""
 
     BINDINGS = [
         Binding("escape", "close", "關閉", show=True),
@@ -63,10 +65,10 @@ class HandScreen(ModalScreen):
         align: center middle;
     }
     #hand-box {
-        width: 72;
-        max-width: 90%;
+        width: 100;
+        max-width: 95%;
         height: auto;
-        max-height: 80%;
+        max-height: 90%;
         border: heavy $accent;
         padding: 1 2;
         background: $panel;
@@ -77,8 +79,13 @@ class HandScreen(ModalScreen):
         height: 1;
         margin-bottom: 1;
     }
-    #hand-list {
+    #hand-cards {
         height: auto;
+        width: auto;
+    }
+    #hand-empty {
+        color: $text-muted;
+        padding: 1 0;
     }
     #hand-hint {
         color: $text-muted;
@@ -95,7 +102,16 @@ class HandScreen(ModalScreen):
     def compose(self) -> ComposeResult:
         with VerticalScroll(id="hand-box"):
             yield Static(self._title, id="hand-title")
-            yield Static(hand_text(self._cards, self._theme), id="hand-list")
+            if not self._cards:
+                yield Static("（沒有卡）", id="hand-empty")
+            else:
+                # 一列 3 張卡（3×30=90，箱寬 100 剛好）
+                for start in range(0, len(self._cards), 3):
+                    chunk = self._cards[start : start + 3]
+                    yield Horizontal(
+                        *[CardWidget(card_id, self._theme) for card_id in chunk],
+                        classes="hand-row",
+                    )
             yield Static("Esc／C／V 關閉", id="hand-hint")
 
     def on_click(self) -> None:
