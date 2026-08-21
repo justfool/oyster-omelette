@@ -16,7 +16,6 @@ from oyster_omelette.theme import DEFAULT_THEME, MAJOR_NAMES, Theme
 from oyster_omelette.tui.card_widget import CardWidget
 from oyster_omelette.tui.hand_view import card_line
 
-
 PLAIN_OPTION_HINTS: dict[str, str] = {
     "不打次要": "不打次要改良，只做這格原本的效果。",
     "只翻修": "只翻修，不多蓋主要也不打次要。",
@@ -130,9 +129,10 @@ class ChoiceScreen(ModalScreen):
 
     def _list_text(self) -> str:
         rows = []
-        for offset, (label, _picks) in enumerate(self._options[:9]):
+        for offset, (label, _picks) in enumerate(self._options):
             mark = "→" if offset == self._index else " "
-            rows.append(f"{mark}{offset + 1} {label}")
+            number = f"{offset + 1}" if offset < 9 else " "
+            rows.append(f"{mark}{number} {label}")
         return "\n".join(rows)
 
     def _render_preview(self) -> None:

@@ -36,6 +36,32 @@ def test_meeting_place_can_skip_minor():
     assert player.minors_hand == hand
 
 
+def test_major_or_minor_lists_all_majors_even_if_unaffordable():
+    game = Game.setup(1, round_cards=["major_or_minor"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.clay = 0
+    options = space_options(game, player, "major_or_minor")
+    majors = [picks.major for _label, picks in options if picks.major]
+    assert majors == list(game.major_supply)
+    assert len(majors) == 10
+    labels = [label for label, picks in options if picks.major]
+    assert "壁爐 2黏" in labels
+    assert "壁爐 3黏" in labels
+
+
+def test_major_or_minor_rejects_unaffordable_major():
+    game = Game.setup(1, round_cards=["major_or_minor"] + ["fences"] * 13)
+    game.prepare_round()
+    player = game.players[0]
+    player.clay = 0
+    result = game.place_worker(0, "major_or_minor", picks=Picks(major="fireplace_2", minor=""))
+    assert not result.ok
+    assert "cannot_build_fireplace" in result.error
+    assert player.majors == []
+    assert player.unplaced_workers == 2
+
+
 def test_major_or_minor_can_pick_later_major():
     game = Game.setup(1, round_cards=["major_or_minor"] + ["fences"] * 13)
     game.prepare_round()

@@ -140,6 +140,9 @@ def _sow_plants_error(player, plants: list[tuple[int, int, str]]) -> str:
     return ""
 
 
+_COST_ZH = {"clay": "黏", "wood": "木", "reed": "蘆", "stone": "石"}
+
+
 def _label(card_id: str) -> str:
     from oyster_omelette.cards import CARDS
     from oyster_omelette.theme import MAJOR_NAMES
@@ -150,10 +153,21 @@ def _label(card_id: str) -> str:
     return MAJOR_NAMES.get(card_id, card_id)
 
 
+def _major_label(major_id: str) -> str:
+    from oyster_omelette.majors import COSTS
+    from oyster_omelette.theme import MAJOR_NAMES
+
+    name = MAJOR_NAMES.get(major_id, major_id)
+    costs = COSTS.get(major_id, {})
+    if not costs:
+        return name
+    bits = [f"{amount}{_COST_ZH.get(resource, resource)}" for resource, amount in costs.items()]
+    return f"{name} {' '.join(bits)}"
+
+
 def space_options(game, player, space_id: str) -> list[tuple[str, Picks]]:
     """給畫面列選項。第一項是預設。空清單表示這格不必選。"""
     from oyster_omelette.cards import can_play_minor
-    from oyster_omelette.majors import can_take_major
 
     if space_id in {"lessons", "lessons_3p", "lessons_4p"}:
         return [(_label(card_id), Picks(occupation=card_id)) for card_id in player.occupations_hand]
@@ -172,8 +186,7 @@ def space_options(game, player, space_id: str) -> list[tuple[str, Picks]]:
         options: list[tuple[str, Picks]] = []
         supply = game.major_supply if game is not None else []
         for major_id in supply:
-            if can_take_major(player, supply, major_id):
-                options.append((_label(major_id), Picks(major=major_id, minor="")))
+            options.append((_major_label(major_id), Picks(major=major_id, minor="")))
         for card_id in player.minors_hand:
             if can_play_minor(player, card_id, game):
                 options.append((_label(card_id), Picks(major="", minor=card_id)))

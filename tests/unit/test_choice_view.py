@@ -22,6 +22,18 @@ def test_preview_for_major_shows_major_name():
     assert "主要改良" in text
 
 
+def test_choice_list_shows_more_than_nine_options():
+    from oyster_omelette.tui.choice_view import ChoiceScreen
+
+    options = [(f"選項{i}", Picks()) for i in range(12)]
+    screen = ChoiceScreen("測試", options, DEFAULT_THEME, lambda _index: None)
+    screen._index = 10
+    text = screen._list_text()
+    assert "選項0" in text
+    assert "選項11" in text
+    assert "→  選項10" in text
+
+
 def test_preview_for_sow_plan_shows_plain_hint():
     text = preview_text("只播種", Picks(sow=True, bake=False), DEFAULT_THEME)
     assert "播種" in text
