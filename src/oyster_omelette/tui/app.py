@@ -31,6 +31,7 @@ from oyster_omelette.tui.goods_view import (
     cards_text,
     goods_text,
 )
+from oyster_omelette.tui.hand_view import HandScreen
 from oyster_omelette.tui.spaces import (
     NEEDS_CELL,
     SPACE_KEYS,
@@ -205,6 +206,8 @@ class OysterOmeletteApp(App):
         Binding("space", "place_selected", "放工人", show=False, priority=True),
         Binding("i", "inspect", "格子"),
         Binding("d", "inspect", "格子", show=False),
+        Binding("c", "show_occupations", "職業手牌"),
+        Binding("v", "show_minors", "次要手牌"),
         Binding("up", "move_up", "上", show=False, priority=True),
         Binding("down", "move_down", "下", show=False, priority=True),
         Binding("left", "move_left", "左", show=False, priority=True),
@@ -377,6 +380,43 @@ class OysterOmeletteApp(App):
         slot = self._board().selected_slot()
         self.push_screen(InspectScreen(inspect_text(slot, self.look)))
 
+    def _current_actor(self) -> int | None:
+        if self.game.god_mode:
+            return self.god_actor
+        turn = self.game.whose_turn()
+        if turn is not None:
+            return turn
+        # 工作階段以外（例如剛開局或收成後）預設看玩家 1。
+        return 0 if self.game.players else None
+
+    def action_show_occupations(self) -> None:
+        actor = self._current_actor()
+        if actor is None:
+            self.note("目前沒有玩家可看。")
+            return
+        player = self.game.players[actor]
+        self.push_screen(
+            HandScreen(
+                f"玩家{actor + 1} 職業手牌（{len(player.occupations_hand)} 張）",
+                player.occupations_hand,
+                self.look,
+            )
+        )
+
+    def action_show_minors(self) -> None:
+        actor = self._current_actor()
+        if actor is None:
+            self.note("目前沒有玩家可看。")
+            return
+        player = self.game.players[actor]
+        self.push_screen(
+            HandScreen(
+                f"玩家{actor + 1} 次要手牌（{len(player.minors_hand)} 張）",
+                player.minors_hand,
+                self.look,
+            )
+        )
+
     def action_place_selected(self) -> None:
         if self._picking_choice():
             self._confirm_choice(self.pending_choice_index)
@@ -482,6 +522,7 @@ class OysterOmeletteApp(App):
     def action_help(self) -> None:
         self.note(
             "方向鍵／Tab 選格。Enter／空白放工人。I 跳出格子說明。"
+            "C 看職業手牌  V 看次要手牌。"
             "P 準備  R 回家  S 計分  G 上帝  N 換操作者  M 農場  T 主題  ? 按鍵  Q 離開。"
             "耕田圍籬蓋房先選行動再方向鍵選農場格。"
             "上課／改良／播種會先列出選項，Enter 用預設。"
@@ -506,7 +547,7 @@ class OysterOmeletteApp(App):
                 self._pick_cell_digit(event.character)
                 event.stop()
             return
-        if event.character in SPACE_KEYS and event.character not in "id":
+        if event.character in SPACE_KEYS and event.character not in "idcv":
             self.place_by_key(event.character)
             event.stop()
 
