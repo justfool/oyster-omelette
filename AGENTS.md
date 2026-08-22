@@ -151,6 +151,7 @@ Gherkin 關鍵字留英文（`Feature` / `Given` / `When` / `Then`），句子�
 
 - **每完成一小段就 commit**，不要累積整天再一次送。
 - 訊息用 conventional commits，主旨可中英混用，內文用台灣繁體說明做了什麼。
+- **commit 內文末尾一律補 `Co-Authored-By:`，署名產出該 commit 的 model name 加版本**，例如 `Co-Authored-By: deepseek-v4-flash-0731 <noreply@deepseek.com>`。所有 agent、主對話都適用，不要漏。
 - 不要 commit `__pycache__`、`.venv`。
 - **合進主線用 rebase，不要 merge commit。** 疊 PR 也是 rebase 再 fast-forward。已經 push 過、必須改寫歷史時才 force-push。
 
