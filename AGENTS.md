@@ -2,7 +2,7 @@
 
 從長 session（2026-08-13～17）整理。之後開新對話也照這份做。
 產品說明與操作見 `README.md`；規則完成度見 `TODO.txt`。
-牌庫：`TODO-deck-x.txt` 是索引。基本盒 96 張在 `TODO-deck-base.txt`；Artifex 120 在 `TODO-deck-a.txt`；Bubulcus 120 在 `TODO-deck-b.txt`。卡表以 `Agricola Database - Database.csv` 為準。
+牌庫：`TODO-deck-x.txt` 是索引。基本盒 96 張在 `TODO-deck-base.txt`；Artifex 120 在 `TODO-deck-a.txt`；Bubulcus 120 在 `TODO-deck-b.txt`。卡表以 `database/agricola-database.csv` 為準。
 
 ## 專案是什麼
 
@@ -14,7 +14,7 @@
 
 - 對使用者、註解、feature 句子、commit 說明一律用**台灣慣用繁體中文**。
 - 不用中國大陸簡體或用詞（例如用「程式」不寫「代碼」、用「資訊」不寫「信息」、用「預設」不寫「默認」）。
-- 領域識別字用穩定英文 id（`forest`、`day_laborer`）。畫面上的中文名寫在 `theme.SPACE_NAMES`。用語對齊 BGA，對照見 `翻譯用語.md`。
+- 領域識別字用穩定英文 id（`forest`、`day_laborer`）。畫面上的中文名寫在 `theme.SPACE_NAMES`。用語對齊 BGA，對照見 `database/翻譯用語.md`。
 
 ## 技術棧
 

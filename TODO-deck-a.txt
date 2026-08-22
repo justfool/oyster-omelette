@@ -1,7 +1,7 @@
 # oyster-omelette Deck A（Artifex）待辦
 # 只有 Artifex 擴充 120 張，不含基本盒那 48 張 A。
 # 基本盒 A 卡見 TODO-deck-base.txt。索引見 TODO-deck-x.txt。
-# 卡文來自 Agricola Database.csv。
+# 卡文來自 database/agricola-database.csv。
 # 格式： [ ] 未做   [~] 部分完成   [x] 已完成
 
 ================================================================
