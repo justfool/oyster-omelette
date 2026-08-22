@@ -12,7 +12,7 @@ def test_occupation_card_title_shows_id_and_name():
 def test_occupation_card_body_has_kind_cost_prereq_and_reward():
     body = card_body("A063", DEFAULT_THEME)
     lines = body.split("\n")
-    assert lines[0] == "次要"
+    assert lines[0] == "次要發展"
     assert "費" in lines[1]
     assert "需" in lines[2]
     assert "打出" in lines[3]
@@ -20,22 +20,22 @@ def test_occupation_card_body_has_kind_cost_prereq_and_reward():
 
 def test_prereq_translated_to_chinese():
     body = card_body("A038", DEFAULT_THEME)  # 5 Sheep
-    assert "5 隻羊" in body
+    assert "5 隻綿羊" in body
     assert "5 Sheep" not in body
 
 
 def test_major_card_title_is_zh_name():
     title = card_title("fireplace_2", DEFAULT_THEME)
-    assert "壁爐" in title
+    assert "火爐" in title
 
 
 def test_major_card_body_shows_cost_effect_and_vp():
     body = card_body("fireplace_2", DEFAULT_THEME)
-    # 主要改良格內只放費用、效果、VP；不再放 kind/prereq/打出。
+    # 主要發展格內只放費用、效果、VP；不再放 kind/prereq/打出。
     assert body.startswith("費")
     assert "烤麵包" in body
     assert "VP" in body
-    assert "主要改良" not in body
+    assert "主要發展" not in body
     assert "需" not in body
     assert "打出" not in body
 

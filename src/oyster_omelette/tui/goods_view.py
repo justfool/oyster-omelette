@@ -1,4 +1,4 @@
-"""資源列：建材、作物、動物、家人分組小格。"""
+"""資源列：建材、作物、動物、農夫分組小格。"""
 
 from __future__ import annotations
 
@@ -15,15 +15,15 @@ GOODS_GROUPS = (
 
 GOOD_ZH = {
     "wood": "木頭",
-    "clay": "黏土",
+    "clay": "磚頭",
     "reed": "蘆葦",
     "stone": "石頭",
-    "grain": "穀",
+    "grain": "小麥",
     "vegetable": "蔬菜",
     "food": "食物",
-    "sheep": "羊",
+    "sheep": "綿羊",
     "wild_boar": "野豬",
-    "cattle": "牛",
+    "cattle": "牛隻",
 }
 
 
@@ -44,7 +44,7 @@ def goods_groups(player, theme: Theme | None = None) -> list[tuple[str, str]]:
             f"{look.icon('begging')}{player.begging}",
         ]
     )
-    groups.append(("家人", family))
+    groups.append(("農夫", family))
     return groups
 
 
@@ -83,21 +83,21 @@ def _join_cards(card_ids: list[str], theme: Theme) -> str:
 def cards_tooltip(player, theme: Theme | None = None, *, show_hand: bool = False) -> str:
     look = _look(theme)
     lines = [
-        f"主要改良：{_join_cards(player.majors, look)}",
+        f"主要發展：{_join_cards(player.majors, look)}",
         f"面前職業：{_join_cards(player.occupations_played, look)}",
-        f"面前次要：{_join_cards(player.minors_played, look)}",
+        f"面前次要發展：{_join_cards(player.minors_played, look)}",
     ]
     if show_hand:
         lines.append(f"職業手牌：{_join_cards(player.occupations_hand, look)}")
-        lines.append(f"次要手牌：{_join_cards(player.minors_hand, look)}")
+        lines.append(f"次要發展手牌：{_join_cards(player.minors_hand, look)}")
     return "\n".join(lines)
 
 
 def family_tooltip(player) -> str:
     return (
-        f"家人 {player.family_size()} 人（人口，含還沒回家的）。\n"
+        f"農夫 {player.family_size()} 人（人口，含還沒回家的）。\n"
         f"還能派工 {player.unplaced_workers} 人（本回合還沒放到行動板）。\n"
-        f"討飯卡 {player.begging} 張。"
+        f"乞討 {player.begging} 張。"
     )
 
 
@@ -177,7 +177,7 @@ class GoodsBar(Vertical):
                     f"{theme.icon('begging')}{player.begging}",
                 ]
             )
-            chips.append(GoodsChip("家人", family, family_tooltip(player)))
+            chips.append(GoodsChip("農夫", family, family_tooltip(player)))
             chips.append(
                 GoodsChip(
                     "卡片",

@@ -74,8 +74,8 @@ def test_god_panel_shows_upcoming_cards():
     game = Game.setup(1, round_cards=["fences", "sheep"], god_mode=True)
     text = god_panel(game)
     assert "即將翻開" in text
-    assert "圍籬" in text
-    assert "羊市" in text
+    assert "建造柵欄" in text
+    assert "羊市場" in text
 
 
 def test_app_can_start_with_default_theme():

@@ -1,4 +1,4 @@
-"""主要改良供應區彈窗：格式與已被拿走的置灰。"""
+"""主要發展供應區彈窗：格式與已被拿走的置灰。"""
 
 from oyster_omelette.game import Game
 from oyster_omelette.theme import DEFAULT_THEME
@@ -22,7 +22,7 @@ def test_supply_text_lists_all_ten_majors():
     game = Game.setup(2)
     text = supply_text(game, DEFAULT_THEME)
     assert text.count("\n") == 9
-    assert "壁爐" in text
+    assert "火爐" in text
     assert "井" in text
 
 
@@ -31,5 +31,5 @@ def test_supply_text_flags_taken_major():
     game.players[0].majors.append("fireplace_2")
     game.major_supply.remove("fireplace_2")
     text = supply_text(game, DEFAULT_THEME)
-    lines = [line for line in text.split("\n") if line.startswith("🔥") or "壁爐" in line]
+    lines = [line for line in text.split("\n") if line.startswith("🔥") or "火爐" in line]
     assert any("玩家1" in line and "已蓋" in line for line in lines)

@@ -17,17 +17,17 @@ from oyster_omelette.tui.card_widget import CardWidget
 from oyster_omelette.tui.hand_view import card_line
 
 PLAIN_OPTION_HINTS: dict[str, str] = {
-    "不打次要": "不打次要改良，只做這格原本的效果。",
-    "只翻修": "只翻修，不多蓋主要也不打次要。",
-    "播種且烤麵包": "所有空田先穀後菜播滿；有烤具就把剩下的穀烤成食物。",
+    "不打次要發展": "不打次要發展，只做這格原本的效果。",
+    "只翻修": "只翻修，不多蓋主要也不打次要發展。",
+    "播種且烤麵包": "所有空農田先小麥後蔬菜播滿；有烤具就把剩下的小麥烤成食物。",
     "只播種": "只播種，不烤麵包。",
     "只烤麵包": "只烤麵包，不播種。",
-    "耕且播": "先耕一塊田，再把空田播滿。",
-    "只耕": "只耕田，不播種。",
-    "只播": "只播種，不耕田。",
+    "耕且播": "先犁一塊農田，再把空農田播滿。",
+    "只耕": "只犁田，不播種。",
+    "只播": "只播種，不犁田。",
     "蘆葦與食物": "拿 1 蘆葦與 1 食物。",
     "石頭與食物": "拿 1 石頭與 1 食物。",
-    "翻修後圍籬": "翻修後木頭夠就自動圍下一塊 1 格牧場。",
+    "翻修後建造柵欄": "房屋翻修後木頭夠就自動圍下一塊 1 格牧場。",
 }
 
 
@@ -46,7 +46,7 @@ def preview_text(label: str, picks: Picks, theme: Theme) -> str:
         if card_id in CARDS:
             return card_line(card_id, theme)
         if card_id in MAJOR_NAMES:
-            return f"{MAJOR_NAMES[card_id]}（主要改良）"
+            return f"{MAJOR_NAMES[card_id]}（主要發展）"
     return PLAIN_OPTION_HINTS.get(label, label)
 
 

@@ -17,9 +17,9 @@ def test_preview_for_minor_shows_card_summary():
 
 
 def test_preview_for_major_shows_major_name():
-    text = preview_text("壁爐", Picks(major="fireplace_2"), DEFAULT_THEME)
-    assert "壁爐" in text
-    assert "主要改良" in text
+    text = preview_text("火爐", Picks(major="fireplace_2"), DEFAULT_THEME)
+    assert "火爐" in text
+    assert "主要發展" in text
 
 
 def test_choice_list_shows_more_than_nine_options():

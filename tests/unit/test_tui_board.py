@@ -52,14 +52,14 @@ def test_face_down_hides_name_unless_god():
     for slot in hidden:
         title = slot_title(slot, theme)
         body = slot_body(slot, theme)
-        assert "圍籬" not in title
+        assert "建造柵欄" not in title
         assert "fences" not in title
         assert theme.icon("face_down") not in title
         assert title == str(slot.round_number)
         assert body == ""
 
     god_hidden = [slot for slot in board_slots(game, god_mode=True) if slot.face_down]
-    assert any(slot.god_name == "圍籬" for slot in god_hidden)
+    assert any(slot.god_name == "建造柵欄" for slot in god_hidden)
 
 
 def test_slot_body_shows_pile_and_worker_icon():
@@ -208,7 +208,7 @@ def test_family_tooltip_explains_unplaced_workers():
     game = Game.setup(1)
     text = family_tooltip(game.players[0])
     assert "還能派工" in text
-    assert "討飯卡" in text
+    assert "乞討" in text
     assert "2" in text
 
 
@@ -230,9 +230,9 @@ def test_app_player_chips_have_hover_tooltips():
         async with app.run_test(size=(140, 40)) as _pilot:
             chips = list(app.query(GoodsChip))
             titles = [chip.border_title for chip in chips]
-            assert "家人" in titles
+            assert "農夫" in titles
             assert "卡片" in titles
-            family = next(chip for chip in chips if chip.border_title == "家人")
+            family = next(chip for chip in chips if chip.border_title == "農夫")
             assert "還能派工" in (family.tooltip or "")
             cards = next(chip for chip in chips if chip.border_title == "卡片")
             assert "面前職業" in (cards.tooltip or "")
@@ -244,7 +244,7 @@ def test_goods_bar_is_grouped():
     game = Game.setup(2)
     groups = goods_groups(game.players[0], DEFAULT_THEME)
     labels = [label for label, _text in groups]
-    assert labels == ["建材", "作物", "動物", "家人"]
+    assert labels == ["建材", "作物", "動物", "農夫"]
     texts = " ".join(text for _label, text in groups)
     assert DEFAULT_THEME.icon("wood") in texts
     assert DEFAULT_THEME.icon("family") in texts
@@ -310,7 +310,7 @@ def test_clicking_space_updates_selection_and_inspect():
             selected = [w for w in app.query(ActionSpaceWidget) if "selected" in w.classes]
             assert [w.slot.space_id for w in selected] == ["farmland"]
             inspect = str(app.query_one("#inspect").render())
-            assert "耕地" in inspect
+            assert "犁田" in inspect
 
     asyncio.run(go())
 

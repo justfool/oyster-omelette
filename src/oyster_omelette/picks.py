@@ -140,7 +140,7 @@ def _sow_plants_error(player, plants: list[tuple[int, int, str]]) -> str:
     return ""
 
 
-_COST_ZH = {"clay": "黏", "wood": "木", "reed": "蘆", "stone": "石"}
+_COST_ZH = {"clay": "磚", "wood": "木", "reed": "蘆", "stone": "石"}
 
 
 def _label(card_id: str) -> str:
@@ -172,7 +172,7 @@ def space_options(game, player, space_id: str) -> list[tuple[str, Picks]]:
     if space_id in {"lessons", "lessons_3p", "lessons_4p"}:
         return [(_label(card_id), Picks(occupation=card_id)) for card_id in player.occupations_hand]
     if space_id in {"meeting_place", "family_growth", "family_growth_without_room"}:
-        options = [("不打次要", Picks(minor=""))]
+        options = [("不打次要發展", Picks(minor=""))]
         for card_id in player.minors_hand:
             if can_play_minor(player, card_id, game):
                 options.append((_label(card_id), Picks(minor=card_id)))
@@ -212,7 +212,7 @@ def space_options(game, player, space_id: str) -> list[tuple[str, Picks]]:
         ]
     if space_id == "renovation_and_fences":
         return [
-            ("翻修後圍籬", Picks(fence_after_renovate=True)),
+            ("翻修後建造柵欄", Picks(fence_after_renovate=True)),
             ("只翻修", Picks(fence_after_renovate=False)),
         ]
     return []

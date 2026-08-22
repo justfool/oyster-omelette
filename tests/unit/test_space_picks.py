@@ -46,8 +46,8 @@ def test_major_or_minor_lists_all_majors_even_if_unaffordable():
     assert majors == list(game.major_supply)
     assert len(majors) == 10
     labels = [label for label, picks in options if picks.major]
-    assert "壁爐 2黏" in labels
-    assert "壁爐 3黏" in labels
+    assert "火爐 2磚" in labels
+    assert "火爐(*) 3磚" in labels
 
 
 def test_major_or_minor_rejects_unaffordable_major():

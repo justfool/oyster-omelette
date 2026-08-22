@@ -55,7 +55,7 @@ def test_json_theme_overlays_a_base(tmp_path):
     theme = load_theme(str(path))
     assert theme.name == "mine"
     assert theme.icon("wood") == "W"
-    assert theme.icon("clay") == "黏"
+    assert theme.icon("clay") == "磚"
 
 
 def test_space_caption_puts_emoji_before_chinese_name():
@@ -67,7 +67,7 @@ def test_space_caption_puts_emoji_before_chinese_name():
 
 def test_text_theme_does_not_prefix_resource_words_on_spaces():
     theme = load_theme("text")
-    assert theme.space_caption("sheep") == "羊市"
+    assert theme.space_caption("sheep") == "羊市場"
     assert theme.space_caption("forest") == "森林"
 
 

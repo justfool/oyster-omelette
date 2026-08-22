@@ -138,13 +138,13 @@ def god_panel(game: Game, theme: Theme | None = None) -> str:
     lines = [
         "【上帝模式】",
         f"即將翻開：{future}",
-        f"公共改良：{supply}",
+        f"主要發展：{supply}",
     ]
     for index, info in enumerate(game.hidden_info()):
         jobs = "、".join(card_zh(card, look) for card in info["occupations"]) or "無"
         mins = "、".join(card_zh(card, look) for card in info["minors"]) or "無"
         lines.append(f"P{index + 1} 職業手牌：{jobs}")
-        lines.append(f"P{index + 1} 次要手牌：{mins}")
+        lines.append(f"P{index + 1} 次要發展手牌：{mins}")
     return "\n".join(lines)
 
 
@@ -207,8 +207,8 @@ class OysterOmeletteApp(App):
         Binding("i", "inspect", "格子"),
         Binding("d", "inspect", "格子", show=False),
         Binding("c", "show_occupations", "職業手牌"),
-        Binding("v", "show_minors", "次要手牌"),
-        Binding("j", "show_supply", "改良供應"),
+        Binding("v", "show_minors", "次要發展"),
+        Binding("j", "show_supply", "發展供應"),
         Binding("up", "move_up", "上", show=False, priority=True),
         Binding("down", "move_down", "下", show=False, priority=True),
         Binding("left", "move_left", "左", show=False, priority=True),
@@ -395,7 +395,7 @@ class OysterOmeletteApp(App):
         player = self.game.players[actor]
         self.push_screen(
             HandScreen(
-                f"玩家{actor + 1} 次要手牌（{len(player.minors_hand)} 張）",
+                f"玩家{actor + 1} 次要發展手牌（{len(player.minors_hand)} 張）",
                 player.minors_hand,
                 self.look,
             )
@@ -470,7 +470,7 @@ class OysterOmeletteApp(App):
         if is_harvest_round(self.game.round):
             self._run_harvest()
         else:
-            self.note("家人回家了。")
+            self.note("農夫回家了。")
 
     def action_do_harvest(self) -> None:
         if self.game.work_phase and not self.game.god_mode:
@@ -491,11 +491,11 @@ class OysterOmeletteApp(App):
         for index, player in enumerate(self.game.players):
             gained = player.begging - before[index]
             if gained:
-                bits.append(f"玩家{index + 1}討飯{gained}")
+                bits.append(f"玩家{index + 1}乞討{gained}")
         if bits:
-            self.note("家人回家並收成：" + "，".join(bits))
+            self.note("農夫回家並收成：" + "，".join(bits))
         else:
-            self.note("家人回家並收成，兩家都吃飽了。")
+            self.note("農夫回家並收成，兩家都吃飽了。")
         if self.game.is_finished():
             self.action_show_score()
             self.note("第 14 回合結束。")
@@ -503,10 +503,10 @@ class OysterOmeletteApp(App):
     def action_help(self) -> None:
         self.note(
             "方向鍵／Tab 選格。Enter／空白放工人。I 跳出格子說明。"
-            "C 職業手牌  V 次要手牌  J 主要供應。"
+            "C 職業手牌  V 次要發展  J 主要發展。"
             "P 準備  R 回家  S 計分  G 上帝  N 換操作者  M 農場  T 主題  ? 按鍵  Q 離開。"
-            "耕田圍籬蓋房先選行動再方向鍵選農場格。"
-            "上課／改良／播種會先列出選項，Enter 用預設。"
+            "犁田建造柵欄蓋房先選行動再方向鍵選農場格。"
+            "技能培訓／發展技術／糧食生產會先列出選項，Enter 用預設。"
         )
 
     def action_show_score(self) -> None:

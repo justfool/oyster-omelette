@@ -1,4 +1,4 @@
-"""主要改良供應區彈窗：10 張卡片攤開，已被拿走的置灰並註明持有者。"""
+"""主要發展供應區彈窗：10 張卡片攤開，已被拿走的置灰並註明持有者。"""
 
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ def supply_text(game, theme: Theme) -> str:
 
 
 class SupplyScreen(ModalScreen):
-    """按 J 彈：看目前主要改良供應區，卡片以長方形攤開。"""
+    """按 J 彈：看目前主要發展供應區，卡片以長方形攤開。"""
 
     BINDINGS = [
         Binding("escape", "close", "關閉", show=True),
@@ -95,7 +95,7 @@ class SupplyScreen(ModalScreen):
 
     def compose(self) -> ComposeResult:
         with VerticalScroll(id="supply-box"):
-            yield Static("主要改良供應區", id="supply-title")
+            yield Static("主要發展供應區", id="supply-title")
             majors = list(ALL_MAJORS)
             # 3 張一列
             for start in range(0, len(majors), 3):
