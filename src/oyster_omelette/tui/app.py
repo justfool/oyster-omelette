@@ -11,6 +11,7 @@ from oyster_omelette.harvest import is_harvest_round
 from oyster_omelette.picks import Picks, space_options
 from oyster_omelette.theme import DEFAULT_THEME, Theme, load_theme
 from oyster_omelette.tui.board_view import BoardView
+from oyster_omelette.tui.choice_view import ChoiceScreen
 from oyster_omelette.tui.farm_view import (
     FarmGrid,
     all_farms_text,
@@ -28,10 +29,8 @@ from oyster_omelette.tui.goods_view import (
     cards_text,
     goods_text,
 )
-from oyster_omelette.tui.choice_view import ChoiceScreen
 from oyster_omelette.tui.hand_view import HandScreen
 from oyster_omelette.tui.score_view import ScoreScreen
-from oyster_omelette.tui.supply_view import SupplyScreen
 from oyster_omelette.tui.spaces import (
     NEEDS_CELL,
     SPACE_KEYS,
@@ -39,6 +38,7 @@ from oyster_omelette.tui.spaces import (
     inspect_text,
     selection_summary,
 )
+from oyster_omelette.tui.supply_view import SupplyScreen
 
 # 舊測試仍從這裡匯入這些名稱。
 __all__ = [
@@ -202,17 +202,17 @@ class OysterOmeletteApp(App):
         Binding("shift+tab", "cycle_prev", "上一格", show=False, priority=True),
         Binding("m", "toggle_farm", "農場"),
         Binding("t", "cycle_theme", "主題", show=False),
-        Binding("enter", "place_selected", "放工人", priority=True),
-        Binding("space", "place_selected", "放工人", show=False, priority=True),
+        Binding("enter", "place_selected", "放工人"),
+        Binding("space", "place_selected", "放工人", show=False),
         Binding("i", "inspect", "格子"),
         Binding("d", "inspect", "格子", show=False),
         Binding("c", "show_occupations", "職業手牌"),
         Binding("v", "show_minors", "次要發展"),
         Binding("j", "show_supply", "發展供應"),
-        Binding("up", "move_up", "上", show=False, priority=True),
-        Binding("down", "move_down", "下", show=False, priority=True),
-        Binding("left", "move_left", "左", show=False, priority=True),
-        Binding("right", "move_right", "右", show=False, priority=True),
+        Binding("up", "move_up", "上", show=False),
+        Binding("down", "move_down", "下", show=False),
+        Binding("left", "move_left", "左", show=False),
+        Binding("right", "move_right", "右", show=False),
         Binding("escape", "cancel_pending", "取消", show=False),
     ]
 

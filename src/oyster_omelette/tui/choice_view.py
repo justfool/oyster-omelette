@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, VerticalScroll
+from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Static
 
@@ -114,11 +114,11 @@ class ChoiceScreen(ModalScreen):
         self._index = 0
 
     def compose(self) -> ComposeResult:
-        with VerticalScroll(id="choice-box"):
+        with Vertical(id="choice-box"):
             yield Static(self._title, id="choice-title")
             with Horizontal(id="choice-body"):
                 yield Static(self._list_text(), id="choice-list")
-                yield VerticalScroll(id="choice-preview")
+                yield Vertical(id="choice-preview")
             yield Static(
                 "方向鍵切選項　1-9 快選　Enter 確認　Esc 取消",
                 id="choice-hint",
@@ -136,7 +136,7 @@ class ChoiceScreen(ModalScreen):
         return "\n".join(rows)
 
     def _render_preview(self) -> None:
-        preview = self.query_one("#choice-preview", VerticalScroll)
+        preview = self.query_one("#choice-preview", Vertical)
         preview.remove_children()
         if not self._options:
             return
@@ -176,6 +176,14 @@ class ChoiceScreen(ModalScreen):
         self.dismiss()
 
     def on_key(self, event) -> None:
+        if event.key in {"up", "left"}:
+            self.action_prev()
+            event.stop()
+            return
+        if event.key in {"down", "right"}:
+            self.action_next()
+            event.stop()
+            return
         if event.character and event.character in "123456789":
             index = int(event.character) - 1
             if 0 <= index < len(self._options):

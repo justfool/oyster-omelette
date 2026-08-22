@@ -12,7 +12,6 @@ from oyster_omelette.board import (
     EXTRA_3P,
     EXTRA_4P,
     FIXED_SPACE_IDS_2P,
-    STAGE_SIZES,
 )
 from oyster_omelette.theme import DEFAULT_THEME, SPACE_NAMES, Theme
 
