@@ -19,6 +19,7 @@ from oyster_omelette.tui.board_view import BoardView
 from oyster_omelette.tui.choice_view import ChoiceScreen
 from oyster_omelette.tui.debug_log import TraceLog, action_line, key_line
 from oyster_omelette.tui.farm_view import (
+    FarmCellWidget,
     FarmGrid,
     all_farms_text,
     cell_mark,
@@ -40,6 +41,7 @@ from oyster_omelette.tui.score_view import ScoreScreen
 from oyster_omelette.tui.spaces import (
     NEEDS_CELL,
     SPACE_KEYS,
+    ActionSpaceWidget,
     board_slots,
     inspect_text,
     selection_summary,
@@ -106,6 +108,17 @@ class InspectScreen(ModalScreen):
 
 def _theme(theme: Theme | None) -> Theme:
     return theme if theme is not None else DEFAULT_THEME
+
+
+def _selected_label(widget: object) -> str:
+    """給一個帶著 .selected 的元件，找出它對應哪個格子／農場格。"""
+    if hasattr(widget, "slot") and widget.slot.space_id:
+        return widget.slot.space_id
+    if hasattr(widget, "slot"):
+        return widget.slot.identity
+    if hasattr(widget, "row") and hasattr(widget, "col"):
+        return f"({widget.row},{widget.col})"
+    return type(widget).__name__
 
 
 def _space_line(key: str, game: Game, space_id: str, theme: Theme) -> str:
@@ -245,6 +258,7 @@ class OysterOmeletteApp(App):
         self.farm_open: bool = False
         self.trace = TraceLog(sink_path=trace_path)
         self.debug_open: bool = False
+        self._last_select_line: str | None = None
         self.messages: list[str] = [
             "2 人熱座。方向鍵選格，Enter 放工人，I 看說明。滑鼠停在上方資源格看細節。按 P 準備第 1 回合。"
         ]
@@ -320,6 +334,7 @@ class OysterOmeletteApp(App):
         self._refresh_farm()
         self._refresh_inspect()
         self._refresh_debug()
+        self._log_selection()
 
     def _refresh_farm(self) -> None:
         farm = self._farm()
@@ -395,6 +410,51 @@ class OysterOmeletteApp(App):
         else:
             self._board().move(direction)
         self._refresh_inspect()
+        self._log_selection()
+
+    def _log_selection(self) -> None:
+        """把目前選取的狀態寫進軌跡：誰被選中、class 與 focus 有沒有跟上。
+
+        選中顏色由 .selected class 與 :focus 驅動，記下此刻哪些格子抓著
+        .selected，才能看出「方向鍵有動、顏色卻沒更新」是選取沒對上，
+        還是 class 卡在舊格子。
+        """
+        cartoon = self.query(".selected")
+        tagged = [_selected_label(w) for w in cartoon]
+        if self._picking_farm():
+            row, col = self._farm().cursor
+            widget = next(
+                (item for item in self.query(FarmCellWidget) if (item.row, item.col) == (row, col)),
+                None,
+            )
+            line = (
+                f"select farm cell={row},{col} "
+                f"chosen_class={'selected' in widget.classes if widget else None} "
+                f"focus={widget and widget.has_focus} "
+                f"selected={tagged}"
+            )
+        else:
+            board = self._board()
+            if not board.slots:
+                return
+            slot = board.selected_slot()
+            widget = next(
+                (
+                    item
+                    for item in self.query(ActionSpaceWidget)
+                    if item.slot.identity == slot.identity
+                ),
+                None,
+            )
+            line = (
+                f"select space={slot.space_id or slot.identity} "
+                f"chosen_class={'selected' in widget.classes if widget else None} "
+                f"focus={widget.has_focus if widget else None} "
+                f"selected={tagged}"
+            )
+        if line != self._last_select_line:
+            self._last_select_line = line
+            self.trace.add("select", line)
 
     def action_inspect(self) -> None:
         slot = self._board().selected_slot()

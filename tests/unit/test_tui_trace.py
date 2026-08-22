@@ -110,6 +110,29 @@ def test_app_f9_toggles_panel_and_pauses_trace():
     asyncio.run(go())
 
 
+def test_app_logs_selection_state_on_arrow_move():
+    app = _app()
+
+    async def go():
+        async with app.run_test(size=(140, 44)) as pilot:
+            board = app.query_one("#board")
+            board.select_space("farm_expansion")
+            board.sync_selection()
+            await pilot.pause()
+            for key in ["right", "right"]:
+                await pilot.press(key)
+                await pilot.pause()
+
+    asyncio.run(go())
+    selects = [entry.text for entry in app.trace.entries if entry.tag == "select"]
+    assert [s for s in selects if "space=farm_expansion" in s]
+    assert [s for s in selects if "space=meeting_place" in s]
+    assert any("chosen_class=True" in s for s in selects)
+    for line in selects:
+        assert "focus=True" in line or "focus=False" in line
+        assert "selected=" in line
+
+
 def test_app_trace_records_key_and_note_from_place():
     app = _app()
 
