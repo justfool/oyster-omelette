@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
+from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Grid, Vertical
 from textual.message import Message
+from textual.screen import ModalScreen
 from textual.widgets import Static
 
 from oyster_omelette.farmyard import CellKind
@@ -22,7 +26,14 @@ def should_show_farm_detail(pending_space: str | None, farm_open: bool) -> bool:
     return farm_open or pending_space is not None
 
 
-def cell_mark(cell, fenced: bool, theme: Theme | None = None, legal: bool = False) -> str:
+def cell_mark(
+    cell,
+    fenced: bool,
+    theme: Theme | None = None,
+    legal: bool = False,
+    blank_empty: bool = False,
+) -> str:
+    del legal  # 合法格改由邊框標示（.legal 綠框），不再用括號包內容
     look = _look(theme)
     if cell.kind == CellKind.WOOD_ROOM:
         mark = look.icon("wood_room")
@@ -35,15 +46,13 @@ def cell_mark(cell, fenced: bool, theme: Theme | None = None, legal: bool = Fals
     elif fenced:
         mark = look.icon("pasture")
     else:
-        mark = look.icon("empty")
+        mark = "" if blank_empty else look.icon("empty")
     if cell.stable:
         mark = look.icon("stable") if mark == look.icon("empty") else f"{mark}{look.icon('stable')}"
     if cell.people:
         mark = f"{mark}{cell.people}"
     elif cell.crop_count:
         mark = f"{mark}{cell.crop_count}"
-    if legal:
-        mark = f"[{mark}]"
     return mark
 
 
@@ -179,15 +188,15 @@ class FarmCellWidget(Static, can_focus=True):
     FarmCellWidget {
         border: solid $primary;
         width: 1fr;
-        height: 3;
+        height: 4;
         content-align: center middle;
+    }
+    FarmCellWidget.legal {
+        border: solid $success;
     }
     FarmCellWidget:focus, FarmCellWidget.selected {
         border: heavy $accent;
         text-style: bold;
-    }
-    FarmCellWidget.legal {
-        border: solid $success;
     }
     """
 
@@ -228,6 +237,8 @@ class FarmGrid(Vertical):
     #farm-grid {
         layout: grid;
         grid-size: 5 3;
+        grid-columns: 8 8 8 8 8;
+        grid-rows: 4 4 4;
         grid-gutter: 0 1;
         height: auto;
     }
@@ -329,7 +340,7 @@ class FarmGrid(Vertical):
             for col in range(player.farm.cols):
                 cell = player.farm.cell(row, col)
                 legal = (row, col) in self.legal
-                mark = cell_mark(cell, (row, col) in fenced, self.look, legal)
+                mark = cell_mark(cell, (row, col) in fenced, self.look, legal, blank_empty=True)
                 if need_mount:
                     grid.mount(FarmCellWidget(row, col, mark, legal))
                 else:
@@ -338,3 +349,108 @@ class FarmGrid(Vertical):
                     widget.set_class(legal, "legal")
                 index += 1
         self.sync_selection()
+
+
+class FarmScreen(ModalScreen):
+    """選農場格的全螢幕 modal。把 FarmGrid 包進來，方向鍵／Enter／Esc 由
+    modal 自己吃，主畫面的 App 綁定（I 說明、Q 離開、C／V 手牌…）就
+    不會漏進來了。確認或取消後用 callback 通知 App。
+    """
+
+    BINDINGS = [
+        Binding("enter", "confirm", "確認", show=True),
+        Binding("escape", "cancel", "取消", show=True),
+        Binding("up", "farm_up", "上", show=False),
+        Binding("down", "farm_down", "下", show=False),
+        Binding("left", "farm_left", "左", show=False),
+        Binding("right", "farm_right", "右", show=False),
+        Binding("0", "cancel", "取消", show=False),
+    ]
+    CSS = """
+    FarmScreen {
+        align: center middle;
+    }
+    FarmScreen FarmGrid {
+        width: 50;
+        height: auto;
+        border: heavy cyan;
+        padding: 0 1 1 1;
+        background: $panel;
+        display: block;
+    }
+    FarmScreen FarmGrid.shown {
+        display: block;
+    }
+    """
+
+    def __init__(
+        self,
+        player,
+        theme: Theme,
+        *,
+        legal: set[tuple[int, int]] | None = None,
+        title: str = "選擇農場格",
+        others: str = "",
+        on_confirm: Callable[[tuple[int, int]], None] | None = None,
+        on_cancel: Callable[[], None] | None = None,
+    ) -> None:
+        super().__init__()
+        self._player = player
+        self.look = theme if theme is not None else DEFAULT_THEME
+        self.legal = set(legal or ())
+        self._title = title
+        self._others = others
+        self._on_confirm = on_confirm
+        self._on_cancel = on_cancel
+        self._grid: FarmGrid | None = None
+
+    def compose(self) -> ComposeResult:
+        self._grid = FarmGrid()
+        yield self._grid
+
+    def on_mount(self) -> None:
+        assert self._grid is not None
+        self._grid.show_player(
+            self._player,
+            self.look,
+            legal=self.legal,
+            title=self._title,
+            others=self._others,
+            picking=True,
+        )
+        if self._grid.legal:
+            row, col = first_legal_cell(self._grid.legal)
+            self._grid.set_cursor(row, col)
+            self._grid.sync_selection()
+
+    @property
+    def grid(self) -> FarmGrid:
+        assert self._grid is not None
+        return self._grid
+
+    def action_farm_up(self) -> None:
+        self.grid.move("up")
+
+    def action_farm_down(self) -> None:
+        self.grid.move("down")
+
+    def action_farm_left(self) -> None:
+        self.grid.move("left")
+
+    def action_farm_right(self) -> None:
+        self.grid.move("right")
+
+    def action_confirm(self) -> None:
+        assert self._grid is not None
+        target = self._grid.selected_cell()
+        self.dismiss()
+        if self._on_confirm:
+            self._on_confirm(target)
+
+    def action_cancel(self) -> None:
+        self.dismiss()
+        if self._on_cancel:
+            self._on_cancel()
+
+
+__all__ = ["FarmScreen"]

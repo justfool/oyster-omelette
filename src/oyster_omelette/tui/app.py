@@ -21,6 +21,7 @@ from oyster_omelette.tui.debug_log import TraceLog, action_line, key_line
 from oyster_omelette.tui.farm_view import (
     FarmCellWidget,
     FarmGrid,
+    FarmScreen,
     all_farms_text,
     cell_mark,
     farm_text,
@@ -339,7 +340,9 @@ class OysterOmeletteApp(App):
     def _refresh_farm(self) -> None:
         farm = self._farm()
         already_open = farm.has_class("shown")
-        if not should_show_farm_detail(self.pending_space, self.farm_open):
+        # 待選格交給 FarmScreen modal；這裡的 inline 大圖只服務「M」純看農場。
+        show = self.farm_open and not self._picking_farm()
+        if not show:
             farm.remove_class("shown")
             return
         farm.add_class("shown")
@@ -350,24 +353,20 @@ class OysterOmeletteApp(App):
             actor = turn if turn is not None else 0
         player = self.game.players[actor]
         legal = set()
-        picking = self._picking_farm()
-        if picking:
-            legal = legal_cells_for(player, self.pending_space or "")
         others = []
         for index, other in enumerate(self.game.players):
             if index == actor:
                 continue
             others.append(farm_text(other, f"玩家{index + 1}", None, self.look))
         mark = "（行動中）" if turn == actor else ""
-        hint = "　方向鍵選格　Enter 確認　0 取消" if picking else ""
         farm.show_player(
             player,
             self.look,
             legal=legal,
-            title=f"玩家{actor + 1}{mark}{hint}",
+            title=f"玩家{actor + 1}{mark}",
             others="\n".join(others),
-            picking=picking,
-            keep_cursor=picking and already_open,
+            picking=False,
+            keep_cursor=already_open,
         )
 
     def _refresh_inspect(self) -> None:
@@ -676,12 +675,39 @@ class OysterOmeletteApp(App):
         if space_id in NEEDS_CELL:
             self.pending_space = space_id
             self.pending_row = None
-            self.note(
-                f"選{self.look.space_caption(space_id)}的格子："
-                "方向鍵選農場格後 Enter。或先按列 1-3，再按行 1-5。Esc／0 取消。"
-            )
+            self._push_farm_screen(space_id)
             return
         self._offer_or_place(space_id, None)
+
+    def _push_farm_screen(self, space_id: str) -> None:
+        turn = self.god_actor if self.game.god_mode else self.game.whose_turn()
+        if turn is None:
+            self.note("沒有人可以放了，按 R 回家。")
+            self._clear_pending()
+            return
+        player = self.game.players[turn]
+        legal = legal_cells_for(player, space_id)
+        caption = self.look.space_caption(space_id)
+
+        def on_confirm(target: tuple[int, int], space_id=space_id) -> None:
+            self._clear_pending()
+            self._offer_or_place(space_id, target)
+
+        def on_cancel() -> None:
+            self._clear_pending()
+            self.note("取消選格。")
+
+        self.push_screen(
+            FarmScreen(
+                player,
+                self.look,
+                legal=legal,
+                title=f"選{caption}的格子",
+                on_confirm=on_confirm,
+                on_cancel=on_cancel,
+            )
+        )
+        self.note(f"選{caption}的格子：方向鍵選格後 Enter，Esc／0 取消。")
 
     def _offer_or_place(self, space_id: str | None, target: tuple[int, int] | None) -> None:
         if not space_id:
