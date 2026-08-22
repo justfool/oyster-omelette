@@ -309,11 +309,12 @@ class OysterOmeletteApp(App):
                 continue
             others.append(farm_text(other, f"玩家{index + 1}", None, self.look))
         mark = "（行動中）" if turn == actor else ""
+        hint = "　方向鍵選格　Enter 確認　0 取消" if picking else ""
         farm.show_player(
             player,
             self.look,
             legal=legal,
-            title=f"玩家{actor + 1}{mark}　方向鍵選格　Enter 確認　0 取消",
+            title=f"玩家{actor + 1}{mark}{hint}",
             others="\n".join(others),
             picking=picking,
             keep_cursor=picking and already_open,

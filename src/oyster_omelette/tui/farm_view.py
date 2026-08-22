@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from textual.binding import Binding
 from textual.containers import Grid, Vertical
 from textual.message import Message
 from textual.widgets import Static
@@ -202,6 +203,12 @@ class FarmCellWidget(Static, can_focus=True):
 class FarmGrid(Vertical):
     """3×5 可選農場大圖。"""
 
+    BINDINGS = [
+        Binding("up", "farm_up", "上", show=False, priority=True),
+        Binding("down", "farm_down", "下", show=False, priority=True),
+        Binding("left", "farm_left", "左", show=False, priority=True),
+        Binding("right", "farm_right", "右", show=False, priority=True),
+    ]
     DEFAULT_CSS = """
     FarmGrid {
         height: auto;
@@ -254,6 +261,23 @@ class FarmGrid(Vertical):
         self.cursor = move_farm_cursor(row, col, direction)
         self.sync_selection()
         return self.cursor
+
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool:
+        if action in {"farm_up", "farm_down", "farm_left", "farm_right"}:
+            return self.picking
+        return True
+
+    def action_farm_up(self) -> None:
+        self.move("up")
+
+    def action_farm_down(self) -> None:
+        self.move("down")
+
+    def action_farm_left(self) -> None:
+        self.move("left")
+
+    def action_farm_right(self) -> None:
+        self.move("right")
 
     def sync_selection(self) -> None:
         if not self.is_attached:
