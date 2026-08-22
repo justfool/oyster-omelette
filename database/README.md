@@ -6,5 +6,6 @@
 |---|---|
 | `agricola-database.csv` | **最權威的卡表**。網友整理的 Agricola Database，實作卡文看修訂版欄。 |
 | `翻譯用語.md` | 畫面英文 → 中文對照。對齊 BGA；翻譯時統一風格。 |
+| `ugg/` | 烏嘎嘎 A／B 牌庫中文與卡圖（非官方；費用／前提仍以 CSV 為準）。 |
 
 牌庫進度仍在根目錄 `TODO-deck-*.txt`。

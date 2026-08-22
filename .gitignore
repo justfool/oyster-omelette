@@ -11,3 +11,6 @@ wheels/
 
 # 測試快取
 .pytest_cache/
+
+# 烏嘎嘎卡圖（實體卡照片，用 fetch.py 重抓）
+database/ugg/images/
