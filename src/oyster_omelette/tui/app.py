@@ -1,8 +1,13 @@
 """終端畫面。規則在 game / farmyard，這裡只負責顯示與按鍵。"""
 
-from textual.app import App, ComposeResult
+from __future__ import annotations
+
+from collections.abc import Mapping
+
+from textual.app import ActionParseResult, App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal
+from textual.containers import Horizontal, ScrollableContainer
+from textual.dom import DOMNode
 from textual.screen import ModalScreen
 from textual.widgets import Footer, Header, Static
 
@@ -12,6 +17,7 @@ from oyster_omelette.picks import Picks, space_options
 from oyster_omelette.theme import DEFAULT_THEME, Theme, load_theme
 from oyster_omelette.tui.board_view import BoardView
 from oyster_omelette.tui.choice_view import ChoiceScreen
+from oyster_omelette.tui.debug_log import TraceLog, action_line, key_line
 from oyster_omelette.tui.farm_view import (
     FarmGrid,
     all_farms_text,
@@ -179,6 +185,18 @@ class OysterOmeletteApp(App):
         min-height: 5;
         max-height: 12;
     }
+    #debug {
+        display: none;
+        border: round $error 60%;
+        height: auto;
+        max-height: 14;
+    }
+    #debug.shown {
+        display: block;
+    }
+    #debug #debug-text {
+        height: auto;
+    }
     .player-tag {
         width: 5;
         height: 3;
@@ -214,9 +232,10 @@ class OysterOmeletteApp(App):
         Binding("left", "move_left", "左", show=False),
         Binding("right", "move_right", "右", show=False),
         Binding("escape", "cancel_pending", "取消", show=False),
+        Binding("f9", "toggle_debug", "除錯軌跡", show=False),
     ]
 
-    def __init__(self, theme: Theme | None = None) -> None:
+    def __init__(self, theme: Theme | None = None, trace_path: str | None = None) -> None:
         super().__init__()
         self.game = Game.setup(player_count=2, deal="base")
         self.look = theme or load_theme()
@@ -224,6 +243,8 @@ class OysterOmeletteApp(App):
         self.pending_row: int | None = None
         self.god_actor: int = 0
         self.farm_open: bool = False
+        self.trace = TraceLog(sink_path=trace_path)
+        self.debug_open: bool = False
         self.messages: list[str] = [
             "2 人熱座。方向鍵選格，Enter 放工人，I 看說明。滑鼠停在上方資源格看細節。按 P 準備第 1 回合。"
         ]
@@ -237,6 +258,8 @@ class OysterOmeletteApp(App):
             yield Static(id="minimap")
         yield FarmGrid(id="detail")
         yield Static(id="inspect")
+        with ScrollableContainer(id="debug"):
+            yield Static(id="debug-text")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -245,7 +268,18 @@ class OysterOmeletteApp(App):
     def note(self, text: str) -> None:
         self.messages.append(text)
         self.messages = self.messages[-3:]
+        self.trace.add("note", text)
         self.refresh_view()
+
+    async def run_action(
+        self,
+        action: str | ActionParseResult,
+        default_namespace: DOMNode | None = None,
+        namespaces: Mapping[str, DOMNode] | None = None,
+    ) -> bool:
+        if isinstance(action, str):
+            self.trace.add("action", action_line(action, default_namespace))
+        return await super().run_action(action, default_namespace, namespaces)
 
     def _picking_farm(self) -> bool:
         return self.pending_space is not None
@@ -285,6 +319,7 @@ class OysterOmeletteApp(App):
         self.query_one("#minimap", Static).update("農場\n" + minimap_text(self.game, self.look))
         self._refresh_farm()
         self._refresh_inspect()
+        self._refresh_debug()
 
     def _refresh_farm(self) -> None:
         farm = self._farm()
@@ -435,6 +470,18 @@ class OysterOmeletteApp(App):
         self.look = load_theme(nxt)
         self.note(f"主題改為 {self.look.name}。也可用 --theme 或 OYSTER_THEME 指定。")
 
+    def action_toggle_debug(self) -> None:
+        self.debug_open = not self.debug_open
+        self.trace.paused = self.debug_open
+        self._refresh_debug()
+
+    def _refresh_debug(self) -> None:
+        panel = self.query_one("#debug", ScrollableContainer)
+        panel.set_class(self.debug_open, "shown")
+        if not self.debug_open:
+            return
+        self.query_one("#debug-text", Static).update(self.trace.render())
+
     def action_next_actor(self) -> None:
         if not self.game.god_mode:
             return
@@ -517,6 +564,7 @@ class OysterOmeletteApp(App):
         self.push_screen(SupplyScreen(self.game, self.look))
 
     def on_key(self, event) -> None:
+        self.trace.add("key", key_line(event.key, event.character, self.focused))
         if not event.character:
             return
         if self.pending_space:
@@ -630,5 +678,11 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help="default（預設）、text，或自訂 JSON 路徑。也可用環境變數 OYSTER_THEME。",
     )
+    parser.add_argument(
+        "--trace",
+        default=None,
+        metavar="FILE",
+        help="把按鍵、動作與提示寫進這個檔案，方便除錯。",
+    )
     args = parser.parse_args(argv)
-    OysterOmeletteApp(theme=load_theme(args.theme)).run()
+    OysterOmeletteApp(theme=load_theme(args.theme), trace_path=args.trace).run()
